@@ -36,7 +36,19 @@ describe("Privacy Context & Masking", () => {
       result.current.setPrivacyMode(true);
     });
 
-    expect(localStorage.getItem("impero-privacy-mode")).toBe("true");
+    expect(localStorage.getItem("dom-privacy-mode")).toBe("true");
+  });
+
+  it("reads legacy dominus-privacy-mode key when modern key is absent", () => {
+    localStorage.setItem("dominus-privacy-mode", "true");
+    const { result } = renderHook(() => usePrivacy(), { wrapper });
+    expect(result.current.isPrivacyMode).toBe(true);
+  });
+
+  it("reads legacy impero-privacy-mode key when modern key is absent", () => {
+    localStorage.setItem("impero-privacy-mode", "true");
+    const { result } = renderHook(() => usePrivacy(), { wrapper });
+    expect(result.current.isPrivacyMode).toBe(true);
   });
 
   it("reads legacy m3-privacy-mode key when modern key is absent", () => {

@@ -3,7 +3,7 @@ name: release-management
 description: Usar esta skill exclusivamente cuando el usuario solicite explícitamente preparar, consolidar o publicar un nuevo release o corte de versión para producción.
 ---
 
-# Workflow Obligatorio de Release Management — IMPERO
+# Workflow Obligatorio de Release Management - DOM
 
 El proceso de release se ejecuta **única y exclusivamente cuando el usuario lo solicite de forma explícita** para realizar un corte de versión y desplegar a producción (ej: *"preparemos el release v0.2.0 para producción"* o *"hagamos el corte de versión"*).
 

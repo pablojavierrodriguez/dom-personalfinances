@@ -8,18 +8,42 @@ import {
 } from "@/components/ui/dialog";
 import {
   Sparkles,
-  CloudLightning,
-  Fingerprint,
-  Globe,
-  RotateCcw,
+  User,
+  Zap,
+  ShieldCheck,
   CheckCircle2,
 } from "lucide-react";
+import { DOMSymbol } from "@/components/ui/DOMSymbol";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-store";
 import { APP_VERSION } from "@/lib/version";
 
 export const CURRENT_VERSION = APP_VERSION;
-const STORAGE_KEY = "impero_last_seen_release";
+export const STORAGE_KEY = "dom_last_seen_release";
+export const LEGACY_DOMINUS_STORAGE_KEY = "dominus_last_seen_release";
+export const LEGACY_STORAGE_KEY = "impero_last_seen_release";
+
+export function markReleaseNotesAsSeen(): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, CURRENT_VERSION);
+    localStorage.setItem(LEGACY_DOMINUS_STORAGE_KEY, CURRENT_VERSION);
+    localStorage.setItem(LEGACY_STORAGE_KEY, CURRENT_VERSION);
+  } catch {
+    // Ignorar en caso de storage restringido
+  }
+}
+
+export function shouldShowReleaseNotes(): boolean {
+  try {
+    const lastSeen =
+      localStorage.getItem(STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_DOMINUS_STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_STORAGE_KEY);
+    return lastSeen !== CURRENT_VERSION;
+  } catch {
+    return false;
+  }
+}
 
 interface ReleaseNotesModalProps {
   open: boolean;
@@ -29,17 +53,20 @@ interface ReleaseNotesModalProps {
 export function ReleaseNotesModal({ open, onOpenChange }: ReleaseNotesModalProps) {
   const { t } = useSettings();
 
-  const handleDismiss = () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, CURRENT_VERSION);
-    } catch {
-      // Ignorar en caso de storage restringido
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      markReleaseNotesAsSeen();
     }
+    onOpenChange(nextOpen);
+  };
+
+  const handleDismiss = () => {
+    markReleaseNotesAsSeen();
     onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md sm:max-w-lg p-0 overflow-hidden border border-border/80 bg-background/95 backdrop-blur-md shadow-2xl rounded-2xl">
         {/* Header Hero */}
         <div className="p-6 border-b border-border/50 bg-gradient-to-b from-primary/10 via-secondary/30 to-transparent relative overflow-hidden">
@@ -64,10 +91,10 @@ export function ReleaseNotesModal({ open, onOpenChange }: ReleaseNotesModalProps
 
         {/* Feature Cards */}
         <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-          {/* Feature 1: Motor Offline-First Global */}
+          {/* Feature 1: Identidad Soberana DOM & Geometría SIGIL */}
           <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-secondary/30 border border-border/40 hover:bg-secondary/50 transition-colors">
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shrink-0">
-              <CloudLightning className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center shrink-0">
+              <DOMSymbol size={20} variant="emerald" />
             </div>
             <div className="space-y-0.5">
               <h4 className="text-xs sm:text-sm font-semibold text-foreground">
@@ -79,10 +106,10 @@ export function ReleaseNotesModal({ open, onOpenChange }: ReleaseNotesModalProps
             </div>
           </div>
 
-          {/* Feature 2: Internacionalización Total (ES / EN) */}
+          {/* Feature 2: Perfil de Usuario & Avatares */}
           <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-secondary/30 border border-border/40 hover:bg-secondary/50 transition-colors">
             <div className="w-9 h-9 rounded-lg bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-blue-400 shrink-0">
-              <Globe className="w-4 h-4" />
+              <User className="w-4 h-4" />
             </div>
             <div className="space-y-0.5">
               <h4 className="text-xs sm:text-sm font-semibold text-foreground">
@@ -94,10 +121,10 @@ export function ReleaseNotesModal({ open, onOpenChange }: ReleaseNotesModalProps
             </div>
           </div>
 
-          {/* Feature 3: Purga Atómica & Reinicio Seguro */}
+          {/* Feature 3: Fluidez Móvil & Balances Atómicos */}
           <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-secondary/30 border border-border/40 hover:bg-secondary/50 transition-colors">
             <div className="w-9 h-9 rounded-lg bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-amber-400 shrink-0">
-              <RotateCcw className="w-4 h-4" />
+              <Zap className="w-4 h-4" />
             </div>
             <div className="space-y-0.5">
               <h4 className="text-xs sm:text-sm font-semibold text-foreground">
@@ -109,10 +136,10 @@ export function ReleaseNotesModal({ open, onOpenChange }: ReleaseNotesModalProps
             </div>
           </div>
 
-          {/* Feature 4: Seguridad Biométrica & Atajos (⌘K) */}
+          {/* Feature 4: Cero Pérdida de Datos & Migración Transparente */}
           <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-secondary/30 border border-border/40 hover:bg-secondary/50 transition-colors">
             <div className="w-9 h-9 rounded-lg bg-purple-500/15 border border-purple-500/25 flex items-center justify-center text-purple-400 shrink-0">
-              <Fingerprint className="w-4 h-4" />
+              <ShieldCheck className="w-4 h-4" />
             </div>
             <div className="space-y-0.5">
               <h4 className="text-xs sm:text-sm font-semibold text-foreground">
@@ -141,13 +168,4 @@ export function ReleaseNotesModal({ open, onOpenChange }: ReleaseNotesModalProps
       </DialogContent>
     </Dialog>
   );
-}
-
-export function shouldShowReleaseNotes(): boolean {
-  try {
-    const lastSeen = localStorage.getItem(STORAGE_KEY);
-    return lastSeen !== CURRENT_VERSION;
-  } catch {
-    return false;
-  }
 }

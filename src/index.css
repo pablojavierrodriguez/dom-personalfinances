@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -118,11 +118,13 @@
   }
 
   /* ==========================================================================
-     1. OBSIDIAN EMERALD (Pure Minimalist Tech OLED)
+     1. DOM OBSIDIAN / M3 (Pure Minimalist Tech OLED & Quiet Luxury)
      - Dark: Negro absoluto OLED (#030305), tarjetas grafito técnico (#0d0d11),
              hairlines sutiles plateados, estética nítida y austera estilo Linear/Stripe.
      - Light: Blanco platino puro (#FAFAFA), tarjetas blancas con bordes de precisión.
      ========================================================================== */
+  [data-app-theme="dom"],
+  [data-app-theme="dominus"],
   [data-app-theme="m3"] {
     --background: 240 15% 2%;         /* #030305 Negro OLED puro */
     --foreground: 0 0% 98%;
@@ -173,6 +175,12 @@
     --pill-radius: 10px;
   }
 
+  [data-app-theme="dom"].light,
+  .light[data-app-theme="dom"],
+  [data-app-theme="dom"] .light,
+  [data-app-theme="dominus"].light,
+  .light[data-app-theme="dominus"],
+  [data-app-theme="dominus"] .light,
   [data-app-theme="m3"].light,
   .light[data-app-theme="m3"],
   [data-app-theme="m3"] .light {
@@ -449,6 +457,11 @@
     font-family: 'Geist Sans', 'IBM Plex Sans', system-ui, sans-serif;
     letter-spacing: -0.03em;
   }
+
+  .font-brand {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    letter-spacing: 0.14em;
+  }
 }
 
 @layer components {
@@ -489,6 +502,8 @@
     border-radius: 9999px !important;
   }
 
+  [data-app-theme="dom"] .theme-pill-btn,
+  [data-app-theme="dominus"] .theme-pill-btn,
   [data-app-theme="m3"] .theme-pill-btn {
     border-radius: 12px !important;
   }
@@ -537,7 +552,9 @@
     }
   }
 
-  /* En m3 / Obsidian Emerald los contenedores mantienen minimalismo lineal puro */
+  /* En DOM / m3 / Obsidian Emerald los contenedores mantienen minimalismo lineal puro */
+  [data-app-theme="dom"],
+  [data-app-theme="dominus"],
   [data-app-theme="m3"] {
     .rounded-2xl {
       border-radius: 16px !important;

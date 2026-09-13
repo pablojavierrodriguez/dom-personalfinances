@@ -71,7 +71,7 @@ export function generateTransactionsCsv(
 /**
  * Triggers a browser download of the generated CSV file
  */
-export function downloadCsvFile(content: string, filename = "transacciones_impero.csv"): void {
+export function downloadCsvFile(content: string, filename = "transacciones_dom.csv"): void {
   const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -155,7 +155,7 @@ export function generateTransactionsExcel(
 /**
  * Triggers a browser download of the generated Excel (.xlsx) file
  */
-export function downloadExcelFile(data: Uint8Array, filename = "transacciones_impero.xlsx"): void {
+export function downloadExcelFile(data: Uint8Array, filename = "transacciones_dom.xlsx"): void {
   const blob = new Blob([data], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });

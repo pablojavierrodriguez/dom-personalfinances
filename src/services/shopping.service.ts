@@ -5,8 +5,12 @@ import { Database } from "@/integrations/supabase/types";
 type ShoppingListRow = Database["public"]["Tables"]["shopping_lists"]["Row"];
 type ShoppingListItemRow = Database["public"]["Tables"]["shopping_list_items"]["Row"];
 
-export const SHOPPING_CACHE_KEY = "impero-shopping-lists-cache";
-export const SHOPPING_QUEUE_KEY = "impero-shopping-sync-queue";
+export const SHOPPING_CACHE_KEY = "dom-shopping-lists-cache";
+export const LEGACY_DOMINUS_SHOPPING_CACHE_KEY = "dominus-shopping-lists-cache";
+export const LEGACY_SHOPPING_CACHE_KEY = "impero-shopping-lists-cache";
+export const SHOPPING_QUEUE_KEY = "dom-shopping-sync-queue";
+export const LEGACY_DOMINUS_SHOPPING_QUEUE_KEY = "dominus-shopping-sync-queue";
+export const LEGACY_SHOPPING_QUEUE_KEY = "impero-shopping-sync-queue";
 
 export type ShoppingSyncOperation =
   | {
@@ -56,7 +60,10 @@ function generateClientUUID(): string {
 
 export function getStoredShoppingLists(): ShoppingList[] {
   try {
-    const raw = localStorage.getItem(SHOPPING_CACHE_KEY);
+    const raw =
+      localStorage.getItem(SHOPPING_CACHE_KEY) ??
+      localStorage.getItem(LEGACY_DOMINUS_SHOPPING_CACHE_KEY) ??
+      localStorage.getItem(LEGACY_SHOPPING_CACHE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed)
@@ -81,7 +88,10 @@ export function saveStoredShoppingLists(lists: ShoppingList[]): void {
 
 export function getPendingShoppingSyncCount(): number {
   try {
-    const raw = localStorage.getItem(SHOPPING_QUEUE_KEY);
+    const raw =
+      localStorage.getItem(SHOPPING_QUEUE_KEY) ??
+      localStorage.getItem(LEGACY_DOMINUS_SHOPPING_QUEUE_KEY) ??
+      localStorage.getItem(LEGACY_SHOPPING_QUEUE_KEY);
     if (!raw) return 0;
     const queue = JSON.parse(raw);
     return Array.isArray(queue) ? queue.length : 0;
@@ -92,7 +102,10 @@ export function getPendingShoppingSyncCount(): number {
 
 function getSyncQueue(): ShoppingSyncOperation[] {
   try {
-    const raw = localStorage.getItem(SHOPPING_QUEUE_KEY);
+    const raw =
+      localStorage.getItem(SHOPPING_QUEUE_KEY) ??
+      localStorage.getItem(LEGACY_DOMINUS_SHOPPING_QUEUE_KEY) ??
+      localStorage.getItem(LEGACY_SHOPPING_QUEUE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];

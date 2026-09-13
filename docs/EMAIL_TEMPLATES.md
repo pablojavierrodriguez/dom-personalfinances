@@ -1,16 +1,16 @@
-# Plantillas de Email Oficiales — IMPERO (Autogobierno • Claridad • Soberanía)
+# Plantillas de Email Oficiales - DOM (El dominio no se conquista. Se administra)
 
 > **CONFIGURACIÓN DEL LOGOTIPO Y DOMINIO:**
 > Las plantillas están preparadas para cargar el logo desde el repositorio o dominio público:
-> `https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg`
+> `https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg`
 > (o reemplazar por `https://<tu-dominio-produccion>/icons/icon.svg`).
-> Si las imágenes remotas son bloqueadas por el cliente de correo del usuario, la etiqueta cuenta con fallback automático (`onerror="this.style.display='none'"`) para que la tipografía de **IMPERO** se muestre de forma limpia e impecable.
+> Si las imágenes remotas son bloqueadas por el cliente de correo del usuario, la etiqueta cuenta con fallback automático (`onerror="this.style.display='none'"`) para que la tipografía de **DOM** se muestre de forma limpia e impecable.
 
 ---
 
 ## 🏛️ Despliegue Open-Source & Self-Hosted (Soberanía Total)
 
-En una instalación **Self-Hosted** de IMPERO (desplegada con Docker Compose, Supabase CLI, Coolify, Dokku o VPS propio), **no existe ninguna restricción de edición**:
+En una instalación **Self-Hosted** de DOM (desplegada con Docker Compose, Supabase CLI, Coolify, Dokku o VPS propio), **no existe ninguna restricción de edición**:
 
 1. **Templates físicos en el repositorio:** Todas las plantillas HTML ya residen directamente en la carpeta [`supabase/templates/`](file:///Users/adrisol/Pablo/code/m3/supabase/templates) del proyecto:
    - `invite.html`
@@ -23,7 +23,7 @@ En una instalación **Self-Hosted** de IMPERO (desplegada con Docker Compose, Su
    - `reauthentication.html`
 
 2. **Entorno Local (Supabase CLI):**
-   Ya están cableadas en [`supabase/config.toml`](file:///Users/adrisol/Pablo/code/m3/supabase/config.toml). Al iniciar el entorno con `npx supabase start`, los correos se renderizan automáticamente con la identidad de IMPERO en el buzón local de desarrollo **Inbucket** (`http://127.0.0.1:54324`).
+   Ya están cableadas en [`supabase/config.toml`](file:///Users/adrisol/Pablo/code/m3/supabase/config.toml). Al iniciar el entorno con `npx supabase start`, los correos se renderizan automáticamente con la identidad de DOM en el buzón local de desarrollo **Inbucket** (`http://127.0.0.1:54324`).
 
 3. **Producción Self-Hosted (Docker Compose):**
    En el servicio de autenticación (`auth` / `gotrue`), se monta el volumen de plantillas o se configuran las variables de entorno:
@@ -39,13 +39,13 @@ En una instalación **Self-Hosted** de IMPERO (desplegada con Docker Compose, Su
        GOTRUE_SMTP_USER: ${SMTP_USER}
        GOTRUE_SMTP_PASS: ${SMTP_PASS}
        GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL:-notificaciones@tudominio.com}
-       GOTRUE_SMTP_SENDER_NAME: "IMPERO"
+       GOTRUE_SMTP_SENDER_NAME: "DOM"
        # Asuntos oficiales
-       GOTRUE_MAILER_SUBJECTS_INVITE: "🚀 Te damos la bienvenida a IMPERO"
-       GOTRUE_MAILER_SUBJECTS_CONFIRMATION: "📩 Confirmá tu registro en IMPERO"
-       GOTRUE_MAILER_SUBJECTS_RECOVERY: "🔑 Restablecer tu contraseña de IMPERO"
-       GOTRUE_MAILER_SUBJECTS_MAGIC_LINK: "✨ Tu enlace de acceso a IMPERO"
-       GOTRUE_MAILER_SUBJECTS_EMAIL_CHANGE: "📫 Confirmación de cambio de correo electrónico — IMPERO"
+       GOTRUE_MAILER_SUBJECTS_INVITE: "🚀 Te damos la bienvenida a DOM"
+       GOTRUE_MAILER_SUBJECTS_CONFIRMATION: "📩 Confirmá tu registro en DOM"
+       GOTRUE_MAILER_SUBJECTS_RECOVERY: "🔑 Restablecer tu contraseña de DOM"
+       GOTRUE_MAILER_SUBJECTS_MAGIC_LINK: "✨ Tu enlace de acceso a DOM"
+       GOTRUE_MAILER_SUBJECTS_EMAIL_CHANGE: "📫 Confirmación de cambio de correo electrónico - DOM"
        # Rutas montadas de templates
        GOTRUE_MAILER_TEMPLATES_INVITE: "/etc/gotrue/templates/invite.html"
        GOTRUE_MAILER_TEMPLATES_CONFIRMATION: "/etc/gotrue/templates/confirm_signup.html"
@@ -61,7 +61,7 @@ En una instalación **Self-Hosted** de IMPERO (desplegada con Docker Compose, Su
 Si utilizás **Supabase Cloud** (el dashboard en `app.supabase.com`) para sincronizar tu cuenta entre celular, tablet y computadora personal:
 - Las directivas locales de `supabase/config.toml` **no se aplican a la nube**.
 - Supabase Cloud **bloquea la edición del asunto y cuerpo de los templates** si usás su mailer compartido por defecto (`@supabase.co`) para prevenir spam, forzando los correos en inglés y con un límite de ~3 correos por hora.
-- **En cuanto configurás un servidor SMTP (gratuito), la interfaz se desbloquea al instante** y todos los correos solicitados desde cualquier dispositivo saldrán con el diseño soberano de IMPERO.
+- **En cuanto configurás un servidor SMTP (gratuito), la interfaz se desbloquea al instante** y todos los correos solicitados desde cualquier dispositivo saldrán con el diseño soberano de DOM.
 
 ---
 
@@ -73,11 +73,11 @@ Tenés dos caminos rápidos y sin costo:
 Si ya tenés una cuenta de Gmail personal o Google Workspace:
 1. Andá a tu cuenta de Google > **Seguridad** (asegurate de tener activada la Verificación en 2 pasos).
 2. En la barra de búsqueda de tu cuenta de Google escribí **Contraseñas de aplicaciones** (App Passwords).
-3. Creá una contraseña con el nombre `IMPERO`. Google te mostrará una clave de 16 letras (ej: `abcd efgh ijkl mnop`).
+3. Creá una contraseña con el nombre `DOM`. Google te mostrará una clave de 16 letras (ej: `abcd efgh ijkl mnop`).
 4. En Supabase (`Project Settings` > `Authentication` > `SMTP Settings`), completá:
    - **Enable Custom SMTP:** ON
    - **Sender email:** `tu-correo@gmail.com`
-   - **Sender name:** `IMPERO`
+   - **Sender name:** `DOM`
    - **Host:** `smtp.gmail.com`
    - **Port:** `465` (SSL)
    - **User:** `tu-correo@gmail.com`
@@ -89,7 +89,7 @@ Si ya tenés una cuenta de Gmail personal o Google Workspace:
 3. En Supabase (`Project Settings` > `Authentication` > `SMTP Settings`), completá:
    - **Enable Custom SMTP:** ON
    - **Sender email:** `onboarding@resend.dev` (o tu correo verificado)
-   - **Sender name:** `IMPERO`
+   - **Sender name:** `DOM`
    - **Host:** `smtp.resend.com`
    - **Port:** `465`
    - **User:** `resend`
@@ -107,14 +107,14 @@ Una vez que hiciste clic en **Save** en los ajustes SMTP:
    - En el editor HTML, reemplazá todo el contenido pegando el código del archivo correspondiente en `supabase/templates/` (o copiando los bloques HTML de esta documentación).
    - Hacé clic en **Save changes**.
 
-A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o navegador web disparará el correo oficial de IMPERO.
+A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o navegador web disparará el correo oficial de DOM.
 
 ---
 
 ## 1. Invite User (Invitación a Usuario Nuevo)
 
 **Panel Supabase:** `Authentication` > `Email Templates` > `Invite user`  
-**Asunto:** `🚀 Te damos la bienvenida a IMPERO`
+**Asunto:** `🚀 Te damos la bienvenida a DOM`
 
 ```html
 <!DOCTYPE html>
@@ -122,7 +122,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenida a IMPERO</title>
+    <title>Bienvenida a DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -143,14 +143,14 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Te damos la bienvenida a tu centro de control financiero</h2>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
-                    Fuiste invitado a formar parte de <b>IMPERO</b>, la plataforma diseñada para brindarte administración financiera con visión y propósito, proyección certera y soberanía total sobre tus recursos.
+                    Fuiste invitado a formar parte de <b>DOM</b>, la plataforma diseñada para brindarte administración financiera con visión y propósito, proyección certera y soberanía total sobre tus recursos.
                 </p>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
                     Para activar tu cuenta y configurar tu contraseña de acceso seguro, hacé clic en el siguiente enlace:
@@ -163,7 +163,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
                 </p>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>
@@ -177,7 +177,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 ## 2. Confirm Signup (Confirmación de Registro)
 
 **Panel Supabase:** `Authentication` > `Email Templates` > `Confirm signup`  
-**Asunto:** `📩 Confirmá tu registro en IMPERO`
+**Asunto:** `📩 Confirmá tu registro en DOM`
 
 ```html
 <!DOCTYPE html>
@@ -185,7 +185,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmá tu registro en IMPERO</title>
+    <title>Confirmá tu registro en DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -206,14 +206,14 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Un paso más hacia tu claridad financiera</h2>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
-                    Gracias por iniciar tu registro en <b>IMPERO</b>. Para garantizar la seguridad de tus finanzas y confirmar la titularidad de tu cuenta, necesitamos verificar tu dirección de correo electrónico.
+                    Gracias por iniciar tu registro en <b>DOM</b>. Para garantizar la seguridad de tus finanzas y confirmar la titularidad de tu cuenta, necesitamos verificar tu dirección de correo electrónico.
                 </p>
                 <div class="btn-wrapper" style="text-align: center; margin: 35px 0;">
                     <a href="{{ .ConfirmationURL }}" class="btn" style="display: inline-block; background-color: #10b981; color: #ffffff !important; font-weight: 700; text-decoration: none; padding: 16px 42px; border-radius: 12px; font-size: 15px; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.35);">Confirmar mi Email</a>
@@ -223,7 +223,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
                 </p>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>
@@ -237,7 +237,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 ## 3. Magic Link (Ingreso sin Contraseña)
 
 **Panel Supabase:** `Authentication` > `Email Templates` > `Magic Link`  
-**Asunto:** `✨ Tu enlace de acceso a IMPERO`
+**Asunto:** `✨ Tu enlace de acceso a DOM`
 
 ```html
 <!DOCTYPE html>
@@ -245,7 +245,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso rápido a IMPERO</title>
+    <title>Acceso rápido a DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -266,14 +266,14 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b; text-align: center;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Acceso seguro e instantáneo</h2>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
-                    Hacé clic en el siguiente botón para ingresar directamente a tu panel de control de <b>IMPERO</b> sin necesidad de ingresar contraseña:
+                    Hacé clic en el siguiente botón para ingresar directamente a tu panel de control de <b>DOM</b> sin necesidad de ingresar contraseña:
                 </p>
                 <div class="btn-wrapper" style="text-align: center; margin: 35px 0;">
                     <a href="{{ .ConfirmationURL }}" class="btn" style="display: inline-block; background-color: #10b981; color: #ffffff !important; font-weight: 700; text-decoration: none; padding: 16px 42px; border-radius: 12px; font-size: 15px; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.35);">Ingresar al Sistema</a>
@@ -283,7 +283,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
                 </p>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>
@@ -297,7 +297,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 ## 4. Reset Password (Recuperación de Contraseña)
 
 **Panel Supabase:** `Authentication` > `Email Templates` > `Reset password`  
-**Asunto:** `🔑 Restablecer tu contraseña de IMPERO`
+**Asunto:** `🔑 Restablecer tu contraseña de DOM`
 
 > [!NOTE]
 > Esta plantilla incorpora un borde superior de alerta ámbar (`#f59e0b`) y un botón de fondo oscuro sobrio (`#0d0e12`), denotando una acción de seguridad crítica.
@@ -308,7 +308,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restablecer contraseña — IMPERO</title>
+    <title>Restablecer contraseña - DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -329,14 +329,14 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; border-top: 6px solid #f59e0b; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b; text-align: center;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Solicitud para restablecer tu contraseña</h2>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
-                    Recibimos una solicitud para actualizar la contraseña de acceso a tu cuenta en <b>IMPERO</b>. Si fuiste vos, podés generar una nueva credencial ahora mismo:
+                    Recibimos una solicitud para actualizar la contraseña de acceso a tu cuenta en <b>DOM</b>. Si fuiste vos, podés generar una nueva credencial ahora mismo:
                 </p>
                 <div class="btn-wrapper" style="text-align: center; margin: 35px 0;">
                     <a href="{{ .ConfirmationURL }}" class="btn" style="display: inline-block; background-color: #0d0e12; color: #ffffff !important; font-weight: 700; text-decoration: none; padding: 16px 42px; border-radius: 12px; font-size: 15px; box-shadow: 0 10px 15px -3px rgba(13, 14, 18, 0.35);">Restablecer Contraseña</a>
@@ -346,7 +346,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
                 </p>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>
@@ -360,7 +360,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 ## 5. Change Email Address (Cambio de Correo)
 
 **Panel Supabase:** `Authentication` > `Email Templates` > `Change email address`  
-**Asunto:** `📫 Confirmación de cambio de correo electrónico — IMPERO`
+**Asunto:** `📫 Confirmación de cambio de correo electrónico - DOM`
 
 ```html
 <!DOCTYPE html>
@@ -368,7 +368,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmación de nuevo correo — IMPERO</title>
+    <title>Confirmación de nuevo correo - DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -389,14 +389,14 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b; text-align: center;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Confirmá tu nueva dirección de correo</h2>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
-                    Solicitaste actualizar la dirección de correo asociada a tu cuenta en <b>IMPERO</b>. Para completar este cambio y resguardar tu acceso soberano, confirmá la nueva dirección:
+                    Solicitaste actualizar la dirección de correo asociada a tu cuenta en <b>DOM</b>. Para completar este cambio y resguardar tu acceso soberano, confirmá la nueva dirección:
                 </p>
                 <div class="btn-wrapper" style="text-align: center; margin: 35px 0;">
                     <a href="{{ .ConfirmationURL }}" class="btn" style="display: inline-block; background-color: #10b981; color: #ffffff !important; font-weight: 700; text-decoration: none; padding: 16px 42px; border-radius: 12px; font-size: 15px; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.35);">Confirmar Nuevo Email</a>
@@ -406,7 +406,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
                 </p>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>
@@ -420,7 +420,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 ## 6. Reauthentication (Código de Verificación OTP)
 
 **Panel Supabase:** `Authentication` > `Email Templates` > `Reauthentication`  
-**Asunto:** `🔐 Tu código de verificación — IMPERO`
+**Asunto:** `🔐 Tu código de verificación - DOM`
 
 ```html
 <!DOCTYPE html>
@@ -428,7 +428,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Código de verificación — IMPERO</title>
+    <title>Código de verificación - DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -448,24 +448,24 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b; text-align: center;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Verificación de identidad</h2>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
-                    Utilizá el siguiente código de un solo uso para confirmar tu acción en <b>IMPERO</b>. Este código es de validez temporal y expirará en pocos minutos:
+                    Utilizá el siguiente código de un solo uso para confirmar tu acción en <b>DOM</b>. Este código es de validez temporal y expirará en pocos minutos:
                 </p>
                 <div class="otp-code" style="display: inline-block; background-color: #f8fafc; color: #0d0e12; font-size: 32px; font-weight: 900; letter-spacing: 0.25em; padding: 18px 36px; border-radius: 12px; border: 2px dashed #94a3b8; margin: 20px 0;">
                     {{ .Token }}
                 </div>
                 <p style="font-size: 13px; color: #94a3b8; margin-top: 30px; font-style: italic; line-height: 1.5;">
-                    Nunca compartas este código con nadie. El equipo de IMPERO jamás te solicitará este token por ningún canal.
+                    Nunca compartas este código con nadie. El equipo de DOM jamás te solicitará este token por ningún canal.
                 </p>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>
@@ -478,7 +478,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 
 ## 7. Email Changed (Notificación de Cambio Exitoso)
 
-**Asunto:** `📫 Tu correo en IMPERO ha sido actualizado`
+**Asunto:** `📫 Tu correo en DOM ha sido actualizado`
 
 ```html
 <!DOCTYPE html>
@@ -486,7 +486,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Correo actualizado — IMPERO</title>
+    <title>Correo actualizado - DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -505,14 +505,14 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b; text-align: center;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Dirección de correo actualizada</h2>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
-                    Te informamos que la dirección de correo electrónico vinculada a tu cuenta de <b>IMPERO</b> ha sido actualizada satisfactoriamente.
+                    Te informamos que la dirección de correo electrónico vinculada a tu cuenta de <b>DOM</b> ha sido actualizada satisfactoriamente.
                 </p>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
                     A partir de este momento, deberás ingresar a la plataforma utilizando tu nueva dirección.
@@ -522,7 +522,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
                 </p>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>
@@ -535,7 +535,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 
 ## 8. Password Changed (Notificación de Contraseña Actualizada)
 
-**Asunto:** `🔐 Tu contraseña de IMPERO ha sido cambiada`
+**Asunto:** `🔐 Tu contraseña de DOM ha sido cambiada`
 
 ```html
 <!DOCTYPE html>
@@ -543,7 +543,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contraseña actualizada — IMPERO</title>
+    <title>Contraseña actualizada - DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -562,24 +562,24 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b; text-align: center;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Contraseña modificada correctamente</h2>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
-                    Te confirmamos que la contraseña de tu cuenta en <b>IMPERO</b> ha sido cambiada de forma exitosa.
+                    Te confirmamos que la contraseña de tu cuenta en <b>DOM</b> ha sido cambiada de forma exitosa.
                 </p>
                 <p style="font-size: 15px; line-height: 1.6; margin-bottom: 22px; color: #475569;">
                     Si fuiste vos quien realizó esta acción, no necesitás hacer nada adicional: tu cuenta se encuentra protegida.
                 </p>
                 <p style="font-size: 13px; color: #94a3b8; margin-top: 35px; font-style: italic; line-height: 1.5;">
-                    Si no reconocés esta modificación, restablecé tu contraseña de inmediato desde la pantalla de inicio de sesión de IMPERO para bloquear accesos no autorizados.
+                    Si no reconocés esta modificación, restablecé tu contraseña de inmediato desde la pantalla de inicio de sesión de DOM para bloquear accesos no autorizados.
                 </p>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>
@@ -602,7 +602,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alerta de Vencimiento — IMPERO</title>
+    <title>Alerta de Vencimiento - DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -623,9 +623,9 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; border-top: 6px solid #10b981; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Tenés un pago próximo a vencer</h2>
@@ -639,11 +639,11 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
                     <div style="font-size: 12px; color: #64748b; margin-top: 5px;">Modalidad: {{ .PaymentMethod }}</div>
                 </div>
                 <div class="btn-wrapper" style="text-align: center; margin: 35px 0;">
-                    <a href="{{ .AppURL }}/bills" class="btn" style="display: inline-block; background-color: #10b981; color: #ffffff !important; font-weight: 700; text-decoration: none; padding: 16px 42px; border-radius: 12px; font-size: 15px; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.35);">Registrar Pago en IMPERO</a>
+                    <a href="{{ .AppURL }}/bills" class="btn" style="display: inline-block; background-color: #10b981; color: #ffffff !important; font-weight: 700; text-decoration: none; padding: 16px 42px; border-radius: 12px; font-size: 15px; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.35);">Registrar Pago en DOM</a>
                 </div>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>
@@ -666,7 +666,7 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte Mensual — IMPERO</title>
+    <title>Reporte Mensual - DOM</title>
     <style>
         body { font-family: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f4f4f7; margin: 0; padding: 0; }
         .wrapper { background-color: #f4f4f7; padding: 50px 15px; }
@@ -687,9 +687,9 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
     <div class="wrapper" style="background-color: #f4f4f7; padding: 50px 15px;">
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);">
             <div class="header" style="background-color: #0d0e12; padding: 40px 30px; text-align: center;">
-                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/impero/main/public/icons/icon.svg" alt="IMPERO" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
-                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">IMPERO</div>
-                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">Autogobierno • Claridad • Soberanía</div>
+                <img src="https://raw.githubusercontent.com/pablojavierrodriguez/dom/main/public/icons/icon.svg" alt="DOM" class="logo-img" style="height: 48px; width: auto; margin-bottom: 8px;" onerror="this.style.display='none'">
+                <div class="logo-text" style="font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #ffffff; margin: 0; line-height: 1;">DOM</div>
+                <div class="logo-sub" style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: #10b981; text-transform: uppercase; margin-top: 6px;">El dominio no se conquista. Se administra</div>
             </div>
             <div class="content" style="padding: 45px 35px; color: #1e293b;">
                 <h2 style="font-size: 22px; font-weight: 800; margin-top: 0; color: #0d0e12; line-height: 1.3;">Tu visión mensual consolidada</h2>
@@ -702,11 +702,11 @@ A partir de ese instante, cualquier acción iniciada desde tu celular, tablet o 
                     <div style="font-size: 12px; color: #64748b;">Variación vs. mes anterior: <b style="color: #10b981;">{{ .NetWorthVariation }}</b></div>
                 </div>
                 <div class="btn-wrapper" style="text-align: center; margin: 35px 0;">
-                    <a href="{{ .AppURL }}/reports" class="btn" style="display: inline-block; background-color: #10b981; color: #ffffff !important; font-weight: 700; text-decoration: none; padding: 16px 42px; border-radius: 12px; font-size: 15px; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.35);">Ver Reporte Completo en IMPERO</a>
+                    <a href="{{ .AppURL }}/reports" class="btn" style="display: inline-block; background-color: #10b981; color: #ffffff !important; font-weight: 700; text-decoration: none; padding: 16px 42px; border-radius: 12px; font-size: 15px; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.35);">Ver Reporte Completo en DOM</a>
                 </div>
             </div>
             <div class="footer" style="background-color: #ffffff; padding: 30px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.6;">
-                &copy; 2026 IMPERO • Autogobierno • Claridad • Soberanía<br>
+                &copy; 2026 DOM • El dominio no se conquista. Se administra<br>
                 <span style="font-size: 10px; color: #cbd5e1; letter-spacing: 0.1em; text-transform: none;">Administración financiera con visión y propósito</span>
             </div>
         </div>

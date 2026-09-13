@@ -1,4 +1,7 @@
-# SPEC-021: Transición de Identidad de Marca hacia IMPERO
+# SPEC-021: Transición de Identidad de Marca hacia IMPERO (Histórico — Actual: DOM)
+
+> [!NOTE]
+> **Trazabilidad Histórica:** Esta especificación documenta la transición intermedia hacia IMPERO. La identidad definitiva consolidada del producto es **DOM** (*"El dominio no se conquista. Se administra."*), formalizada en [rebrand.md](file:///Users/adrisol/Pablo/code/m3/docs/reports/rebrand.md).
 
 ---
 

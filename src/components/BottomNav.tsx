@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useSettings } from "@/lib/settings-store";
 import { useAuth } from "@/lib/auth-context";
+import { DOMSymbol } from "@/components/ui/DOMSymbol";
 
 interface BottomNavProps {
   activeTab: string;
@@ -102,7 +103,10 @@ export function BottomNav({ activeTab, onTabChange, onQuickAdd, onTransfer, onIm
         >
           <div>
             <SheetHeader className="px-5 pt-6 pb-4 border-b border-border/50 pr-12">
-              <SheetTitle className="text-base font-display">{t("nav.moreOptions")}</SheetTitle>
+              <div className="flex items-center gap-2 mb-1">
+                <DOMSymbol size={22} variant="badge" />
+                <SheetTitle className="text-base font-display tracking-wider uppercase">DOM</SheetTitle>
+              </div>
               <SheetDescription className="text-xs text-muted-foreground">{t("nav.advancedMgmt")}</SheetDescription>
             </SheetHeader>
             <div className="py-2 overflow-y-auto max-h-[calc(100vh-180px)] no-scrollbar">

@@ -1,9 +1,11 @@
 /**
- * WebAuthn Biometric Guard - IMPERO
+ * WebAuthn Biometric Guard - DOM
  * Módulo de soporte para autenticación biométrica local de plataforma (Touch ID, Face ID, Android Biometrics, Windows Hello).
  */
 
-const CREDENTIAL_STORAGE_KEY = "impero-biometric-credential-id";
+const CREDENTIAL_STORAGE_KEY = "dom-biometric-credential-id";
+const LEGACY_DOMINUS_CREDENTIAL_STORAGE_KEY = "dominus-biometric-credential-id";
+const LEGACY_CREDENTIAL_STORAGE_KEY = "impero-biometric-credential-id";
 
 /**
  * Verifica si el dispositivo y navegador actual soportan autenticación biométrica de plataforma.
@@ -28,7 +30,7 @@ export async function checkBiometricsSupport(): Promise<boolean> {
 /**
  * Registra una credencial biométrica en el dispositivo del usuario.
  */
-export async function registerBiometricCredential(userEmail: string = "usuario@impero.app"): Promise<string> {
+export async function registerBiometricCredential(userEmail: string = "usuario@dom.app"): Promise<string> {
   if (!navigator.credentials) {
     throw new Error("La API WebAuthn (credentials) no está disponible en este entorno.");
   }
@@ -43,12 +45,12 @@ export async function registerBiometricCredential(userEmail: string = "usuario@i
     publicKey: {
       challenge,
       rp: {
-        name: "IMPERO Finanzas",
+        name: "DOM Finanzas",
       },
       user: {
         id: userId,
         name: userEmail,
-        displayName: userEmail.split("@")[0] || "Usuario IMPERO",
+        displayName: userEmail.split("@")[0] || "Usuario DOM",
       },
       pubKeyCredParams: [
         { alg: -7, type: "public-key" },  // ES256
@@ -89,7 +91,10 @@ export async function verifyBiometricCredential(): Promise<boolean> {
   const challenge = new Uint8Array(32);
   window.crypto.getRandomValues(challenge);
 
-  const storedCredId = localStorage.getItem(CREDENTIAL_STORAGE_KEY);
+  const storedCredId =
+    localStorage.getItem(CREDENTIAL_STORAGE_KEY) ??
+    localStorage.getItem(LEGACY_DOMINUS_CREDENTIAL_STORAGE_KEY) ??
+    localStorage.getItem(LEGACY_CREDENTIAL_STORAGE_KEY);
 
   const options: PublicKeyCredentialRequestOptions = {
     challenge,
@@ -131,7 +136,11 @@ export async function verifyBiometricCredential(): Promise<boolean> {
  */
 export function hasBiometricCredential(): boolean {
   try {
-    return Boolean(localStorage.getItem(CREDENTIAL_STORAGE_KEY));
+    return Boolean(
+      localStorage.getItem(CREDENTIAL_STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_DOMINUS_CREDENTIAL_STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_CREDENTIAL_STORAGE_KEY)
+    );
   } catch {
     return false;
   }
@@ -143,5 +152,7 @@ export function hasBiometricCredential(): boolean {
 export function clearBiometricCredential(): void {
   try {
     localStorage.removeItem(CREDENTIAL_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_DOMINUS_CREDENTIAL_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_CREDENTIAL_STORAGE_KEY);
   } catch {}
 }

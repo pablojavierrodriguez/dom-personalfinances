@@ -1,8 +1,52 @@
-# Release Notes - IMPERO (ex-m3)
+# Release Notes - DOM (ex-IMPERO)
 
 ---
 
 ## [Unreleased] — En Desarrollo (Próxima Versión)
+
+---
+
+## [0.4.0] — 2026-09-13 🚀 Identidad Soberana DOM, Geometría SIGIL y Gestión de Perfil
+
+### 🎯 Resumen
+Consolidación de la identidad soberana definitiva **DOM - Finanzas Personales Soberanas** ("El dominio no se conquista. Se administra."): transición integral de marca hacia una estética monolítica de alta gama con geometría matemática **SIGIL** (monograma "D" con contraforma circular concéntrica equilibrada en muros de 99px); preservación absoluta de datos con migración en cadena de almacenamiento local; sistema de diseño enriquecido con tipografía contemporánea de alta precisión (`Space Grotesk`), componentes reactivos `DOMSymbol` y `DOMLogo`, y temas visuales con ratio de contraste WCAG AAA; gestión integral de perfil de usuario con carga de avatar en almacenamiento seguro y sincronización bidireccional; rediseño de las 8 plantillas transaccionales de correo electrónico; y actualización del canal de WhatsApp.
+
+### ✨ Nuevas Funcionalidades y Mejoras
+
+#### 🏛️ Identidad de Marca Soberana DOM & Geometría SIGIL
+- **Monograma y Logotipo Arquitectónico (`DOMSymbol` & `DOMLogo`):**
+  - Símbolo distintivo basado en la geometría **SIGIL**: monograma "D" forjado con una contraforma interior circular concéntrica perfecta que forma un sello de precisión matemática sobre fondo carbón profundo (`#0c0e12`).
+  - Soporte de variantes modulares (`default`, `emerald`, `gold`, `monochrome`, `badge`) integradas en barra de navegación de escritorio (`DesktopSidebar`), navegación móvil (`BottomNav`), pantallas de autenticación (`Auth`), página de bienvenida (`Landing`) y asistente de inicio (`OnboardingWizard`).
+  - Tipografía contemporánea `Space Grotesk` (`.font-brand`) con métrica arquitectónica y espaciado noble, complementando la legibilidad de la tipografía de datos sin distorsión visual.
+- **Tokens de Color y Accesibilidad (WCAG AAA):**
+  - Incorporación del tema unificado con fondo carbón `#0c0e12` y contrastes de 8.4:1 en acentos dorados/esmeralda y 19.4:1 en textos principales sobre superficie oscura.
+
+#### 👤 Gestión de Perfil de Usuario y Avatares
+- **Carga y Personalización de Avatar (`UserProfile`):**
+  - Selector interactivo de imagen de perfil con previsualización inmediata y optimización de carga.
+  - Almacenamiento seguro en la nube y persistencia en tiempo real en la cuenta del usuario.
+- **Sincronización Bidireccional de Perfil:**
+  - Persistencia unificada entre datos de sesión y ficha de perfil en base de datos.
+  - Conservación íntegra de nombre completo, avatar y preferencias de usuario.
+
+#### 🛡️ Retrocompatibilidad y Migración de Almacenamiento Local (Cero Pérdida de Datos)
+- **Motor de Migración Atómica en Cadena:**
+  - Migración transparente en el arranque de la app de claves locales históricas hacia el espacio de nombres `dom-*`.
+  - Fallback reactivo en lectura: si una clave moderna aún no existe, resuelve contra la clave histórica y la actualiza automáticamente.
+  - Preservación de las claves legadas originales para garantizar que sesiones activas y backups locales continúen funcionando sin fricción.
+- **Sincronización y Caché de Entidades:**
+  - Cola global de sincronización diferida (`dom-global-sync-queue`) y colas de listas de compras adaptadas con preservación total de operaciones pendientes.
+
+#### 📱 Experiencia PWA y Assets Móviles
+- **Manifiesto y Metadatos de Sistema:**
+  - Actualización de manifiesto web y metadatos con nombre oficial **DOM**, descripción y colores de splash screen `#0c0e12` para aperturas fluidas en iOS y Android.
+  - Vector SVG optimizado de alta fidelidad y generación de assets PNG de alta resolución.
+
+#### ✉️ Canales Externos y Plantillas Transaccionales
+- **Plantillas de Correo Electrónico:**
+  - Rediseño de las 8 plantillas HTML transaccionales de Supabase Auth con el monograma vectorial DOM, fondo carbón y microcopia sobria.
+- **Agente y Conciliación WhatsApp:**
+  - Actualización de mensajes de confirmación OTP y respuestas de bienvenida con la denominación DOM.
 
 ---
 

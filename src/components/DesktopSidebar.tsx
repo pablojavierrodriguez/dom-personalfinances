@@ -10,6 +10,7 @@ import { useSettings } from "@/lib/settings-store";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { DOMLogo } from "@/components/ui/DOMLogo";
 
 interface DesktopSidebarProps {
   activeTab: string;
@@ -69,7 +70,7 @@ export function DesktopSidebar({
   return (
     <TooltipProvider delayDuration={0}>
       <motion.aside
-        animate={{ width: collapsed ? 68 : 240 }}
+        animate={{ width: collapsed ? 68 : 256 }}
         transition={{ type: "spring", stiffness: 400, damping: 40 }}
         className="hidden md:flex flex-col h-screen sticky top-0 shrink-0 z-30 bg-card border-r border-border/50 overflow-hidden"
       >
@@ -81,22 +82,21 @@ export function DesktopSidebar({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="flex items-center gap-2"
+                className="flex items-center min-w-0 flex-1 mr-2"
               >
-                <div className="w-8 h-8 flex items-center justify-center shrink-0">
-                  <img src="/icons/icon.svg" alt="IMPERO logo" className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(16,185,129,0.25)]" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-display font-bold text-foreground text-base tracking-tight leading-none">IMPERO</span>
-                  <span className="text-[10px] text-muted-foreground tracking-tight leading-tight mt-0.5">{t("nav.tagline") || "Visión y Propósito"}</span>
-                </div>
+                <DOMLogo
+                  size="sm"
+                  showTagline
+                  taglinePosition="inline"
+                  taglineText={t("nav.tagline") || "Visión y Propósito"}
+                />
               </motion.div>
             )}
           </AnimatePresence>
           <Button
             size="icon"
             variant="ghost"
-            className="w-8 h-8 text-muted-foreground hover:text-foreground"
+            className="w-8 h-8 text-muted-foreground hover:text-foreground shrink-0"
             onClick={() => setCollapsed(!collapsed)}
           >
             {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}

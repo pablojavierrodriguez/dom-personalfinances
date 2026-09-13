@@ -125,7 +125,7 @@ Este bug fue resuelto en `SettingsPage.tsx` — las propiedades de `social_links
 
 ## Inputs de montos y moneda (Formato `es-AR`)
 
-En **IMPERO**, todos los montos se presentan con separador de miles por punto (`.`) y decimales por coma (`,`).
+En **DOM**, todos los montos se presentan con separador de miles por punto (`.`) y decimales por coma (`,`).
 
 **Regla de Oro:** Nunca usar `<input type="number">` para montos si se pretende admitir decimales en español o separador de miles, ya que el navegador móvil/desktop fuerza la notación anglosajona (`.`) y rechaza comas.
 

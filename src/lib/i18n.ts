@@ -344,7 +344,7 @@ const translations = {
 
     // Integrations & Automation
     "settings.integrations": "Integraciones & Automatización",
-    "settings.whatsappBot": "Bot de WhatsApp (IMPERO IA)",
+    "settings.whatsappBot": "Bot de WhatsApp (DOM IA)",
     "settings.whatsappActive": "Vinculado y activo",
     "settings.whatsappInactive": "Carga de gastos por audio, texto o ticket",
     "settings.whatsappConnected": "Conectado",
@@ -372,15 +372,15 @@ const translations = {
     "settings.accountSession": "Cuenta & Sesión",
     "settings.sessionActive": "Sesión iniciada",
     "settings.signOut": "Cerrar sesión",
-    "settings.about": "Acerca de IMPERO",
+    "settings.about": "Acerca de DOM",
     "settings.purgeCancel": "Cancelar",
 
     // PWA
-    "pwa.installTitle": "Instalar IMPERO en tu teléfono",
+    "pwa.installTitle": "Instalar DOM en tu teléfono",
     "pwa.installSubtitle": "Tu dinero. Tu mente. Tu control. Acceso en 1 toque, pantalla completa y offline.",
     "pwa.installButton": "Instalar App",
-    "pwa.installedDevice": "Aplicación IMPERO instalada en este dispositivo.",
-    "pwa.iosModalTitle": "Instalar IMPERO en tu Pantalla de Inicio",
+    "pwa.installedDevice": "Aplicación DOM instalada en este dispositivo.",
+    "pwa.iosModalTitle": "Instalar DOM en tu Pantalla de Inicio",
     "pwa.iosModalDesc": "Sigue estos 2 sencillos pasos en tu navegador móvil para tener la app como nativa:",
     "pwa.iosStep1Title": "Toca el botón Compartir",
     "pwa.iosStep1Desc": "En la barra inferior de Safari o en el menú de tres puntos de tu navegador.",
@@ -866,11 +866,11 @@ const translations = {
     "onboarding.rulesCheckbox": "Habilitar reglas recomendadas por defecto",
     "onboarding.readyTitle": "¡Todo listo!",
     "onboarding.readyDesc": "Tu espacio financiero está preparado para empezar.",
-    "onboarding.startApp": "Empezar a usar IMPERO",
+    "onboarding.startApp": "Empezar a usar DOM",
     "onboarding.skip": "Omitir configuración",
 
     // Security & Biometric
-    "security.tagline": "IMPERO · Seguridad",
+    "security.tagline": "DOM · Seguridad",
     "security.biometricTitle": "Sesión Protegida",
     "security.biometricDesc": "Tu información financiera está resguardada. Confirmá tu identidad con Face ID, Touch ID o huella para continuar.",
     "security.biometricFailed": "Verificación biométrica no completada o cancelada. Reintentá.",
@@ -879,11 +879,11 @@ const translations = {
     "security.logoutBtn": "Cerrar sesión de forma segura",
 
     // Release Notes
-    "releaseNotes.title": "¿Qué hay de nuevo en IMPERO?",
+    "releaseNotes.title": "¿Qué hay de nuevo en DOM?",
     "releaseNotes.version": "Versión {version}",
     "releaseNotes.badge": "Actualización Mayor",
     "releaseNotes.desc": "Hemos incorporado mejoras de arquitectura, rendimiento y ergonomía sensorial inspiradas en las mejores herramientas de productividad del mundo.",
-    "releaseNotes.dismiss": "Entendido, continuar a IMPERO",
+    "releaseNotes.dismiss": "Entendido, continuar a DOM",
 
     // Card Statement Payment Modal
     "card.payStatementModalTitle": "Pagar Resumen: {name}",
@@ -964,7 +964,7 @@ const translations = {
     "authErr.unexpectedDesc": "Ocurrió un error. Por favor intentá nuevamente.",
     "authErr.noConnection": "Sin conexión con el servidor",
     "authErr.noConnectionLocal": "No se pudo conectar con la base de datos local. Verificá que Supabase esté iniciado ejecutando 'supabase start' o que Docker esté corriendo.",
-    "authErr.noConnectionRemote": "No pudimos conectar con los servidores de IMPERO. Verificá tu conexión a internet o reintentá en unos momentos.",
+    "authErr.noConnectionRemote": "No pudimos conectar con los servidores de DOM. Verificá tu conexión a internet o reintentá en unos momentos.",
     "authErr.invalidCredentials": "Credenciales incorrectas",
     "authErr.invalidCredentialsDesc": "El email o la contraseña ingresados no son correctos. Verificalos e intentá nuevamente.",
     "authErr.emailNotConfirmed": "Email no confirmado",
@@ -990,6 +990,11 @@ const translations = {
     "profile.privacyNote": "Tus datos están resguardados en tu instancia privada y segura.",
     "profile.saveError": "Error al guardar",
     "profile.saveSuccess": "Perfil actualizado",
+    "profile.uploadPhoto": "Subir foto",
+    "profile.enterUrl": "Ingresar enlace web",
+    "profile.removeAvatar": "Eliminar foto",
+    "profile.avatarUploaded": "Foto de perfil actualizada",
+    "profile.avatarUploadError": "Error al subir la imagen",
 
     // Transaction List extra
     "tx.deleted": "\"{desc}\" eliminada",
@@ -1028,7 +1033,7 @@ const translations = {
     "export.typeExpense": "Gasto",
     "export.typeIncome": "Ingreso",
     "export.noCategory": "Sin Categoría",
-    "export.filename": "transacciones_impero",
+    "export.filename": "transacciones_dom",
 
     // Reset password
     "resetpwd.title": "Nueva contraseña",
@@ -1039,22 +1044,22 @@ const translations = {
 
     // Release Notes
     "release.version": "Versión",
-    "release.majorUpdate": "Actualización de Versión",
-    "release.title": "¿Qué hay de nuevo en IMPERO?",
-    "release.subtitle": "Incorporamos motor offline-first global, localización bilingüe completa y purga atómica de datos con reseteo garantizado.",
-    "release.feature1Title": "Motor Offline-First Global",
-    "release.feature1Desc": "Operación continua sin conexión a internet, carga instantánea a 0ms y sincronización transparente en segundo plano.",
-    "release.feature2Title": "Internacionalización Total (ES / EN)",
-    "release.feature2Desc": "Experiencia bilingüe integral en todas las pantallas, filtros temporales, reportes y notificaciones del sistema.",
-    "release.feature3Title": "Purga Atómica & Reinicio Seguro",
-    "release.feature3Desc": "Eliminación limpia de datos en un solo paso, balance reseteado a $0,00 y re-aprovisionamiento instantáneo de cuentas base.",
-    "release.feature4Title": "Seguridad Biométrica & Atajos (⌘K)",
-    "release.feature4Desc": "Bloqueo de privacidad con TouchID/FaceID, atajos globales de teclado y buscador omnicanal para máxima agilidad.",
+    "release.majorUpdate": "Actualización Mayor",
+    "release.title": "¿Qué hay de nuevo en DOM?",
+    "release.subtitle": "Identidad soberana DOM, avatares de perfil con sincronización en la nube, fluidez de registro móvil y balances atómicos.",
+    "release.feature1Title": "Identidad Soberana DOM & Geometría SIGIL",
+    "release.feature1Desc": "Estética monolítica de alta gama con monograma arquitectónico 'D', tipografía contemporánea Space Grotesk y paleta oscura de máximo contraste.",
+    "release.feature2Title": "Perfil de Usuario & Avatares",
+    "release.feature2Desc": "Carga y personalización de foto de perfil con almacenamiento seguro en la nube y persistencia en tiempo real en tu cuenta.",
+    "release.feature3Title": "Fluidez Móvil & Balances Atómicos",
+    "release.feature3Desc": "Acceso directo a gastos desde el botón flotante (FAB) y recálculo matemático consistente en 2 fases al editar movimientos.",
+    "release.feature4Title": "Cero Pérdida de Datos & Migración Transparente",
+    "release.feature4Desc": "Migración fluida de datos locales a la nueva identidad, colas offline íntegras y máxima privacidad sin pérdida de sesiones.",
     "release.footerHint": "Podés volver a abrir este panel desde Ajustes en cualquier momento.",
     "release.dismiss": "¡Entendido!",
 
     // Biometrics Lock
-    "biometrics.tag": "IMPERO · Seguridad",
+    "biometrics.tag": "DOM · Seguridad",
     "biometrics.title": "Sesión Protegida",
     "biometrics.description": "Tu información financiera está resguardada. Confirmá tu identidad con Face ID, Touch ID o huella para continuar.",
     "biometrics.verifying": "Verificando identidad...",
@@ -1065,7 +1070,7 @@ const translations = {
 
     // WhatsApp Assistant Modal
     "whatsapp.title": "Asistente Autónomo de WhatsApp",
-    "whatsapp.description": "Registrá compras al instante enviando un audio, una foto del ticket o un mensaje directo a IMPERO.",
+    "whatsapp.description": "Registrá compras al instante enviando un audio, una foto del ticket o un mensaje directo a DOM.",
     "whatsapp.linked": "Cuenta vinculada",
     "whatsapp.help": "Podés mandar audios, capturas o textos como “Gasté 4500 en súper con Galicia” para que se registre automáticamente.",
     "whatsapp.unlink": "Desvincular WhatsApp",
@@ -1074,7 +1079,7 @@ const translations = {
     "whatsapp.yourCode": "Tu código de 6 dígitos:",
     "whatsapp.codeExpire": "Enviá este código al contacto del bot desde WhatsApp para confirmar tu número. Expira en 15 minutos.",
     "whatsapp.sendMessage": "Enviar mensaje a WhatsApp",
-    "whatsapp.securityNotice": "Por seguridad, IMPERO solo procesará mensajes provenientes de tu número autenticado. Nunca compartas tu código.",
+    "whatsapp.securityNotice": "Por seguridad, DOM solo procesará mensajes provenientes de tu número autenticado. Nunca compartas tu código.",
     "whatsapp.invalidPhone": "Número inválido",
     "whatsapp.invalidPhoneDesc": "Por favor ingresá tu número con código de país (ej. +54911...)",
     "whatsapp.codeGenerated": "Código generado",
@@ -1560,7 +1565,7 @@ const translations = {
 
     // Integrations & Automation
     "settings.integrations": "Integrations & Automation",
-    "settings.whatsappBot": "WhatsApp Bot (IMPERO AI)",
+    "settings.whatsappBot": "WhatsApp Bot (DOM AI)",
     "settings.whatsappActive": "Linked and active",
     "settings.whatsappInactive": "Log expenses via voice, text or receipts",
     "settings.whatsappConnected": "Connected",
@@ -1588,15 +1593,15 @@ const translations = {
     "settings.accountSession": "Account & Session",
     "settings.sessionActive": "Signed in",
     "settings.signOut": "Sign out",
-    "settings.about": "About IMPERO",
+    "settings.about": "About DOM",
     "settings.purgeCancel": "Cancel",
 
     // PWA
-    "pwa.installTitle": "Install IMPERO on your phone",
+    "pwa.installTitle": "Install DOM on your phone",
     "pwa.installSubtitle": "Your money. Your mind. Your control. 1-tap access, fullscreen and offline.",
     "pwa.installButton": "Install App",
-    "pwa.installedDevice": "IMPERO app installed on this device.",
-    "pwa.iosModalTitle": "Add IMPERO to your Home Screen",
+    "pwa.installedDevice": "DOM app installed on this device.",
+    "pwa.iosModalTitle": "Add DOM to your Home Screen",
     "pwa.iosModalDesc": "Follow these 2 simple steps in your mobile browser to run the app as native:",
     "pwa.iosStep1Title": "Tap the Share button",
     "pwa.iosStep1Desc": "In the bottom bar of Safari or in your browser's menu.",
@@ -2082,11 +2087,11 @@ const translations = {
     "onboarding.rulesCheckbox": "Enable recommended default rules",
     "onboarding.readyTitle": "All set!",
     "onboarding.readyDesc": "Your financial workspace is ready to go.",
-    "onboarding.startApp": "Start using IMPERO",
+    "onboarding.startApp": "Start using DOM",
     "onboarding.skip": "Skip setup",
 
     // Security & Biometric
-    "security.tagline": "IMPERO · Security",
+    "security.tagline": "DOM · Security",
     "security.biometricTitle": "Protected Session",
     "security.biometricDesc": "Your financial information is safeguarded. Confirm your identity with Face ID, Touch ID or fingerprint to continue.",
     "security.biometricFailed": "Biometric verification not completed or cancelled. Please retry.",
@@ -2095,11 +2100,11 @@ const translations = {
     "security.logoutBtn": "Sign out securely",
 
     // Release Notes
-    "releaseNotes.title": "What's new in IMPERO?",
+    "releaseNotes.title": "What's new in DOM?",
     "releaseNotes.version": "Version {version}",
     "releaseNotes.badge": "Major Update",
     "releaseNotes.desc": "We have incorporated architecture, performance, and ergonomics improvements inspired by the best productivity tools in the world.",
-    "releaseNotes.dismiss": "Got it, continue to IMPERO",
+    "releaseNotes.dismiss": "Got it, continue to DOM",
 
     // Card Statement Payment Modal
     "card.payStatementModalTitle": "Pay Statement: {name}",
@@ -2180,7 +2185,7 @@ const translations = {
     "authErr.unexpectedDesc": "An error occurred. Please try again.",
     "authErr.noConnection": "No server connection",
     "authErr.noConnectionLocal": "Could not connect to the local database. Make sure Supabase is running via 'supabase start' or Docker is running.",
-    "authErr.noConnectionRemote": "Could not connect to IMPERO servers. Check your internet connection or try again in a moment.",
+    "authErr.noConnectionRemote": "Could not connect to DOM servers. Check your internet connection or try again in a moment.",
     "authErr.invalidCredentials": "Invalid credentials",
     "authErr.invalidCredentialsDesc": "The email or password entered is incorrect. Check them and try again.",
     "authErr.emailNotConfirmed": "Email not confirmed",
@@ -2206,6 +2211,11 @@ const translations = {
     "profile.privacyNote": "Your data is stored in your private and secure instance.",
     "profile.saveError": "Error saving",
     "profile.saveSuccess": "Profile updated",
+    "profile.uploadPhoto": "Upload photo",
+    "profile.enterUrl": "Enter web link",
+    "profile.removeAvatar": "Remove photo",
+    "profile.avatarUploaded": "Profile photo updated",
+    "profile.avatarUploadError": "Error uploading image",
 
     // Transaction List extra
     "tx.deleted": "\"{desc}\" deleted",
@@ -2244,7 +2254,7 @@ const translations = {
     "export.typeExpense": "Expense",
     "export.typeIncome": "Income",
     "export.noCategory": "No Category",
-    "export.filename": "transactions_impero",
+    "export.filename": "transactions_dom",
 
     // Reset password
     "resetpwd.title": "New password",
@@ -2255,22 +2265,22 @@ const translations = {
 
     // Release Notes
     "release.version": "Version",
-    "release.majorUpdate": "Version Highlights",
-    "release.title": "What's new in IMPERO?",
-    "release.subtitle": "We've introduced a global offline-first engine, complete bilingual support, and atomic data purge with guaranteed reset.",
-    "release.feature1Title": "Global Offline-First Engine",
-    "release.feature1Desc": "Seamless operation without internet connection, instant 0ms loading, and transparent background synchronization.",
-    "release.feature2Title": "Full Localization (ES / EN)",
-    "release.feature2Desc": "Complete bilingual experience across all screens, date filters, reports, and system notifications.",
-    "release.feature3Title": "Atomic Purge & Safe Reset",
-    "release.feature3Desc": "Clean one-step data wipe, balance strictly reset to $0.00, and instant provisioning of default accounts.",
-    "release.feature4Title": "Biometric Security & Shortcuts (⌘K)",
-    "release.feature4Desc": "Privacy lock with TouchID/FaceID, global keyboard shortcuts, and omnichannel search for maximum agility.",
+    "release.majorUpdate": "Major Release",
+    "release.title": "What's new in DOM?",
+    "release.subtitle": "DOM sovereign identity, cloud-synced user avatars, seamless mobile logging, and atomic balances.",
+    "release.feature1Title": "DOM Sovereign Identity & SIGIL Geometry",
+    "release.feature1Desc": "Monolithic high-end aesthetics with architectural 'D' monogram, contemporary Space Grotesk typography, and high-contrast dark palette.",
+    "release.feature2Title": "User Profile & Avatars",
+    "release.feature2Desc": "Upload and customize profile pictures with secure cloud storage and real-time synchronization across your account.",
+    "release.feature3Title": "Mobile Fluidity & Atomic Balances",
+    "release.feature3Desc": "Direct expense entry from floating action button (FAB) and two-phase atomic balance recalculation when editing transactions.",
+    "release.feature4Title": "Zero Data Loss & Transparent Migration",
+    "release.feature4Desc": "Seamless local data migration to the new DOM identity, resilient offline outbox queues, and zero session disruption.",
     "release.footerHint": "You can re-open this panel from Settings at any time.",
     "release.dismiss": "Got it!",
 
     // Biometrics Lock
-    "biometrics.tag": "IMPERO · Security",
+    "biometrics.tag": "DOM · Security",
     "biometrics.title": "Protected Session",
     "biometrics.description": "Your financial information is safe. Confirm your identity with Face ID, Touch ID, or fingerprint to continue.",
     "biometrics.verifying": "Verifying identity...",
@@ -2281,7 +2291,7 @@ const translations = {
 
     // WhatsApp Assistant Modal
     "whatsapp.title": "Autonomous WhatsApp Assistant",
-    "whatsapp.description": "Record purchases instantly by sending a voice note, receipt photo, or direct message to IMPERO.",
+    "whatsapp.description": "Record purchases instantly by sending a voice note, receipt photo, or direct message to DOM.",
     "whatsapp.linked": "Linked account",
     "whatsapp.help": "You can send voice notes, photos, or text like “Spent 4500 on groceries with Chase” to automatically record it.",
     "whatsapp.unlink": "Unlink WhatsApp",
@@ -2290,7 +2300,7 @@ const translations = {
     "whatsapp.yourCode": "Your 6-digit code:",
     "whatsapp.codeExpire": "Send this code to the bot contact on WhatsApp to confirm your number. Expires in 15 minutes.",
     "whatsapp.sendMessage": "Send message to WhatsApp",
-    "whatsapp.securityNotice": "For security, IMPERO will only process messages from your authenticated number. Never share your code.",
+    "whatsapp.securityNotice": "For security, DOM will only process messages from your authenticated number. Never share your code.",
     "whatsapp.invalidPhone": "Invalid number",
     "whatsapp.invalidPhoneDesc": "Please enter your phone number with country code (e.g. +1...)",
     "whatsapp.codeGenerated": "Code generated",

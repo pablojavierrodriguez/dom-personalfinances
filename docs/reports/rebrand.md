@@ -1,11 +1,11 @@
 # DOMINUS
-*Briefing estratégico de marca y diseño — para el equipo creativo*
+*Briefing estratégico de marca y diseño - para el equipo creativo*
 
 ---
 
 ## 1. Qué es DOMINUS
 
-DOMINUS es una aplicación de finanzas personales soberana, privada y self-hosted (proyecto originalmente en desarrollo bajo el nombre técnico "m3 — Money Mind Master"). Permite registrar gastos sin fricción (texto, voz o foto vía WhatsApp con IA), proyectar el flujo de caja a 30/60/90 días, manejar múltiples monedas (ARS, USD, EUR) y presupuestos con rollover — todo corriendo sobre infraestructura propia del usuario (Supabase/PostgreSQL, Docker), sin depender de terceros ni ceder datos financieros a redes comerciales.
+DOMINUS es una aplicación de finanzas personales soberana, privada y self-hosted (proyecto originalmente en desarrollo bajo el nombre técnico "m3 - Money Mind Master"). Permite registrar gastos sin fricción (texto, voz o foto vía WhatsApp con IA), proyectar el flujo de caja a 30/60/90 días, manejar múltiples monedas (ARS, USD, EUR) y presupuestos con rollover - todo corriendo sobre infraestructura propia del usuario (Supabase/PostgreSQL, Docker), sin depender de terceros ni ceder datos financieros a redes comerciales.
 
 ---
 
@@ -14,15 +14,15 @@ DOMINUS es una aplicación de finanzas personales soberana, privada y self-hoste
 DOMINUS no se presenta como "otra app de gastos". Su propuesta de fondo es una convicción sobre el carácter humano y la administración de lo que se nos ha confiado.
 
 **La raíz del nombre:**
-Del latín *dominus* — "señor, dueño, amo de la casa" — la fuente de la que deriva *dominium* (dominio). Es también la palabra que subyace al mandato de Génesis 1:28: *"fructificad y multiplicaos... y tened dominio..."* — el único pasaje donde soberanía, mayordomía y multiplicación de recursos aparecen como una sola instrucción.
+Del latín *dominus* - "señor, dueño, amo de la casa" - la fuente de la que deriva *dominium* (dominio). Es también la palabra que subyace al mandato de Génesis 1:28: *"fructificad y multiplicaos... y tened dominio..."* - el único pasaje donde soberanía, mayordomía y multiplicación de recursos aparecen como una sola instrucción.
 
 **La distinción clave:**
-*Dominus* no es *imperator* (quien conquista y manda por la fuerza sobre lo ajeno). Es quien ejerce una autoridad **delegada** — la casa, la propiedad, los recursos que se le confiaron, no que arrebató. Gobierna lo suyo, no lo ajeno. El dominio no se conquista: se administra.
+*Dominus* no es *imperator* (quien conquista y manda por la fuerza sobre lo ajeno). Es quien ejerce una autoridad **delegada** - la casa, la propiedad, los recursos que se le confiaron, no que arrebató. Gobierna lo suyo, no lo ajeno. El dominio no se conquista: se administra.
 
-Todos saben que deberían gastar menos, ahorrar más, decidir mejor — el problema nunca fue la falta de información, sino la falta de dominio propio. La mayoría de las apps de finanzas atacan esto con más gráficos y más recordatorios (una solución técnica a un problema de carácter). DOMINUS parte de otro lugar: no presiona al usuario a controlarse por fuerza, lo acompaña a ejercer, con constancia, el gobierno fiel sobre lo que se le ha confiado — el dominio propio no se fabrica a fuerza de voluntad, se cultiva; es un fruto, no un logro.
+Todos saben que deberían gastar menos, ahorrar más, decidir mejor - el problema nunca fue la falta de información, sino la falta de dominio propio. La mayoría de las apps de finanzas atacan esto con más gráficos y más recordatorios (una solución técnica a un problema de carácter). DOMINUS parte de otro lugar: no presiona al usuario a controlarse por fuerza, lo acompaña a ejercer, con constancia, el gobierno fiel sobre lo que se le ha confiado - el dominio propio no se fabrica a fuerza de voluntad, se cultiva; es un fruto, no un logro.
 
 **Narrativa de marca (resumen):**
-> *A cada uno se le confía una casa: sus recursos, sus decisiones, su economía. No se conquista — se administra. DOMINUS es el nombre de ese gobierno fiel: el dominio, no del que toma por la fuerza, sino del que fue puesto a cargo y responde por multiplicar lo que se le dio.*
+> *A cada uno se le confía una casa: sus recursos, sus decisiones, su economía. No se conquista - se administra. DOMINUS es el nombre de ese gobierno fiel: el dominio, no del que toma por la fuerza, sino del que fue puesto a cargo y responde por multiplicar lo que se le dio.*
 
 ---
 
@@ -60,13 +60,13 @@ Para evitar mensajes difusos, estructuramos los copies según su contexto de uso
 
 ---
 
-## 5. Los "Sabios" — Asistentes de IA configurables
+## 5. Los "Sabios" - Asistentes de IA configurables
 
 La aplicación (la Bóveda / la Casa) es el entorno soberano; los asistentes de IA son consejeros configurables según la etapa o el perfil del usuario. 
 
-* **Salo** — el sabio pragmático, protector, astuto con vencimientos, cuotas y blindaje de caja.
-* **Levi** — el copiloto analítico, métrico, enfocado en eficiencia matemática y optimización.
-* **Tito** — el compañero empático, cercano y desestresante para momentos de fricción financiera.
+* **Salo** - el sabio pragmático, protector, astuto con vencimientos, cuotas y blindaje de caja.
+* **Levi** - el copiloto analítico, métrico, enfocado en eficiencia matemática y optimización.
+* **Tito** - el compañero empático, cercano y desestresante para momentos de fricción financiera.
 
 > **Regla de identidad para los asistentes:** Deben concebirse como **tonos de voz y personalidades analíticas**, representados mediante micro-iconografía secundaria o avatares abstractos sutiles. **Prohibido convertirlos en mascotas infantiles o caricaturescas estilo Duolingo**, ya que demolerían la sobriedad y la autoridad institucional de DOMINUS.
 
@@ -122,7 +122,7 @@ El nombre final es **DOMINUS**. Durante el proceso de selección se evaluaron y 
 ### Mitigación de riesgos de percepción internacional
 * **Carga cultural en el mercado anglosajón:** En inglés, la palabra *Dominus* puede tener ecos de dinámicas de dominación/BDSM o villanos de fantasía/gaming (*Warhammer 40k*, *Path of Exile*).
   - **Mitigación:** En toda comunicación externa, App Store, Google Play y metadatos, la marca debe presentarse siempre acompañada de su descriptor de categoría:
-    - `DOMINUS — Sovereign Personal Finance` (Internacional)
+    - `DOMINUS - Sovereign Personal Finance` (Internacional)
     - `DOMINUS: Finanzas Personales Soberanas` (Hispanoamérica)
 * **SEO y presencia web:** Dominus es una palabra disputada por vinos de alta gama (*Dominus Estate*) y literatura clásica.
   - **Estrategia de dominios sugerida:** Buscar extensiones orientadas a producto financiero (`dominus.app`, `dominus.finance`, `dominus.money`, o `usedominus.com`).
@@ -147,3 +147,18 @@ El nombre final es **DOMINUS**. Durante el proceso de selección se evaluaron y 
    - Fuente comercial o de código abierto recomendada para títulos (Display) y para UI/números tabulares.
 6. **Archivos vectoriales normalizados:**
    - Formatos SVG limpios, PNG transparentes en alta resolución y variantes monocromáticas (blanco puro, negro puro y escala de grises).
+
+---
+
+## 9. Resolución Final y Consolidación de Marca: DOM & Geometría SIGIL
+
+Tras la evaluación de nombres de máximo impacto (`dominuos`, `dominion`, `dominus`, `dominia`, `dominator`), se adoptó por decisión unánime la denominación definitiva:
+
+- **Nombre Oficial de Producto:** **DOM**
+- **Geometría Oficial:** **SIGIL** (Isotipo "D" con contraforma interior circular concéntrica de 99px de grosor exacto en sus cuatro muros).
+- **Lema Inmutable:** *"El dominio no se conquista. Se administra."*
+- **Implementación Técnica:** Componentes `DOMSymbol` y `DOMLogo`, prefijos de almacenamiento `dom-*` con migración transparente en cadena desde `impero-*` y `dominus-*`.
+
+---
+
+> Para la hoja de ruta técnica, dependencias y fases de implementación detalladas, consultar el [Plan de Trabajo: Transición de Marca a DOM](file:///Users/adrisol/Pablo/code/m3/docs/reports/rebrand_work_plan.md).

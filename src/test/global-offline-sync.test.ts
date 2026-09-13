@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   CACHE_KEYS,
+  GLOBAL_QUEUE_KEY,
   getCachedData,
   setCachedData,
   enqueueGlobalSyncOp,
@@ -162,7 +163,7 @@ describe("P27: Global Offline-First Sync Engine & Resilient Outbox", () => {
 
     expect(getPendingGlobalSyncCount()).toBe(2);
 
-    const queue = JSON.parse(localStorage.getItem("impero-global-sync-queue") || "[]");
+    const queue = JSON.parse(localStorage.getItem(GLOBAL_QUEUE_KEY) || "[]");
     expect(queue).toHaveLength(2);
     expect(queue[0].type).toBe("insert_transaction");
     expect(queue[1].type).toBe("update_account_balance");

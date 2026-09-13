@@ -1,5 +1,8 @@
 # IMPERO
-*Briefing de marca y diseño — para el equipo creativo*
+*Briefing de marca y diseño (Histórico — Ver evolución definitiva a [DOM](file:///Users/adrisol/Pablo/code/m3/docs/reports/rebrand.md))*
+
+> [!NOTE]
+> **Documento de Archivo Histórico (SPEC-021):** Este briefing documenta la etapa intermedia de la marca (IMPERO), la cual evolucionó estratégicamente hacia la identidad definitiva **DOM** (*"El dominio no se conquista. Se administra."*). Para la especificación vigente de marca, consultar [docs/reports/rebrand.md](file:///Users/adrisol/Pablo/code/m3/docs/reports/rebrand.md).
 
 ---
 

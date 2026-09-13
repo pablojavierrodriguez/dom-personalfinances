@@ -95,7 +95,7 @@ serve(async (req: Request) => {
             whatsappPhoneId,
             whatsappAccessToken,
             senderPhone,
-            "👋 ¡Hola! Soy el asistente financiero de *IMPERO*.\n\nTu número no está vinculado a ninguna cuenta. Por favor ingresá a la app, abrí *Ajustes* ⚙️ y seleccioná *Integración con WhatsApp* para vincular tu teléfono."
+            "👋 ¡Hola! Soy el asistente financiero de *DOM*.\n\nTu número no está vinculado a ninguna cuenta. Por favor ingresá a la app, abrí *Ajustes* ⚙️ y seleccioná *Integración con WhatsApp* para vincular tu teléfono."
           );
         }
         return new Response(JSON.stringify({ status: "unregistered_sender" }), {
@@ -144,7 +144,7 @@ serve(async (req: Request) => {
               whatsappPhoneId,
               whatsappAccessToken,
               senderPhone,
-              "⚠️ El código de verificación es incorrecto o ha expirado. Por favor generá uno nuevo desde la sección de Ajustes en m3."
+              "⚠️ El código de verificación es incorrecto o ha expirado. Por favor generá uno nuevo desde la sección de Ajustes en DOM."
             );
           }
           return new Response(JSON.stringify({ status: "invalid_otp" }), {

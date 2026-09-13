@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, Globe, DollarSign, Wallet, Sparkles, Zap } from "lucide-react";
 import { useSettings, CURRENCIES, type Currency } from "@/lib/settings-store";
 import type { Language } from "@/lib/i18n";
+import { DOMSymbol } from "@/components/ui/DOMSymbol";
 
 const STEPS = ["welcome", "language", "currency", "rules", "ready"] as const;
 type Step = typeof STEPS[number];
@@ -68,14 +69,14 @@ export function OnboardingWizard({
         >
           {step === "welcome" && (
             <>
-              <div className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center mb-6 fab-glow">
-                <Sparkles className="w-10 h-10 text-primary-foreground" />
-              </div>
-              <h1 className="text-2xl font-bold font-display text-foreground text-center mb-1">
-                IMPERO
+              <DOMSymbol size={64} variant="badge" className="mb-6 shadow-2xl" />
+              <h1 className="text-2xl font-bold font-brand text-foreground text-center mb-1">
+                DOM
               </h1>
               <p className="text-xs font-semibold text-primary uppercase tracking-wider text-center mb-3">
-                Administración financiera con visión y propósito
+                {selectedLang === "es"
+                  ? "El dominio no se conquista. Se administra."
+                  : "Dominion is not conquered. It is managed."}
               </p>
               <p className="text-muted-foreground text-center text-sm mb-8">
                 {selectedLang === "es"

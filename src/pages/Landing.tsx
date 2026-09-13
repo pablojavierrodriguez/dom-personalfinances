@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { DOMLogo } from "@/components/ui/DOMLogo";
 import { 
   Sparkles, 
   MessageSquare, 
@@ -24,15 +24,11 @@ export default function LandingPage() {
       {/* Header / Nav */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl overflow-hidden border border-border/60 bg-background/50 flex items-center justify-center shrink-0 shadow-sm">
-              <img src="/icons/icon.svg" alt="IMPERO logo" className="w-full h-full object-cover" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-display font-bold text-foreground text-sm tracking-tight leading-none">IMPERO</span>
-              <span className="text-[10px] font-semibold text-primary uppercase tracking-wider mt-0.5">Visión y Propósito</span>
-            </div>
-          </div>
+          <DOMLogo
+            size="sm"
+            showTagline
+            taglineText="Finanzas Soberanas"
+          />
 
           <div className="flex items-center gap-3">
             <a
@@ -61,7 +57,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/80 border border-border/60 text-xs text-muted-foreground font-medium mb-6 backdrop-blur-sm">
             <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <span>100% Self-Hosted & Soberano · Sin suscripciones ni tracking</span>
+            <span>El dominio no se conquista. Se administra. · 100% Soberano</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-display font-extrabold tracking-tight text-foreground mb-6 leading-tight">
@@ -156,7 +152,7 @@ export default function LandingPage() {
         <div className="text-center mb-10">
           <span className="text-xs font-semibold text-primary uppercase tracking-wider">Benchmark de Mercado</span>
           <h2 className="text-2xl sm:text-4xl font-display font-bold text-foreground mt-1 mb-3">
-            ¿Por qué IMPERO supera a las soluciones comerciales?
+            ¿Por qué DOM supera a las soluciones comerciales?
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto">
             Comparativa directa frente a las dos soluciones móviles más populares a nivel global y regional.
@@ -168,7 +164,7 @@ export default function LandingPage() {
             <thead>
               <tr className="border-b border-border/70 bg-secondary/50">
                 <th className="py-4 px-4 sm:px-6 font-semibold text-foreground">Capacidad Clave</th>
-                <th className="py-4 px-4 sm:px-6 font-semibold text-primary bg-primary/10">IMPERO</th>
+                <th className="py-4 px-4 sm:px-6 font-semibold text-primary bg-primary/10">DOM</th>
                 <th className="py-4 px-4 sm:px-6 font-semibold text-muted-foreground">Mobills Premium</th>
                 <th className="py-4 px-4 sm:px-6 font-semibold text-muted-foreground">Wallet by BudgetBakers</th>
               </tr>
@@ -264,7 +260,7 @@ export default function LandingPage() {
       <section className="py-12 px-4 max-w-4xl mx-auto w-full">
         <div className="rounded-2xl gradient-card border border-border/60 p-8 text-center relative">
           <h3 className="text-2xl font-display font-bold text-foreground mb-3">
-            ¿Querés tu propia instancia privada de IMPERO?
+            ¿Querés tu propia instancia privada de DOM?
           </h3>
           <p className="text-sm text-muted-foreground max-w-xl mx-auto mb-6">
             Podés desplegarla en 5 minutos en Vercel conectada a una base de datos gratuita de Supabase, 
@@ -292,7 +288,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="mt-auto border-t border-border/50 py-8 px-4 text-center text-xs text-muted-foreground">
-        <p>IMPERO - Administración financiera con visión y propósito.</p>
+        <p>DOM - El dominio no se conquista. Se administra.</p>
       </footer>
     </div>
   );

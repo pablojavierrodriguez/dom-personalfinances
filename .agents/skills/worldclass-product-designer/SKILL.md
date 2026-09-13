@@ -1,15 +1,15 @@
 ---
 name: worldclass-product-designer
 description: >-
-  Diseña interfaces y micro-interacciones de calibre mundial para m3. Especializado en
+  Diseña interfaces y micro-interacciones de calibre mundial para DOM. Especializado en
   estética moderna de alta gama, micro-animaciones fluidas (Framer Motion), tokens HSL,
   ergonomía táctil móvil, tipografía de precisión y retroalimentación sensorial.
 ---
 
-# World-Class Product Designer Skill — IMPERO
+# World-Class Product Designer Skill - DOM
 
 ## Misión
-Hacer que IMPERO se sienta tan pulida, reactiva y soberana de usar como Linear, Cron o Stripe. Cero interfaces genéricas o básicas; cada elemento interactivo debe transmitir artesanía, solidez, calma financiera y deleite visual.
+Hacer que DOM se sienta tan pulida, reactiva y soberana de usar como Linear, Cron o Stripe. Cero interfaces genéricas o básicas; cada elemento interactivo debe transmitir artesanía, solidez, calma financiera y deleite visual.
 
 ---
 

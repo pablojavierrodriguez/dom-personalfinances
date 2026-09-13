@@ -3,7 +3,7 @@ name: supabase-integration
 description: Usar esta skill siempre que se trabaje con Supabase — cliente JS, autenticación, políticas RLS, CLI, migraciones, o al alternar entre la instancia local (Docker) y el proyecto cloud de producción. También cuando el usuario mencione errores de conexión con Supabase, problemas de login del CLI, o el error "Resource has been removed".
 ---
 
-# Supabase Integration — IMPERO (m3)
+# Supabase Integration — DOM
 
 Convenciones y estándares para el proyecto, que utiliza un entorno local con Docker y un proyecto cloud de producción en Supabase.
 
@@ -89,7 +89,7 @@ export SUPABASE_ACCESS_TOKEN=<token_generado_en_app.supabase.com/account/tokens>
 
 ---
 
-## Arquitectura de Migraciones en IMPERO
+## Arquitectura de Migraciones en DOM
 
 El proyecto utiliza una **estrategia de migración consolidada**:
 

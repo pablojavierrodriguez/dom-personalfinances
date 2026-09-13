@@ -38,7 +38,7 @@ import { MonthSelector } from "@/components/MonthSelector";
 import { DashboardCardPicker } from "@/components/DashboardCardPicker";
 import { KeyboardShortcutsModal } from "@/components/KeyboardShortcutsModal";
 import { GlobalCommandMenu } from "@/components/GlobalCommandMenu";
-import { ReleaseNotesModal, shouldShowReleaseNotes } from "@/components/ReleaseNotesModal";
+import { ReleaseNotesModal, shouldShowReleaseNotes, markReleaseNotesAsSeen } from "@/components/ReleaseNotesModal";
 import { PageTransition } from "@/components/PageTransition";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { usePrivacy } from "@/contexts/PrivacyContext";
@@ -130,6 +130,7 @@ const Index = ({ initialTab }: IndexProps = {}) => {
       const onboardingComplete = localStorage.getItem("onboarding-complete");
       if (onboardingComplete) {
         setReleaseNotesOpen(true);
+        markReleaseNotesAsSeen();
       }
     }
   }, []);

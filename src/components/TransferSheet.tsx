@@ -84,7 +84,7 @@ export function TransferSheet({ open, onClose, accounts, onTransfer }: TransferS
                 const cur = (a.currency as Currency) || "ARS";
                 return (
                   <option key={a.id} value={a.id}>
-                    {a.name} ({cur}) — {formatInCurrency(a.balance, cur)}
+                    {a.name} ({cur}) - {formatInCurrency(a.balance, cur)}
                   </option>
                 );
               })}
@@ -114,7 +114,7 @@ export function TransferSheet({ open, onClose, accounts, onTransfer }: TransferS
                 const cur = (a.currency as Currency) || "ARS";
                 return (
                   <option key={a.id} value={a.id}>
-                    {a.name} ({cur}) — {formatInCurrency(a.balance, cur)}
+                    {a.name} ({cur}) - {formatInCurrency(a.balance, cur)}
                   </option>
                 );
               })}

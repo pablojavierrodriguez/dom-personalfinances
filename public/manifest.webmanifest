@@ -1,13 +1,13 @@
 {
-  "name": "IMPERO - Administración financiera con visión y propósito",
-  "short_name": "IMPERO",
-  "description": "Administración financiera con visión y propósito. Finanzas personales soberanas, privadas y con proyección certera.",
+  "name": "DOM - Tu dominio financiero",
+  "short_name": "DOM",
+  "description": "El dominio no se conquista. Se administra. Finanzas personales soberanas, privadas y con proyección certera.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0a0a0f",
-  "theme_color": "#0a0a0f",
+  "background_color": "#0c0e12",
+  "theme_color": "#0c0e12",
   "lang": "es",
   "categories": ["finance", "productivity", "utilities"],
   "icons": [

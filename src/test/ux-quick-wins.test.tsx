@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { DashboardSparkline } from "@/components/DashboardSparkline";
 import { KeyboardShortcutsModal } from "@/components/KeyboardShortcutsModal";
 import { GlobalCommandMenu } from "@/components/GlobalCommandMenu";
-import { ReleaseNotesModal, shouldShowReleaseNotes, CURRENT_VERSION } from "@/components/ReleaseNotesModal";
+import { ReleaseNotesModal, shouldShowReleaseNotes, CURRENT_VERSION, STORAGE_KEY } from "@/components/ReleaseNotesModal";
 import { SettingsProvider } from "@/lib/settings-store";
 import { PrivacyProvider } from "@/contexts/PrivacyContext";
 
@@ -114,18 +114,39 @@ describe("UX Quick Wins: Sparklines, Keyboard Shortcuts, Command Menu & Release 
         <ReleaseNotesModal open={true} onOpenChange={onOpenChange} />
       );
 
-      expect(screen.getByText("¿Qué hay de nuevo en IMPERO?")).toBeDefined();
-      expect(screen.getByText(`Versión ${CURRENT_VERSION}`)).toBeDefined();
-      expect(screen.getByText("Motor Offline-First Global")).toBeDefined();
-      expect(screen.getByText("Internacionalización Total (ES / EN)")).toBeDefined();
+      expect(screen.getByText("¿Qué hay de nuevo en DOM?")).toBeDefined();
+      expect(screen.getByText(new RegExp(`Versión ${CURRENT_VERSION}`))).toBeDefined();
+      expect(screen.getByText("Identidad Soberana DOM & Geometría SIGIL")).toBeDefined();
+      expect(screen.getByText("Perfil de Usuario & Avatares")).toBeDefined();
 
       // Click dismiss
       const dismissBtn = screen.getByRole("button", { name: /¡Entendido!/i });
       fireEvent.click(dismissBtn);
 
-      expect(localStorage.getItem("impero_last_seen_release")).toBe(CURRENT_VERSION);
+      expect(localStorage.getItem(STORAGE_KEY)).toBe(CURRENT_VERSION);
       expect(shouldShowReleaseNotes()).toBe(false);
       expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it("marks as seen when closed via Dialog onOpenChange(false) without clicking button", () => {
+      localStorage.clear();
+      expect(shouldShowReleaseNotes()).toBe(true);
+
+      const onOpenChange = vi.fn();
+      const { unmount } = render(
+        <ReleaseNotesModal open={true} onOpenChange={onOpenChange} />
+      );
+
+      // Simular cierre por Radix Dialog (ej: backdrop, tecla Escape, o botón X)
+      const closeButtons = screen.getAllByRole("button");
+      const xBtn = closeButtons.find(b => b.querySelector("span.sr-only")?.textContent === "Close");
+      if (xBtn) {
+        fireEvent.click(xBtn);
+      }
+
+      expect(localStorage.getItem(STORAGE_KEY)).toBe(CURRENT_VERSION);
+      expect(shouldShowReleaseNotes()).toBe(false);
+      unmount();
     });
   });
 });

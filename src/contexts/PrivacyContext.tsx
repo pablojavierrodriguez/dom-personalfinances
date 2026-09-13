@@ -34,16 +34,28 @@ export interface PrivacyContextType {
 
 const PrivacyContext = createContext<PrivacyContextType | null>(null);
 
-const STORAGE_KEY = "impero-privacy-mode";
+const STORAGE_KEY = "dom-privacy-mode";
+const LEGACY_DOMINUS_STORAGE_KEY = "dominus-privacy-mode";
+const LEGACY_IMPERO_STORAGE_KEY = "impero-privacy-mode";
 const LEGACY_STORAGE_KEY = "m3-privacy-mode";
-const BIOMETRIC_ENABLED_KEY = "impero-biometric-enabled";
-const BIOMETRIC_TIMEOUT_KEY = "impero-biometric-timeout";
+
+const BIOMETRIC_ENABLED_KEY = "dom-biometric-enabled";
+const LEGACY_DOMINUS_BIOMETRIC_ENABLED_KEY = "dominus-biometric-enabled";
+const LEGACY_BIOMETRIC_ENABLED_KEY = "impero-biometric-enabled";
+
+const BIOMETRIC_TIMEOUT_KEY = "dom-biometric-timeout";
+const LEGACY_DOMINUS_BIOMETRIC_TIMEOUT_KEY = "dominus-biometric-timeout";
+const LEGACY_BIOMETRIC_TIMEOUT_KEY = "impero-biometric-timeout";
 const MASK = "$ ••••••";
 
 export function PrivacyProvider({ children }: { children: ReactNode }) {
   const [isPrivacyMode, setIsPrivacyMode] = useState<boolean>(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+      const stored =
+        localStorage.getItem(STORAGE_KEY) ??
+        localStorage.getItem(LEGACY_DOMINUS_STORAGE_KEY) ??
+        localStorage.getItem(LEGACY_IMPERO_STORAGE_KEY) ??
+        localStorage.getItem(LEGACY_STORAGE_KEY);
       return stored === "true";
     } catch {
       return false;
@@ -53,7 +65,11 @@ export function PrivacyProvider({ children }: { children: ReactNode }) {
   const [isBiometricsSupported, setIsBiometricsSupported] = useState<boolean>(false);
   const [isBiometricLockEnabled, setIsBiometricLockEnabledState] = useState<boolean>(() => {
     try {
-      return localStorage.getItem(BIOMETRIC_ENABLED_KEY) === "true";
+      const stored =
+        localStorage.getItem(BIOMETRIC_ENABLED_KEY) ??
+        localStorage.getItem(LEGACY_DOMINUS_BIOMETRIC_ENABLED_KEY) ??
+        localStorage.getItem(LEGACY_BIOMETRIC_ENABLED_KEY);
+      return stored === "true";
     } catch {
       return false;
     }
@@ -61,7 +77,10 @@ export function PrivacyProvider({ children }: { children: ReactNode }) {
 
   const [biometricTimeoutMinutes, setBiometricTimeoutMinutesState] = useState<number>(() => {
     try {
-      const stored = localStorage.getItem(BIOMETRIC_TIMEOUT_KEY);
+      const stored =
+        localStorage.getItem(BIOMETRIC_TIMEOUT_KEY) ??
+        localStorage.getItem(LEGACY_DOMINUS_BIOMETRIC_TIMEOUT_KEY) ??
+        localStorage.getItem(LEGACY_BIOMETRIC_TIMEOUT_KEY);
       return stored ? Number(stored) : 3;
     } catch {
       return 3;

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Suite de auto-validación y compliance para m3.
+ * Suite de auto-validación y compliance para DOM.
  *
  * Pilares de validación:
  * 1. Tipado TypeScript (tsc --noEmit)
@@ -15,7 +15,7 @@ const path = require('path');
 const ROOT_DIR = path.resolve(__dirname, '..');
 
 console.log('=====================================================');
-console.log('🚀 m3 (Money Master): SUITE DE AUTO-VALIDACIÓN');
+console.log('🚀 DOM: SUITE DE AUTO-VALIDACIÓN');
 console.log('=====================================================\n');
 
 const checks = [
