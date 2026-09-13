@@ -138,7 +138,7 @@ export function ShoppingListManager({ accounts, categories, onCheckout }: Shoppi
   const completedLists = useMemo(() => lists.filter(l => l.status === "completed"), [lists]);
   const archivedLists = useMemo(() => lists.filter(l => l.status === "archived"), [lists]);
 
-  // — Handlers —
+  // - Handlers -
   const handleCreateList = async () => {
     if (!formName.trim()) return;
     try {
@@ -385,7 +385,7 @@ export function ShoppingListManager({ accounts, categories, onCheckout }: Shoppi
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Ícono sutil que sólo aparece si hay archivadas (patrón uniforme IMPERO) */}
+              {/* Ícono sutil que sólo aparece si hay archivadas (patrón uniforme DOMINUS) */}
               {archivedLists.length > 0 && (
                 <button
                   type="button"

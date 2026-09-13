@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -118,11 +118,12 @@
   }
 
   /* ==========================================================================
-     1. OBSIDIAN EMERALD (Pure Minimalist Tech OLED)
+     1. DOMINUS OBSIDIAN / M3 (Pure Minimalist Tech OLED & Quiet Luxury)
      - Dark: Negro absoluto OLED (#030305), tarjetas grafito técnico (#0d0d11),
              hairlines sutiles plateados, estética nítida y austera estilo Linear/Stripe.
      - Light: Blanco platino puro (#FAFAFA), tarjetas blancas con bordes de precisión.
      ========================================================================== */
+  [data-app-theme="dominus"],
   [data-app-theme="m3"] {
     --background: 240 15% 2%;         /* #030305 Negro OLED puro */
     --foreground: 0 0% 98%;
@@ -173,6 +174,9 @@
     --pill-radius: 10px;
   }
 
+  [data-app-theme="dominus"].light,
+  .light[data-app-theme="dominus"],
+  [data-app-theme="dominus"] .light,
   [data-app-theme="m3"].light,
   .light[data-app-theme="m3"],
   [data-app-theme="m3"] .light {
@@ -448,6 +452,11 @@
   .font-display {
     font-family: 'Geist Sans', 'IBM Plex Sans', system-ui, sans-serif;
     letter-spacing: -0.03em;
+  }
+
+  .font-brand {
+    font-family: 'Cinzel', 'Times New Roman', serif;
+    letter-spacing: 0.18em;
   }
 }
 

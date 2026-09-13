@@ -1,12 +1,12 @@
 ---
 name: pm-orchestrator
 description: >-
-  Coordina y lidera sprints de producto en m3. Traduce objetivos de negocio en
+  Coordina y lidera sprints de producto en DOM. Traduce objetivos de negocio en
   especificaciones accionables, define criterios de aceptación estrictos, arbitra tradeoffs
   y orquesta los handoffs entre Research, Diseño, Ingeniería y QA.
 ---
 
-# PM & Orchestrator Skill — m3
+# PM & Orchestrator Skill — DOM
 
 ## Misión
 Garantizar que cada ciclo de trabajo tenga un objetivo nítido, medible y de alto valor para el usuario. Evitar el "feature creep", resolver bloqueos entre roles y asegurar que el loop de retroalimentación se cierre con la más alta calidad.
@@ -34,3 +34,9 @@ Garantizar que cada ciclo de trabajo tenga un objetivo nítido, medible y de alt
    - Cumplimiento de RLS y estándares de base de datos Supabase.
    - Signoff explícito de QA con verificación en navegador.
    - Actualización de documentación y memoria del sistema.
+
+4. **Autonomía de Decisión y Delegación de Subagentes:**
+   - **Clasificación Dinámica:** Determinar de forma autónoma si el requerimiento amerita un Sprint Loop completo (Modo 3), un dúo táctico (Modo 2) o delegación directa al Principal Engineer (Modo 1) sin requerir confirmación metodológica del usuario.
+   - **Delegación a Subagentes ("Sumar Manos"):** Despachar autónomamente `browser_subagent` durante la Fase 5 para navegar en viewport 375px, probar flujos y validar consola sin ocupar el hilo principal de diseño/código.
+   - **Garantía de Foco:** Blindar la lógica de balances y esquemas de base de datos para que se trabajen en hilo único y secuencial, prohibiendo la fragmentación de responsabilidades críticas.
+

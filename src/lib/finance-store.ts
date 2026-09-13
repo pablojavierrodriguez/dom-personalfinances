@@ -86,13 +86,16 @@ export function useFinanceStore() {
   const [tags, setTags] = useState<Tag[]>(() => loadJSON("tags", []));
   const [pendingGlobalSyncCount, setPendingGlobalSyncCount] = useState<number>(() => getPendingGlobalSyncCount());
   const [isGlobalSyncing, setIsGlobalSyncing] = useState(false);
-  const RULES_STORAGE_KEY = "impero-transaction-rules";
-  const LEGACY_RULES_STORAGE_KEY = "m3-transaction-rules";
+  const RULES_STORAGE_KEY = "dom-transaction-rules";
+  const LEGACY_RULES_STORAGE_KEY = "impero-transaction-rules";
+  const OLD_LEGACY_RULES_STORAGE_KEY = "m3-transaction-rules";
 
   const [rules, setRules] = useState<TransactionRule[]>(() => {
     const modern = loadJSON<TransactionRule[] | null>(RULES_STORAGE_KEY, null);
     if (modern !== null) return modern;
-    return loadJSON(LEGACY_RULES_STORAGE_KEY, []);
+    const legacy = loadJSON<TransactionRule[] | null>(LEGACY_RULES_STORAGE_KEY, null);
+    if (legacy !== null) return legacy;
+    return loadJSON(OLD_LEGACY_RULES_STORAGE_KEY, []);
   });
 
   const saveRules = useCallback((newRules: TransactionRule[]) => {

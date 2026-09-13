@@ -29,12 +29,12 @@ describe("P12: Seguridad & Bloqueo Biométrico Web", () => {
 
     let success = false;
     await act(async () => {
-      success = await result.current.setBiometricLockEnabled(true, "test@impero.app");
+      success = await result.current.setBiometricLockEnabled(true, "test@dominus.app");
     });
 
     expect(success).toBe(true);
     expect(result.current.isBiometricLockEnabled).toBe(true);
-    expect(localStorage.getItem("impero-biometric-enabled")).toBe("true");
+    expect(localStorage.getItem("dominus-biometric-enabled")).toBe("true");
   });
 
   it("locks and unlocks the application with biometrics", async () => {
@@ -45,7 +45,7 @@ describe("P12: Seguridad & Bloqueo Biométrico Web", () => {
     const { result } = renderHook(() => usePrivacy(), { wrapper });
 
     await act(async () => {
-      await result.current.setBiometricLockEnabled(true, "test@impero.app");
+      await result.current.setBiometricLockEnabled(true, "test@dominus.app");
     });
 
     // Lock application manually
@@ -72,6 +72,6 @@ describe("P12: Seguridad & Bloqueo Biométrico Web", () => {
     });
 
     expect(result.current.biometricTimeoutMinutes).toBe(5);
-    expect(localStorage.getItem("impero-biometric-timeout")).toBe("5");
+    expect(localStorage.getItem("dominus-biometric-timeout")).toBe("5");
   });
 });

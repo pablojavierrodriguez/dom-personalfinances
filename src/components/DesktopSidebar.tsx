@@ -10,6 +10,7 @@ import { useSettings } from "@/lib/settings-store";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { DominusLogo } from "@/components/ui/DominusLogo";
 
 interface DesktopSidebarProps {
   activeTab: string;
@@ -83,13 +84,11 @@ export function DesktopSidebar({
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-2"
               >
-                <div className="w-8 h-8 flex items-center justify-center shrink-0">
-                  <img src="/icons/icon.svg" alt="IMPERO logo" className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(16,185,129,0.25)]" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-display font-bold text-foreground text-base tracking-tight leading-none">IMPERO</span>
-                  <span className="text-[10px] text-muted-foreground tracking-tight leading-tight mt-0.5">{t("nav.tagline") || "Visión y Propósito"}</span>
-                </div>
+                <DominusLogo
+                  size="sm"
+                  showTagline
+                  taglineText={t("nav.tagline") || "Visión y Propósito"}
+                />
               </motion.div>
             )}
           </AnimatePresence>

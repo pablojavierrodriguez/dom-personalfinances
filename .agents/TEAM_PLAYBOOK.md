@@ -1,6 +1,42 @@
-# Playbook de Operación Multi-Agente — m3 (Money Master)
+# Playbook de Operación Multi-Agente — DOM (El dominio no se conquista. Se administra)
 
-Este manual rige la dinámica de trabajo colaborativo en bucle (loop) entre los 5 roles de agentes para llevar m3 al estándar más alto del mercado de software financiero personal.
+Este manual rige la dinámica de trabajo colaborativo en bucle (loop) entre los 5 roles de agentes para llevar DOM al estándar más alto del mercado de software financiero personal.
+
+---
+
+## 🚦 Matriz de Decisión Dinámica (Autonomía del Sistema)
+
+El usuario no debe solicitar explícitamente qué rol o modo activar. El sistema clasifica de forma automática el input recibido en uno de los siguientes 3 modos operativos:
+
+| Modo Operativo | Disparadores Típicos | Roles Involucrados | Overhead / Documentación |
+| :--- | :--- | :--- | :--- |
+| **Modo 1: Foco Quirúrgico** *(Fast-Track)* | Bugfix puntual, corrección de saldos o invariantes, ajuste tipográfico/copy, linter, tests fallidos. | **Principal Engineer** (control directo y exclusivo). | **Cero burocracia.** Sin spec documental. Cambio atómico + validación (`tsc` + tests). |
+| **Modo 2: Dúo Táctico** *(Experiencia + Código)* | Rediseño de card/vista, nuevo modal/sheet, optimización ergonómica táctil, nuevo chart. | **Product Designer** + **Principal Engineer** (+ QA check). | **Ligero.** Especificación en el plan de chat. Sin archivo en `docs/sprints/` salvo que toque DB. |
+| **Modo 3: Sprint Playbook Completo** | Feature nueva del backlog, cambios de modelo de datos en Supabase, flujos de negocio complejos. | **PM Orchestrator** liderando las 5 fases completas. | **Formal.** Documento de sprint en `docs/sprints/SPRINT-XXX-<slug>.md`. |
+
+---
+
+## 🤖 Autonomía de Subagentes: ¿Cuándo sumar manos vs. Cuándo tener foco?
+
+El PM Orchestrator y el Principal Engineer deciden cuándo paralelizar tareas o delegar en subagentes (`browser_subagent`, background tasks) bajo una **regla de oro inquebrantable**:
+
+> **"Foco absoluto en la lógica de dominio; manos paralelas en la exploración y verificación."**
+
+### 🟢 Cuándo SÍ sumar manos (Subagentes / Paralelización):
+1. **Auditoría de QA y Navegación Autónoma (`browser_subagent`):**
+   - Al concluir un cambio de interfaz o flujo de usuario, despachar un subagente de navegador para navegar, probar formularios, auditar viewport de 375px y detectar errores de consola o desbordes sin bloquear al usuario ni el hilo principal.
+2. **Research y Benchmarking Exploratorio:**
+   - Para contrastar patrones de UX de la competencia (Linear, Copilot Money, Stripe) o revisar documentación externa mientras se planifica la arquitectura.
+3. **Auditorías de Accesibilidad (a11y) y Performance:**
+   - Ejecución de audits de contraste, árbol de accesibilidad o monitoreo de re-renders.
+
+### 🔴 Cuándo mantener FOCO ABSOLUTO (Un solo hilo atómico, sin subagentes):
+1. **Consistencia Contable e Invariantes de Balances:**
+   - La matemática de saldos, deudas de tarjetas de crédito ($\le 0$) y recálculo atómico de transacciones requiere trazabilidad estricta. Prohibido fragmentar la lógica financiera en múltiples agentes simultáneos.
+2. **Esquema de Base de Datos y Supabase RLS:**
+   - `00000000000000_schema_foundation.sql` y deltas para producción deben ser gestionados por una única mente técnica (Principal Engineer) para garantizar idempotencia y seguridad.
+3. **Refactors de Arquitectura / State Management:**
+   - Modificaciones complejas de store, hooks centrales o sincronización offline-first.
 
 ---
 

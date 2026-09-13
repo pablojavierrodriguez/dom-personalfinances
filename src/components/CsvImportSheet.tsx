@@ -853,7 +853,7 @@ export function CsvImportSheet({
                           {headers.slice(0, 6).map((h, hIdx) => (
                             <div key={`sample-head-${hIdx}-${h}`} className="min-w-0 truncate">
                               <span className="text-muted-foreground truncate">{h}: </span>
-                              <span className="text-foreground font-mono-data font-medium truncate">{rows[0][h] || "—"}</span>
+                              <span className="text-foreground font-mono-data font-medium truncate">{rows[0][h] || "-"}</span>
                             </div>
                           ))}
                         </div>

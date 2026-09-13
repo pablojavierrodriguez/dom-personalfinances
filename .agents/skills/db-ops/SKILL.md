@@ -1,11 +1,11 @@
 ---
 name: db-ops
-description: Operaciones locales de base de datos para m3. Usar para aplicar migraciones, reiniciar base de datos local, ejecutar seed data y correr validaciones obligatorias de seguridad y performance (db advisors).
+description: Operaciones locales de base de datos para DOM. Usar para aplicar migraciones, reiniciar base de datos local, ejecutar seed data y correr validaciones obligatorias de seguridad y performance (db advisors).
 ---
 
 # DB Ops — Herramientas y Flujo de Base de Datos Local
 
-Guía operativa y scripts de base de datos local (Docker) para `m3`.
+Guía operativa y scripts de base de datos local (Docker) para `DOM`.
 
 ## Variables y Conexión Local
 

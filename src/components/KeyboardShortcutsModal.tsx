@@ -131,7 +131,7 @@ export function KeyboardShortcutsModal({ open, onOpenChange }: KeyboardShortcuts
             {t("shortcuts.footerHint")}{" "}
             <kbd className="px-1 py-0.5 rounded bg-background border border-border/60 text-[10px] font-mono">?</kbd>
           </span>
-          <span>IMPERO v{APP_VERSION}</span>
+          <span>DOM v{APP_VERSION}</span>
         </div>
       </DialogContent>
     </Dialog>

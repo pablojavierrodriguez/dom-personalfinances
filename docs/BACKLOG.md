@@ -1,4 +1,4 @@
-# Product Backlog - IMPERO
+# Product Backlog - DOM
 
 Documento vivo de priorización de producto basado en valor para el usuario final, robustez financiera y arquitectura sobre Supabase.
 
@@ -9,7 +9,7 @@ Documento vivo de priorización de producto basado en valor para el usuario fina
 | Prioridad | Épica / Feature | Valor para el Usuario | Esfuerzo | Impacto | Spec | Estado |
 | :---: | :--- | :--- | :--- | :---: | :---: | :---: |
 | **P0** 🔴 | **Importación de Extractos Bancarios (CSV/PDF)** | **Elimina la mayor fricción:** permite cargar cientos de movimientos de bancos y billeteras en segundos sin tipeo manual. | Medio | **Altísimo** | [SPEC-003](specs/SPEC-003-csv-banking-import.md) | Completado |
-| **P1** 🟡 | **Agente IA de Ingesta Autónoma (Bot WhatsApp / Visión / Archivos)** | **Fricción cero:** registrar gastos por mensaje de voz, foto de ticket/comprobante o reenvío de extractos directamente a un bot de WhatsApp conectado a la base de IMPERO. | Alto | **Altísimo (Game Changer)** | [SPEC-008](specs/SPEC-008-autonomous-agent-whatsapp-bot.md) | Completado |
+| **P1** 🟡 | **Agente IA de Ingesta Autónoma (Bot WhatsApp / Visión / Archivos)** | **Fricción cero:** registrar gastos por mensaje de voz, foto de ticket/comprobante o reenvío de extractos directamente a un bot de WhatsApp conectado a la base de DOM. | Alto | **Altísimo (Game Changer)** | [SPEC-008](specs/SPEC-008-autonomous-agent-whatsapp-bot.md) | Completado |
 | **P2** 🟢 | **Tarjetas de Crédito & Gestión de Cuotas** | **Resuelve la distorsión financiera real:** proyecta compras en cuotas diferidas y calcula saldos adeudados futuros. | Medio | **Alto** | [SPEC-004](specs/SPEC-004-credit-cards-and-installments.md) | Completado |
 | **P3** 🟡 | **Presupuestos Inteligentes & Alertas de Desvío** | **Control preventivo en tiempo real:** alerta sobregastos por categoría antes del cierre de mes. | Medio | **Alto** | [SPEC-005](specs/SPEC-005-intelligent-budgets.md) | Completado |
 | **P4** 🟢 | **Comprobantes y Adjuntos en Alta Rápida** | **Optimización de conveniencia:** adjuntar ticket/foto directamente al crear la transacción en `QuickAddSheet`. | Bajo | **Medio** | [SPEC-002](specs/SPEC-002-receipt-attachments.md) | Completado |
@@ -37,7 +37,7 @@ Documento vivo de priorización de producto basado en valor para el usuario fina
 | **P26** 🚀 | **Centro de Novedades In-App ("What's New Modal")** | **Celebración de valor:** modal interactivo que comunica automáticamente los avances de versión al usuario con highlights visuales y badges. | Bajo | **Medio** | [SPEC-028](specs/SPEC-028-whats-new-modal.md) | Completado |
 | **P27** 🌐 | **Motor Global Offline-First & Outbox Sync (Toda la App)** | **Cero fricción y cero pérdida de datos:** apertura instantánea en 0ms mediante Stale-While-Revalidate, registro y mutaciones en las 9 entidades de dominio garantizadas sin señal celular con cola de sincronización diferida e indicador global de conectividad. | Medio | **Altísimo (Game Changer)** | [SPEC-029](specs/SPEC-029-global-offline-first-sync-engine.md) | Completada ✅ |
 | **P28** 🌐 | **Internacionalización Integral (ES / EN) y Erradicación de Textos Hardcodeados** | **Paridad absoluta y experiencia global:** 100% de paridad en 1.101 claves de traducción, cero textos o etiquetas hardcodeadas en vistas, componentes, filtros dinámicos, toasts y tooltips, con auditoría automatizada en CI/CD. | Bajo | **Altísimo** | [i18n-audit](scripts/check-i18n.cjs) | Completado ✅ |
-
+| **P29** 🏛️ | **Transición a Marca DOM: Identidad Soberana, Geometría SIGIL, Retrocompatibilidad & Cero Pérdida de Datos** | **Soberanía y longevidad:** Monograma arquitectónico forjado en carbón/esmeralda con geometría matemática SIGIL (`DominusSymbol`), tipografía noble `Cinzel`, migración en cadena de claves locales hacia `dom-*`, rediseño de plantillas transaccionales e integración en todos los canales. | Medio | **Altísimo (Strategic Brand)** | [rebrand.md](reports/rebrand.md) | Completado ✅ |
 
 ---
 
@@ -63,7 +63,7 @@ Documento vivo de priorización de producto basado en valor para el usuario fina
 ### P1 — Agente IA de Ingesta Autónoma (Bot WhatsApp / Visión / Archivos)
 - **Problema:** Incluso con importadores en la app, abrir la web/app cada vez que se hace un gasto en la calle o llega un comprobante genera fricción. WhatsApp es el canal donde el usuario ya vive todo el día.
 - **Alcance:**
-  - **Canal WhatsApp:** Webhook (Meta Cloud API o Twilio / Baileys) vinculado al `user_id` de **IMPERO**.
+  - **Canal WhatsApp:** Webhook (Meta Cloud API o Twilio / Baileys) vinculado al `user_id` de **DOM**.
   - **Modos de Ingesta:**
     1. **Mensaje de texto o audio:** *"Gasté 14500 en Coto con Galicia"* -> Whisper (audio a texto) + LLM (extracción de `{ amount: 14500, description: "Coto", category: "groceries", account: "Galicia", type: "expense" }`).
     2. **Foto de comprobante / ticket físico:** Visión multimodal (Gemini / GPT-4o Vision) extrae el total, comercio, fecha y categorías.
@@ -212,7 +212,7 @@ Documento vivo de priorización de producto basado en valor para el usuario fina
 ### P13 — Unificación de Identidad de Marca, Nomenclatura y Microcopia de Alta Gama
 - **Problema:** Discrepancias de nombre (`FinTrack` vs. `m3 / Money Master`), textos en inglés en tooltips y modales ("Transfer", "del"), y jerga técnica poco accesible.
 - **Alcance:**
-  - Estandarizar la identidad visual de marca hacia **IMPERO** en la barra lateral desktop (`DesktopSidebar.tsx`), encabezados, título del documento y meta tags de PWA.
+  - Estandarizar la identidad visual de marca hacia **DOM** en la barra lateral desktop (`DesktopSidebar.tsx`), encabezados, título del documento y meta tags de PWA.
   - Auditar el 100% de la microcopia asegurando español neutro y financiero consistente.
   - Homogeneizar nomenclaturas de widgets y métricas (ej. "Ritmo de gasto", "Ciclo de tarjeta", "Salud financiera").
 - **Criterios de Aceptación:**
@@ -405,7 +405,7 @@ Documento vivo de priorización de producto basado en valor para el usuario fina
 
 ---
 
-## 💡 Próximos Horizontes de Producto (Siguiente Etapa de IMPERO)
+## 💡 Próximos Horizontes de Producto (Siguiente Etapa de DOM)
 
 Habiendo liquidado la totalidad de las épicas fundamentales (**P0 a P20**) y el sprint de Quick Wins de UX (**P21, P22, P24, P26**), el producto consolida una experiencia de uso ágil y sensorial:
 
@@ -443,11 +443,26 @@ Habiendo liquidado la totalidad de las épicas fundamentales (**P0 a P20**) y el
 
 ---
 
-### C4 — Finanzas Compartidas / Modo Pareja o Familia (Household Finance)
+### C4 - Finanzas Compartidas / Modo Pareja o Familia (Household Finance)
 - **Problema:** En parejas o familias se comparten gastos comunes (alquiler, compras, servicios) pero cada miembro mantiene cuentas bancarias y gastos personales separados.
 - **Alcance:**
-  - Vinculación segura de dos perfiles de IMPERO a un "Espacio Compartido".
+  - Vinculación segura de dos perfiles de DOMINUS a un "Espacio Compartido".
   - Posibilidad de imputar transacciones a presupuestos compartidos o registrar quién pagó para cálculo automático de liquidación de saldos (*Splitwise-style* integrado).
 - **Criterios de Aceptación:**
   - Cada miembro mantiene sus cuentas bancarias privadas, pero puede visualizar y nutrir los compromisos y presupuestos comunes.
+
+---
+
+### P29 - Transición a Marca DOM: Identidad Soberana, Geometría SIGIL, Retrocompatibilidad & Cero Pérdida de Datos
+- **Problema:** Las denominaciones previas (m3 e IMPERO) presentaban fricciones legales y de percepción de marca (connotaciones autoritarias o genéricas). Se requiere una identidad perenne, sobria y de autoridad serena ("DOM") manteniendo absoluta continuidad operativa sin pérdida de datos para los usuarios existentes.
+- **Alcance:**
+  - **Identidad Visual:** Geometría matemática SIGIL integrada en isotipo (`DominusSymbol`), logotipo institucional con tipografía noble `Cinzel` (`DominusLogo`) y tokens de color con contraste WCAG AAA.
+  - **Retrocompatibilidad Absoluta:** Motor de migración en cadena de claves locales hacia `dom-*` (`storage-migration.ts`) con preservación de colas offline y cachés previas.
+  - **PWA & Assets Móviles:** Actualización de `manifest.webmanifest`, splash screen en carbón `#0c0e12`, generación de assets con SDF y auditoría de recursos con `pwa-assets-audit`.
+  - **Canales Externos:** Rediseño de las 8 plantillas transaccionales de correo en Supabase Auth y actualización de mensajes en el webhook de WhatsApp.
+  - **Internacionalización:** 100% de paridad en 1.110 claves bilingües con la nueva microcopia de soberanía.
+- **Criterios de Aceptación:**
+  - Cero pérdida de datos o desconfiguración de sesiones para usuarios preexistentes.
+  - La suite de validación (`npm run check:all`) pasa al 100% con cero errores y cero advertencias.
+
 

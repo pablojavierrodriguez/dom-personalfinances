@@ -593,7 +593,7 @@ export function SettingsPage({ onImportCsv, onOpenReleaseNotes, onOpenShortcuts,
             </>
           )}
 
-          <SectionTitle>{t("settings.about") || "Acerca de IMPERO"}</SectionTitle>
+          <SectionTitle>{t("settings.about") || "Acerca de DOM"}</SectionTitle>
 
           {onOpenReleaseNotes && (
             <button

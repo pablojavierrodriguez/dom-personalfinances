@@ -1,8 +1,40 @@
-# Release Notes - IMPERO (ex-m3)
+# Release Notes - DOM (ex-IMPERO)
 
 ---
 
 ## [Unreleased] — En Desarrollo (Próxima Versión)
+
+### 🎯 Resumen
+Consolidación de la identidad soberana definitiva **DOM - Finanzas Personales Soberanas** ("El dominio no se conquista. Se administra."): transición de marca integral desde las denominaciones previas hacia una estética monolítica de alta gama con geometría matemática **SIGIL** (monograma "D" con contraforma circular concéntrica equilibrada en muros de 99px); preservación absoluta de datos con migración en cadena de claves locales hacia `dom-*`; sistema de diseño enriquecido con tipografía institucional (`Cinzel`), componentes reactivos `DominusSymbol` y `DominusLogo`, temas visuales con ratio de contraste WCAG AAA; rediseño de las 8 plantillas transaccionales de correo electrónico; y actualización del canal de WhatsApp.
+
+### ✨ Nuevas Funcionalidades y Mejoras
+
+#### 🏛️ Identidad de Marca Soberana DOM & Geometría SIGIL
+- **Monograma y Logotipo Arquitectónico (`DominusSymbol` & `DominusLogo`):**
+  - Símbolo distintivo basado en la geometría **SIGIL**: monograma "D" forjado con una contraforma interior circular concéntrica perfecta que forma un sello de precisión matemática sobre fondo carbón profundo (`#0c0e12`).
+  - Soporte de variantes modulares (`default`, `emerald`, `gold`, `monochrome`, `badge`) integradas en barra de navegación de escritorio (`DesktopSidebar`), navegación móvil (`BottomNav`), pantallas de autenticación (`Auth`), página de bienvenida (`Landing`) y asistente de inicio (`OnboardingWizard`).
+  - Tipografía institucional `Cinzel` (.font-brand) con tracking amplio (`tracking-[0.22em]`), complementando la legibilidad de la tipografía de datos sin distorsión visual.
+- **Tokens de Color y Accesibilidad (WCAG AAA):**
+  - Incorporación del tema unificado con fondo carbón `#0c0e12` y contrastes de 8.4:1 en acentos dorados/esmeralda y 19.4:1 en textos principales sobre superficie oscura.
+
+#### 🛡️ Retrocompatibilidad y Migración de Almacenamiento Local (Cero Pérdida de Datos)
+- **Motor de Migración Atómica en Cadena (`storage-migration.ts`):**
+  - Migración transparente en el arranque (`main.tsx`) de claves locales desde `impero-*` y `dominus-*` hacia el espacio de nombres `dom-*`.
+  - Fallback reactivo en lectura: si una clave moderna aún no existe, resuelve contra la clave histórica y la actualiza automáticamente.
+  - Preservación de las claves legadas originales para garantizar que sesiones activas y backups locales continúen funcionando sin fricción.
+- **Sincronización y Caché de Entidades:**
+  - Cola global de sincronización diferida (`dom-global-sync-queue`) y colas de listas de compras adaptadas con preservación total de operaciones pendientes.
+
+#### 📱 Experiencia PWA y Assets Móviles
+- **Manifiesto y Metadatos de Sistema:**
+  - Actualización de `manifest.webmanifest` e `index.html` con nombre oficial **DOM**, descripción y colores de splash screen `#0c0e12` para aperturas fluidas en iOS y Android.
+  - Vector SVG optimizado de alta fidelidad en `public/icons/icon.svg` y generación de assets PNG de alta resolución mediante SDF en `scripts/generate-brand-assets.cjs`.
+
+#### ✉️ Canales Externos y Plantillas Transaccionales
+- **Plantillas de Correo Electrónico (`supabase/templates/`):**
+  - Rediseño de las 8 plantillas HTML transaccionales de Supabase Auth con el monograma vectorial DOM, fondo carbón y microcopia sobria.
+- **Agente y Conciliación WhatsApp:**
+  - Actualización de mensajes de confirmación OTP y respuestas de bienvenida con la denominación DOM.
 
 ---
 

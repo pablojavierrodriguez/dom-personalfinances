@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, Sparkles, ArrowRight, User, AlertCircle, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { DominusSymbol } from "@/components/ui/DominusSymbol";
 import { toast } from "sonner";
 import { useSettings } from "@/lib/settings-store";
 import { getHumanAuthErrorMessage, extractAuthUrlError, isLocalEnvironment } from "@/lib/auth-errors";
@@ -86,12 +87,10 @@ export default function AuthPage() {
         className="w-full max-w-sm"
       >
         {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 rounded-2xl overflow-hidden border border-border/60 bg-background/50 flex items-center justify-center mb-4 shadow-lg">
-            <img src="/icons/icon.svg" alt="IMPERO logo" className="w-full h-full object-cover" />
-          </div>
-          <h1 className="text-2xl font-bold font-display text-foreground">IMPERO</h1>
-          <p className="text-xs font-medium text-primary tracking-wider uppercase mb-1">{t("auth.tagline")}</p>
+        <div className="flex flex-col items-center mb-8 text-center">
+          <DominusSymbol size={52} variant="badge" className="mb-4 shadow-xl" />
+          <h1 className="text-2xl font-bold font-brand text-foreground uppercase">DOM</h1>
+          <p className="text-xs font-medium text-primary tracking-wider uppercase mt-1 mb-1">{t("auth.tagline")}</p>
           <p className="text-sm text-muted-foreground mt-1">
             {mode === "login" && t("auth.loginSubtitle")}
             {mode === "signup" && t("auth.signupSubtitle")}

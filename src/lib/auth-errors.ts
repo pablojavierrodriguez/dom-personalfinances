@@ -76,7 +76,7 @@ export function getHumanAuthErrorMessage(error: any): {
       title: "Sin conexión con el servidor",
       description: isLocal
         ? "No se pudo conectar con la base de datos local. Verificá que Supabase esté iniciado ejecutando 'supabase start' o que Docker esté corriendo."
-        : "No pudimos conectar con los servidores de IMPERO. Verificá tu conexión a internet o reintentá en unos momentos.",
+        : "No pudimos conectar con los servidores de DOM. Verificá tu conexión a internet o reintentá en unos momentos.",
       isConnectionError: true,
     };
   }

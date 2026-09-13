@@ -209,7 +209,7 @@ export function WhatsAppIntegrationModal() {
                     size="sm"
                     className="w-full text-xs"
                     onClick={() => {
-                      const msg = encodeURIComponent(`Hola! Mi código de vinculación IMPERO es: ${otpInfo.code}`);
+                      const msg = encodeURIComponent(`Hola! Mi código de vinculación DOM es: ${otpInfo.code}`);
                       window.open(`https://wa.me/?text=${msg}`, "_blank");
                     }}
                   >

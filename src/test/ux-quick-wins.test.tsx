@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { DashboardSparkline } from "@/components/DashboardSparkline";
 import { KeyboardShortcutsModal } from "@/components/KeyboardShortcutsModal";
 import { GlobalCommandMenu } from "@/components/GlobalCommandMenu";
-import { ReleaseNotesModal, shouldShowReleaseNotes, CURRENT_VERSION } from "@/components/ReleaseNotesModal";
+import { ReleaseNotesModal, shouldShowReleaseNotes, CURRENT_VERSION, STORAGE_KEY } from "@/components/ReleaseNotesModal";
 import { SettingsProvider } from "@/lib/settings-store";
 import { PrivacyProvider } from "@/contexts/PrivacyContext";
 
@@ -114,8 +114,8 @@ describe("UX Quick Wins: Sparklines, Keyboard Shortcuts, Command Menu & Release 
         <ReleaseNotesModal open={true} onOpenChange={onOpenChange} />
       );
 
-      expect(screen.getByText("¿Qué hay de nuevo en IMPERO?")).toBeDefined();
-      expect(screen.getByText(`Versión ${CURRENT_VERSION}`)).toBeDefined();
+      expect(screen.getByText("¿Qué hay de nuevo en DOM?")).toBeDefined();
+      expect(screen.getByText(new RegExp(`Versión ${CURRENT_VERSION}`))).toBeDefined();
       expect(screen.getByText("Motor Offline-First Global")).toBeDefined();
       expect(screen.getByText("Internacionalización Total (ES / EN)")).toBeDefined();
 
@@ -123,7 +123,7 @@ describe("UX Quick Wins: Sparklines, Keyboard Shortcuts, Command Menu & Release 
       const dismissBtn = screen.getByRole("button", { name: /¡Entendido!/i });
       fireEvent.click(dismissBtn);
 
-      expect(localStorage.getItem("impero_last_seen_release")).toBe(CURRENT_VERSION);
+      expect(localStorage.getItem(STORAGE_KEY)).toBe(CURRENT_VERSION);
       expect(shouldShowReleaseNotes()).toBe(false);
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });

@@ -1,9 +1,23 @@
 import { supabase } from "@/integrations/supabase/client";
 import { isValidUuid } from "@/services/transactions.service";
 
-export const GLOBAL_QUEUE_KEY = "impero-global-sync-queue";
+export const GLOBAL_QUEUE_KEY = "dom-global-sync-queue";
+export const LEGACY_GLOBAL_QUEUE_KEY = "dominus-global-sync-queue";
+export const HISTORIC_GLOBAL_QUEUE_KEY = "impero-global-sync-queue";
 
 export const CACHE_KEYS = {
+  ACCOUNTS: "dom-cache-accounts",
+  CATEGORIES: "dom-cache-categories",
+  TRANSACTIONS: "dom-cache-transactions",
+  BUDGETS: "dom-cache-budgets",
+  GOALS: "dom-cache-goals",
+  BILLS: "dom-cache-bills",
+  RECURRING: "dom-cache-recurring",
+  RULES: "dom-transaction-rules",
+  TAGS: "dom-cache-tags",
+} as const;
+
+export const LEGACY_CACHE_KEYS = {
   ACCOUNTS: "impero-cache-accounts",
   CATEGORIES: "impero-cache-categories",
   TRANSACTIONS: "impero-cache-transactions",
@@ -261,7 +275,15 @@ export function generateUUID(): string {
 
 export function getCachedData<T>(key: string, fallback: T): T {
   try {
-    const raw = localStorage.getItem(key);
+    let raw = localStorage.getItem(key);
+    if (!raw && key.startsWith("dom-")) {
+      const domLegacy = key.replace(/^dom-/, "dominus-");
+      raw = localStorage.getItem(domLegacy);
+      if (!raw) {
+        const imperoLegacy = key.replace(/^dom-/, "impero-");
+        raw = localStorage.getItem(imperoLegacy);
+      }
+    }
     if (!raw) return fallback;
     const parsed = JSON.parse(raw);
     return parsed ?? fallback;
@@ -280,7 +302,10 @@ export function setCachedData<T>(key: string, data: T): void {
 
 export function getPendingGlobalSyncCount(): number {
   try {
-    const raw = localStorage.getItem(GLOBAL_QUEUE_KEY);
+    const raw =
+      localStorage.getItem(GLOBAL_QUEUE_KEY) ??
+      localStorage.getItem(LEGACY_GLOBAL_QUEUE_KEY) ??
+      localStorage.getItem(HISTORIC_GLOBAL_QUEUE_KEY);
     if (!raw) return 0;
     const queue = JSON.parse(raw);
     return Array.isArray(queue) ? queue.length : 0;
@@ -291,7 +316,10 @@ export function getPendingGlobalSyncCount(): number {
 
 export function getGlobalSyncQueue(): GlobalSyncOperation[] {
   try {
-    const raw = localStorage.getItem(GLOBAL_QUEUE_KEY);
+    const raw =
+      localStorage.getItem(GLOBAL_QUEUE_KEY) ??
+      localStorage.getItem(LEGACY_GLOBAL_QUEUE_KEY) ??
+      localStorage.getItem(HISTORIC_GLOBAL_QUEUE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];

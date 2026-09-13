@@ -1,19 +1,17 @@
-# IMPERO - Administración Financiera con Visión y Propósito
+# DOM - Finanzas Personales Soberanas
 
 <p align="center">
-  <img src="public/icons/icon.svg" width="128" height="128" alt="IMPERO logo" />
+  <img src="public/icons/icon.svg" width="128" height="128" alt="DOM logo" />
   <br />
-  <strong>Visión • Propósito • Soberanía</strong>
-  <br />
-  <em>Administración financiera con visión y propósito.</em>
+  <strong>El dominio no se conquista. Se administra.</strong>
 </p>
 
 > **Finanzas personales soberanas, privadas y con proyección certera.**  
-> Aplicación open-source y self-hosted diseñada para eliminar la fricción de registro mediante IA (WhatsApp con audio, fotos o texto), proyectar el flujo de caja a 30/60/90 días y gobernar tu economía personal con serenidad y templanza.
+> Aplicación open-source y self-hosted diseñada para eliminar la fricción de registro mediante IA (WhatsApp con audio, fotos o texto), proyectar el flujo de caja a 30/60/90 días y gobernar tu economía personal con serenidad y constancia.
 
 ---
 
-## 🌟 ¿Por qué IMPERO? (Ventajas frente a soluciones tradicionales)
+## 🌟 ¿Por qué DOM? (Ventajas frente a soluciones tradicionales)
 
 A diferencia de aplicaciones comerciales cerradas (**Mobills**, **Wallet by BudgetBakers**, etc.) que cobran suscripciones mensuales recurrentes o venden datos a redes de crédito:
 
@@ -67,7 +65,7 @@ A diferencia de aplicaciones comerciales cerradas (**Mobills**, **Wallet by Budg
 
 5. **Personalización de Correos Electrónicos (Opcional):**
    - Por defecto, Supabase Cloud envía correos genéricos en inglés.
-   - Para que los correos de confirmación y reseteo de contraseña lleven el diseño oficial de IMPERO, Supabase Cloud requiere habilitar un servidor SMTP propio (podés usar tu propia cuenta de Gmail gratuita con una *Contraseña de aplicación* o Resend).
+   - Para que los correos de confirmación y reseteo de contraseña lleven el diseño oficial de DOM, Supabase Cloud requiere habilitar un servidor SMTP propio (podés usar tu propia cuenta de Gmail gratuita con una *Contraseña de aplicación* o Resend).
    - La guía paso a paso y los códigos HTML están detallados en [docs/EMAIL_TEMPLATES.md](docs/EMAIL_TEMPLATES.md).
 
 ---
@@ -78,8 +76,8 @@ Para máxima privacidad sin tocar la nube:
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/impero.git
-cd impero
+git clone https://github.com/tu-usuario/dom.git
+cd dom
 
 # 2. Instalar dependencias
 npm install
@@ -97,13 +95,13 @@ npm run dev
 
 - La app estará disponible en `http://localhost:5173`.
 - La base de datos en `postgresql://postgres:postgres@127.0.0.1:54422/postgres`.
-- El buzón de correos de desarrollo (Inbucket) en `http://127.0.0.1:54324`, donde las plantillas en español de IMPERO ya vienen **preconfiguradas y listas para usar** desde `supabase/templates/`.
+- El buzón de correos de desarrollo (Inbucket) en `http://127.0.0.1:54324`, donde las plantillas en español de DOM ya vienen **preconfiguradas y listas para usar** desde `supabase/templates/`.
 
 ---
 
 ## 📬 Plantillas de Correo Electrónico (Transaccionales)
 
-IMPERO incluye plantillas HTML responsive con identidad visual sobria (*Obsidian + Verde Esmeralda*):
+DOM incluye plantillas HTML responsive con identidad visual sobria (*Obsidian + Verde Esmeralda*):
 
 - **En Desarrollo Local (Supabase CLI):** Las plantillas en [`supabase/templates/`](supabase/templates/) ya están vinculadas en [`supabase/config.toml`](supabase/config.toml) y se visualizan automáticamente en Inbucket sin configuración adicional.
 - **En Producción Self-Hosted (Docker Compose):** Se monta el volumen `./supabase/templates:/etc/gotrue/templates:ro` en el contenedor `auth` y se definen las variables de entorno `GOTRUE_SMTP_*` de tu propio servidor de correo (Postfix, Mailcow, Stalwart, Gmail, etc.).
@@ -133,4 +131,4 @@ IMPERO incluye plantillas HTML responsive con identidad visual sobria (*Obsidian
 
 ## 📄 Licencia
 
-Software libre bajo licencia MIT. Desarrollado con excelencia por y para personas que valoran la soberanía de sus finanzas. IMPERO: Administración financiera con visión y propósito.
+Software libre bajo licencia MIT. Desarrollado con excelencia por y para personas que valoran la soberanía de sus finanzas. DOM: El dominio no se conquista. Se administra.

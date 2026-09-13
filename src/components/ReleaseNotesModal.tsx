@@ -19,7 +19,9 @@ import { useSettings } from "@/lib/settings-store";
 import { APP_VERSION } from "@/lib/version";
 
 export const CURRENT_VERSION = APP_VERSION;
-const STORAGE_KEY = "impero_last_seen_release";
+export const STORAGE_KEY = "dom_last_seen_release";
+export const LEGACY_DOMINUS_STORAGE_KEY = "dominus_last_seen_release";
+export const LEGACY_STORAGE_KEY = "impero_last_seen_release";
 
 interface ReleaseNotesModalProps {
   open: boolean;
@@ -145,7 +147,10 @@ export function ReleaseNotesModal({ open, onOpenChange }: ReleaseNotesModalProps
 
 export function shouldShowReleaseNotes(): boolean {
   try {
-    const lastSeen = localStorage.getItem(STORAGE_KEY);
+    const lastSeen =
+      localStorage.getItem(STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_DOMINUS_STORAGE_KEY) ??
+      localStorage.getItem(LEGACY_STORAGE_KEY);
     return lastSeen !== CURRENT_VERSION;
   } catch {
     return false;

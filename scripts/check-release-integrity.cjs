@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script de validación de integridad de releases para m3/IMPERO.
+ * Script de validación de integridad de releases para DOM.
  * Verifica la coherencia entre package.json y docs/RELEASE_NOTES.md,
  * asegurando que la última versión cerrada coincida con la desplegada en Cloud
  * y que las notas activas sean 100% User-Facing sin identificadores internos.

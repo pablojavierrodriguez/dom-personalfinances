@@ -106,7 +106,7 @@ export function ReportsPage({
     try {
       const accountsMap = getAccountsMap();
       const excelBuffer = generateTransactionsExcel(filteredTransactions, accountsMap);
-      const filename = `impero_transacciones_${dateRange}_${new Date().toISOString().split("T")[0]}.xlsx`;
+      const filename = `dominus_transacciones_${dateRange}_${new Date().toISOString().split("T")[0]}.xlsx`;
       downloadExcelFile(excelBuffer, filename);
       toast.success(t("report.exportSuccessExcel"));
     } catch {
@@ -119,7 +119,7 @@ export function ReportsPage({
     try {
       const accountsMap = getAccountsMap();
       const csvContent = generateTransactionsCsv(filteredTransactions, accountsMap);
-      const filename = `impero_transacciones_${dateRange}_${new Date().toISOString().split("T")[0]}.csv`;
+      const filename = `dominus_transacciones_${dateRange}_${new Date().toISOString().split("T")[0]}.csv`;
       downloadCsvFile(csvContent, filename);
       toast.success(t("report.exportSuccessCsv"));
     } catch {

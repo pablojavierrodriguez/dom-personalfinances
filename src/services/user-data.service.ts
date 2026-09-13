@@ -183,6 +183,7 @@ export function purgeLocalUserData(): void {
     localStorage.removeItem("onboarding-current-step");
     localStorage.removeItem("onboarding-temp-currency");
     localStorage.removeItem("onboarding-temp-accounts");
+    localStorage.removeItem("dominus_last_seen_release");
     localStorage.removeItem("impero_last_seen_release");
   } catch {
     // Silencioso
@@ -191,6 +192,15 @@ export function purgeLocalUserData(): void {
   // 4. Claves de compatibilidad y legacy
   const legacyKeys = [
     "tags",
+    "impero-global-sync-queue",
+    "impero-cache-accounts",
+    "impero-cache-categories",
+    "impero-cache-transactions",
+    "impero-cache-budgets",
+    "impero-cache-goals",
+    "impero-cache-bills",
+    "impero-cache-recurring",
+    "impero-cache-tags",
     "impero-transaction-rules",
     "m3-transaction-rules",
     "impero-finance-data",
