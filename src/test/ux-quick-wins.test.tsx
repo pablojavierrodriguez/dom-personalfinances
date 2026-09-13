@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { DashboardSparkline } from "@/components/DashboardSparkline";
 import { KeyboardShortcutsModal } from "@/components/KeyboardShortcutsModal";
 import { GlobalCommandMenu } from "@/components/GlobalCommandMenu";
-import { ReleaseNotesModal, shouldShowReleaseNotes } from "@/components/ReleaseNotesModal";
+import { ReleaseNotesModal, shouldShowReleaseNotes, CURRENT_VERSION } from "@/components/ReleaseNotesModal";
 import { SettingsProvider } from "@/lib/settings-store";
 import { PrivacyProvider } from "@/contexts/PrivacyContext";
 
@@ -115,7 +115,7 @@ describe("UX Quick Wins: Sparklines, Keyboard Shortcuts, Command Menu & Release 
       );
 
       expect(screen.getByText("¿Qué hay de nuevo en IMPERO?")).toBeDefined();
-      expect(screen.getByText("Versión 0.3.1")).toBeDefined();
+      expect(screen.getByText(`Versión ${CURRENT_VERSION}`)).toBeDefined();
       expect(screen.getByText("Motor Offline-First Global")).toBeDefined();
       expect(screen.getByText("Internacionalización Total (ES / EN)")).toBeDefined();
 
@@ -123,7 +123,7 @@ describe("UX Quick Wins: Sparklines, Keyboard Shortcuts, Command Menu & Release 
       const dismissBtn = screen.getByRole("button", { name: /¡Entendido!/i });
       fireEvent.click(dismissBtn);
 
-      expect(localStorage.getItem("impero_last_seen_release")).toBe("0.3.1");
+      expect(localStorage.getItem("impero_last_seen_release")).toBe(CURRENT_VERSION);
       expect(shouldShowReleaseNotes()).toBe(false);
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });

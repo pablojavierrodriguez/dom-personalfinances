@@ -754,7 +754,11 @@ const Index = ({ initialTab }: IndexProps = {}) => {
         onSubmit={store.addTransaction} accounts={store.getActiveAccounts()}
         categories={store.getAllActiveCategories()} tags={store.tags}
         initialType={quickAddType}
-        getTransactionCountByCategory={store.getTransactionCountByCategory} />
+        getTransactionCountByCategory={store.getTransactionCountByCategory}
+        onTransferRequest={() => {
+          setQuickAddOpen(false);
+          setTransferOpen(true);
+        }} />
 
       <CsvImportSheet
         open={csvImportOpen}

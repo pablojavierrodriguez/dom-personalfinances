@@ -166,4 +166,46 @@ describe("useFinanceStore Unit & Integration Tests", () => {
     expect(typeof result.current.syncGlobalQueue).toBe("function");
     expect(typeof result.current.purgeAllUserData).toBe("function");
   });
+
+  it("updates account balances accurately when editing a transaction (amount, account or type)", async () => {
+    const { result } = renderHook(() => useFinanceStore());
+    const dummyCategory = { id: "cat-1", name: "Alimentación", color: "bg-orange-500", type: "expense" as const };
+
+    // Wait for accounts to initialize
+    await waitFor(() => {
+      expect(result.current.accounts.length).toBeGreaterThanOrEqual(2);
+    });
+
+    const initialAcc1 = result.current.accounts.find(a => a.id === "acc-1")?.balance ?? 50000;
+
+    // 1. Add expense of 1000 in acc-1
+    act(() => {
+      result.current.addTransaction(1000, "Cena", dummyCategory, "expense", "acc-1");
+    });
+
+    // Check acc-1 balance decreased by 1000
+    expect(result.current.accounts.find(a => a.id === "acc-1")?.balance).toBe(initialAcc1 - 1000);
+
+    const addedTx = result.current.transactions[0];
+    expect(addedTx).toBeDefined();
+
+    // 2. Edit transaction: increase amount from 1000 to 1500
+    act(() => {
+      result.current.updateTransaction(addedTx.id, { amount: 1500 });
+    });
+
+    // acc-1 balance should now be initial - 1500
+    expect(result.current.accounts.find(a => a.id === "acc-1")?.balance).toBe(initialAcc1 - 1500);
+
+    // 3. Edit transaction: move from acc-1 to acc-2 (credit card)
+    const initialAcc2 = result.current.accounts.find(a => a.id === "acc-2")?.balance ?? 12000;
+    act(() => {
+      result.current.updateTransaction(addedTx.id, { accountId: "acc-2" });
+    });
+
+    // acc-1 balance should be reverted back to initialAcc1
+    expect(result.current.accounts.find(a => a.id === "acc-1")?.balance).toBe(initialAcc1);
+    // acc-2 (credit card) balance should have increased debt by 1500
+    expect(result.current.accounts.find(a => a.id === "acc-2")?.balance).toBe(initialAcc2 + 1500);
+  });
 });

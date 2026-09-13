@@ -1,6 +1,6 @@
 import { Transaction, Account, getStatementPeriod, getPaymentDueDate } from "@/lib/types";
 import { useState, useMemo, useRef, useEffect } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo, animate } from "framer-motion";
 import { format, isToday, isYesterday, isFuture, differenceInCalendarDays } from "date-fns";
 import { CategoryIcon } from "./CategoryIcon";
 import { Trash2, Pencil, ArrowLeftRight, CreditCard, ChevronDown, DollarSign, Calculator, Clock } from "lucide-react";
@@ -27,6 +27,8 @@ function SwipeableTransaction({
   formatInCurrency,
   onSelect,
   onDelete,
+  showAccountChip,
+  isHint,
 }: {
   tx: Transaction;
   account?: Account;
@@ -35,6 +37,8 @@ function SwipeableTransaction({
   formatInCurrency: (amount: number, currency: Currency, opts?: { sign?: string; abs?: boolean }) => string;
   onSelect?: (tx: Transaction) => void;
   onDelete?: (id: string) => void;
+  showAccountChip?: boolean;
+  isHint?: boolean;
 }) {
   const { maskAmount } = usePrivacy();
   const { t } = useSettings();
@@ -55,6 +59,17 @@ function SwipeableTransaction({
   const x = useMotionValue(0);
   const deleteOpacity = useTransform(x, [-120, -60], [1, 0]);
   const editOpacity = useTransform(x, [60, 120], [0, 1]);
+
+  useEffect(() => {
+    if (isHint) {
+      const controls = animate(x, [0, -28, 0], {
+        duration: 0.8,
+        ease: "easeInOut",
+        delay: 0.15,
+      });
+      return () => controls.stop();
+    }
+  }, [isHint, x]);
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     if (info.offset.x < -100 && onDelete) {
@@ -139,6 +154,14 @@ function SwipeableTransaction({
               <span className="truncate">
                 {tx.category.name} · {isToday(tx.date) ? format(tx.date, "h:mm a") : isYesterday(tx.date) ? `${t("common.yesterday")} ${format(tx.date, "h:mm a")}` : format(tx.date, "MMM d")}
               </span>
+              {showAccountChip && account && (
+                <span className="inline-flex items-center gap-1 shrink-0 px-1.5 py-0.2 rounded bg-secondary/60 border border-border/30">
+                  <span className={`w-1.5 h-1.5 rounded-full ${account.color} shrink-0`} />
+                  <span className="text-[10px] text-muted-foreground/90 font-medium truncate max-w-[70px]">
+                    {account.name}
+                  </span>
+                </span>
+              )}
               {isFuture(tx.date) && (
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500 font-semibold text-[10px] tracking-tight shrink-0">
                   <Clock className="w-2.5 h-2.5 shrink-0" />
@@ -306,6 +329,24 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
 
   const currentCurrency = settings.currency || "ARS";
   const accountsMap = useMemo(() => new Map<string, Account>(accounts.map(a => [a.id, a])), [accounts]);
+  const showAccountChip = useMemo(() => accounts.filter(a => !a.archived).length > 1, [accounts]);
+
+  const [hintTxId, setHintTxId] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const shown = localStorage.getItem("swipe-hint-shown");
+      if (!shown && transactions.length > 0) {
+        const timer = setTimeout(() => {
+          setHintTxId(transactions[0].id);
+          localStorage.setItem("swipe-hint-shown", "1");
+        }, 1200);
+        return () => clearTimeout(timer);
+      }
+    } catch {
+      // Ignore localStorage availability issues
+    }
+  }, [transactions.length]);
 
   const showSubtotals = settings.showDailySubtotals ?? false;
 
@@ -496,6 +537,8 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
                       formatInCurrency={formatInCurrency}
                       onSelect={onSelect}
                       onDelete={onDelete}
+                      showAccountChip={showAccountChip}
+                      isHint={hintTxId === tx.id}
                     />
                   </motion.div>
                 ))}
@@ -534,6 +577,8 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
                       formatInCurrency={formatInCurrency}
                       onSelect={onSelect}
                       onDelete={onDelete}
+                      showAccountChip={showAccountChip}
+                      isHint={hintTxId === item.tx.id}
                     />
                   )}
                 </motion.div>

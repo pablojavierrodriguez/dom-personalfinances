@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { LayoutDashboard, ArrowLeftRight, Wallet, Plus, MoreHorizontal } from "lucide-react";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from "@/components/ui/sheet";
 import {
-  CreditCard, Tags, Repeat, Receipt, Settings, PiggyBank, Target, Bell, BarChart3, Hash, Zap, ShoppingCart, Upload, User, LogOut
+  CreditCard, Tags, Repeat, Settings, PiggyBank, Target, Bell, BarChart3, Hash, Zap, ShoppingCart, Upload, User, LogOut
 } from "lucide-react";
 import { useSettings } from "@/lib/settings-store";
 import { useAuth } from "@/lib/auth-context";
@@ -21,7 +21,6 @@ interface BottomNavProps {
 
 export function BottomNav({ activeTab, onTabChange, onQuickAdd, onTransfer, onImportCsv, pendingBillsCount = 0 }: BottomNavProps) {
   const [moreOpen, setMoreOpen] = useState(false);
-  const [fabOpen, setFabOpen] = useState(false);
   const { t } = useSettings();
   const { user, signOut } = useAuth();
 
@@ -32,6 +31,7 @@ export function BottomNav({ activeTab, onTabChange, onQuickAdd, onTransfer, onIm
   ];
 
   const moreItems = [
+    { id: "transfer", icon: Repeat, label: t("nav.transfer"), desc: t("tx.transferDesc") || "Mover fondos entre cuentas", isAction: true, onClick: onTransfer },
     { id: "budgets", icon: PiggyBank, label: t("nav.budgets"), desc: t("nav.budgetsDesc") },
     { id: "goals", icon: Target, label: t("nav.goals"), desc: t("nav.goalsDesc") },
     { id: "obligations", icon: Bell, label: t("nav.obligations") || "Recurrentes", desc: t("nav.obligationsDesc") || "Vencimientos y pagos periódicos", badge: pendingBillsCount },
@@ -52,95 +52,6 @@ export function BottomNav({ activeTab, onTabChange, onQuickAdd, onTransfer, onIm
 
   return (
     <>
-      <AnimatePresence>
-        {fabOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex flex-col justify-end p-6 pb-24 items-center"
-            onClick={() => setFabOpen(false)}
-          >
-            <div className="w-full max-w-xs flex flex-col gap-3">
-              {/* Opción 1: GASTO */}
-              <motion.button
-                initial={{ opacity: 0, y: 30, scale: 0.85 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.85 }}
-                transition={{ delay: 0.04 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setFabOpen(false);
-                  onQuickAdd("expense");
-                }}
-                className="flex items-center justify-between px-4 py-3.5 rounded-2xl bg-destructive/15 border border-destructive/30 text-foreground hover:bg-destructive/25 active:scale-98 transition-all shadow-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center text-destructive-foreground shadow-sm">
-                    <Receipt className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <span className="text-sm font-semibold block text-foreground">{t("tx.newExpense") || "Nuevo Gasto"}</span>
-                    <span className="text-[11px] text-muted-foreground block">{t("tx.newExpenseDesc") || "Registrar salida de dinero"}</span>
-                  </div>
-                </div>
-                <span className="text-destructive text-lg font-bold">−</span>
-              </motion.button>
-
-              {/* Opción 2: INGRESO */}
-              <motion.button
-                initial={{ opacity: 0, y: 30, scale: 0.85 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.85 }}
-                transition={{ delay: 0.08 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setFabOpen(false);
-                  onQuickAdd("income");
-                }}
-                className="flex items-center justify-between px-4 py-3.5 rounded-2xl bg-primary/15 border border-primary/30 text-foreground hover:bg-primary/25 active:scale-98 transition-all shadow-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-sm">
-                    <ArrowLeftRight className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <span className="text-sm font-semibold block text-foreground">{t("tx.newIncome") || "Nuevo Ingreso"}</span>
-                    <span className="text-[11px] text-muted-foreground block">{t("tx.newIncomeDesc") || "Sueldo, cobro o rendimientos"}</span>
-                  </div>
-                </div>
-                <span className="text-primary text-lg font-bold">+</span>
-              </motion.button>
-
-              {/* Opción 3: TRANSFERENCIA (Azul) */}
-              <motion.button
-                initial={{ opacity: 0, y: 30, scale: 0.85 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.85 }}
-                transition={{ delay: 0.12 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setFabOpen(false);
-                  onTransfer();
-                }}
-                className="flex items-center justify-between px-4 py-3.5 rounded-2xl bg-sky-500/15 border border-sky-500/30 text-foreground hover:bg-sky-500/25 active:scale-98 transition-all shadow-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-sky-500 flex items-center justify-center text-white shadow-sm">
-                    <Repeat className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <span className="text-sm font-semibold block text-foreground">{t("nav.transfer")}</span>
-                    <span className="text-[11px] text-muted-foreground block">{t("tx.transferDesc") || "Mover fondos entre cuentas"}</span>
-                  </div>
-                </div>
-                <span className="text-sky-500 text-lg font-bold">⇄</span>
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className="fixed bottom-0 left-0 right-0 z-40">
         <div className="bg-card/95 backdrop-blur-lg border-t border-border/50 pb-safe">
           <div className="flex items-center justify-around px-1 h-16 max-w-md mx-auto">
@@ -171,11 +82,14 @@ export function BottomNav({ activeTab, onTabChange, onQuickAdd, onTransfer, onIm
               )}
             </button>
 
-            <motion.button whileTap={{ scale: 0.92 }} onClick={() => setFabOpen(prev => !prev)}
-              className="h-12 w-12 rounded-full bg-primary flex items-center justify-center fab-glow -mt-3">
-              <motion.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
-                <Plus className="w-5 h-5 text-primary-foreground" />
-              </motion.div>
+            <motion.button
+              whileTap={{ scale: 0.92 }}
+              onClick={() => onQuickAdd("expense")}
+              className="h-12 w-12 rounded-full bg-primary flex items-center justify-center fab-glow -mt-3 shadow-lg"
+              title={t("tx.newExpense") || "Nuevo Gasto"}
+              aria-label={t("tx.newExpense") || "Nuevo Gasto"}
+            >
+              <Plus className="w-5 h-5 text-primary-foreground" />
             </motion.button>
           </div>
         </div>

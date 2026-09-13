@@ -406,34 +406,90 @@ export function useFinanceStore() {
     });
 
     setTransactions(prev => {
-      const next = prev.map(t => {
-        if (t.id === id) {
-          const updated = { ...t, ...updates };
-          if (updates.amount !== undefined && updates.amount !== t.amount) {
-            const diff = updates.amount - t.amount;
-            setAccounts(accs => {
-              const nextAccs = accs.map(acc => {
-                if (acc.id === updated.accountId) {
-                  const isCredit = acc.type === "credit";
-                  const newBal = isCredit
-                    ? (updated.type === "expense" ? acc.balance + diff : acc.balance - diff)
-                    : (updated.type === "income" ? acc.balance + diff : acc.balance - diff);
-                  updateAccountRemote(acc.id, { balance: newBal }).catch(err => {
-                    enqueueGlobalSyncOp({ type: "update_account_balance", id: acc.id, balance: newBal });
-                    setPendingGlobalSyncCount(getPendingGlobalSyncCount());
-                  });
-                  return { ...acc, balance: newBal };
-                }
-                return acc;
+      const prevTx = prev.find(t => t.id === id);
+      if (!prevTx) return prev;
+
+      // Las transferencias se gestionan con su propia lógica de doble leg
+      if (prevTx.isTransfer) {
+        const next = prev.map(t => (t.id === id ? { ...t, ...updates } : t));
+        setCachedData(CACHE_KEYS.TRANSACTIONS, next);
+        return next;
+      }
+
+      const prevAmount = prevTx.amount;
+      const prevAccId = prevTx.accountId;
+      const prevType = prevTx.type;
+      const prevCurrency = prevTx.currency || "ARS";
+
+      const newAmount = updates.amount !== undefined ? updates.amount : prevAmount;
+      const newAccId = updates.accountId !== undefined ? updates.accountId : prevAccId;
+      const newType = updates.type !== undefined ? updates.type : prevType;
+      const newCurrency = updates.currency !== undefined ? updates.currency : prevCurrency;
+
+      const balanceChanged =
+        newAmount !== prevAmount ||
+        newAccId !== prevAccId ||
+        newType !== prevType ||
+        newCurrency !== prevCurrency;
+
+      if (balanceChanged) {
+        setAccounts(accs => {
+          const nextAccs = accs.map(acc => {
+            let newBal = acc.balance;
+            const accCurrency = (acc.currency as Currency) || "ARS";
+
+            // Paso 1: revertir el impacto de la transacción anterior en la cuenta original
+            if (acc.id === prevAccId) {
+              let prevEffective = prevAmount;
+              if (prevCurrency !== accCurrency) {
+                const rateFrom = DEFAULT_EXCHANGE_RATES[prevCurrency] ?? 1;
+                const rateTo = DEFAULT_EXCHANGE_RATES[accCurrency] ?? 1;
+                const amountInArs = rateFrom > 0 ? prevAmount / rateFrom : prevAmount;
+                prevEffective = amountInArs * rateTo;
+              }
+
+              const isCredit = acc.type === "credit";
+              const revertDelta = isCredit
+                ? (prevType === "expense" ? -prevEffective : prevEffective)
+                : (prevType === "income" ? -prevEffective : prevEffective);
+
+              newBal = acc.balance + revertDelta;
+            }
+
+            // Paso 2: aplicar el nuevo impacto en la cuenta destino
+            if (acc.id === newAccId) {
+              let newEffective = newAmount;
+              if (newCurrency !== accCurrency) {
+                const rateFrom = DEFAULT_EXCHANGE_RATES[newCurrency] ?? 1;
+                const rateTo = DEFAULT_EXCHANGE_RATES[accCurrency] ?? 1;
+                const amountInArs = rateFrom > 0 ? newAmount / rateFrom : newAmount;
+                newEffective = amountInArs * rateTo;
+              }
+
+              const baseBalance = acc.id === prevAccId ? newBal : acc.balance;
+              const isCredit = acc.type === "credit";
+              const applyDelta = isCredit
+                ? (newType === "expense" ? newEffective : -newEffective)
+                : (newType === "income" ? newEffective : -newEffective);
+
+              newBal = baseBalance + applyDelta;
+            }
+
+            if (newBal !== acc.balance) {
+              updateAccountRemote(acc.id, { balance: newBal }).catch(err => {
+                enqueueGlobalSyncOp({ type: "update_account_balance", id: acc.id, balance: newBal });
+                setPendingGlobalSyncCount(getPendingGlobalSyncCount());
               });
-              setCachedData(CACHE_KEYS.ACCOUNTS, nextAccs);
-              return nextAccs;
-            });
-          }
-          return updated;
-        }
-        return t;
-      });
+              return { ...acc, balance: newBal };
+            }
+            return acc;
+          });
+          setCachedData(CACHE_KEYS.ACCOUNTS, nextAccs);
+          return nextAccs;
+        });
+      }
+
+      const next = prev.map(t => (t.id === id ? { ...t, ...updates } : t));
       setCachedData(CACHE_KEYS.TRANSACTIONS, next);
       return next;
     });

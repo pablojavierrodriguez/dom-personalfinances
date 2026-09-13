@@ -25,9 +25,10 @@ interface QuickAddSheetProps {
   tags?: Tag[];
   initialType?: "expense" | "income";
   getTransactionCountByCategory?: (categoryId: string) => number;
+  onTransferRequest?: () => void;
 }
 
-export function QuickAddSheet({ open, onClose, onSubmit, accounts, categories, tags = [], initialType = "expense", getTransactionCountByCategory }: QuickAddSheetProps) {
+export function QuickAddSheet({ open, onClose, onSubmit, accounts, categories, tags = [], initialType = "expense", getTransactionCountByCategory, onTransferRequest }: QuickAddSheetProps) {
   const { currencySymbol, settings, t } = useSettings();
   const [amount, setAmount] = useState("0");
   const [type, setType] = useState<"income" | "expense">(initialType);
@@ -209,17 +210,31 @@ export function QuickAddSheet({ open, onClose, onSubmit, accounts, categories, t
   const typeToggle = (
     <div className="flex bg-secondary rounded-full p-0.5">
       <button
+        type="button"
         onClick={() => setType("expense")}
-        className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors ${type === "expense" ? "bg-card text-foreground" : "text-muted-foreground"}`}
+        className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors ${type === "expense" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"}`}
       >
         {t("quickadd.expense")}
       </button>
       <button
+        type="button"
         onClick={() => setType("income")}
-        className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors ${type === "income" ? "bg-card text-foreground" : "text-muted-foreground"}`}
+        className={`px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors ${type === "income" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"}`}
       >
         {t("quickadd.income")}
       </button>
+      {onTransferRequest && (
+        <button
+          type="button"
+          onClick={() => {
+            resetAndClose();
+            onTransferRequest();
+          }}
+          className="px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-colors text-muted-foreground hover:text-foreground"
+        >
+          {t("nav.transfer")}
+        </button>
+      )}
     </div>
   );
 

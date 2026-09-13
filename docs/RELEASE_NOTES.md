@@ -4,11 +4,34 @@
 
 ## [Unreleased] — En Desarrollo (Próxima Versión)
 
+---
+
+## [0.3.2] — 2026-09-13 🚀 Fluidez de Registro Móvil y Consistencia Atómica de Balances
+
 ### 🎯 Resumen
-Próximos desarrollos de producto y mejoras continuas.
+Mejoras clave en la fluidez del registro diario de operaciones, consistencia matemática y atómica de balances al editar transacciones, y optimizaciones de microinteracción y descubrimiento en la experiencia móvil.
 
 ### ✨ Nuevas Funcionalidades y Mejoras
-- Ningún cambio registrado aún.
+
+#### ⚡ Consistencia Financiera y Balances Atómicos
+- **Recálculo Atómico de Balances en Edición de Transacciones:**
+  - Corrección integral de `updateTransaction` para recalcular saldos en dos fases atómicas (reversión en cuenta original y débito/crédito en cuenta destino). Resuelve inconsistencias al cambiar cuenta, monto o tipo (`expense` ↔ `income`) sin necesidad de sincronización manual.
+  - Compatibilidad total con tarjetas de crédito (pasivos no positivos) y operaciones multi-divisa.
+
+#### 🚀 Fluidez de Registro y Navegación Móvil
+- **Acceso Directo a Registro de Gastos:**
+  - El botón flotante (FAB) abre directamente el formulario de registro de Gastos en un solo toque, eliminando el menú intermedio de opciones redundantes.
+  - Se incorpora la opción de **Transferencia** directamente en el selector de tipo superior dentro del formulario rápido y en el menú extendido.
+
+#### 📱 Microinteracciones y Claridad Visual
+- **Identificador de Cuenta en Cada Transacción:**
+  - Indicador visual compacto con color y nombre de la cuenta en cada fila de la lista cuando existen 2 o más cuentas activas.
+- **Descubrimiento de Gestos (Swipe Hint):**
+  - Animación sutil de deslizamiento en la primera fila durante la primera sesión para enseñar intuitivamente las acciones de edición y borrado rápido.
+- **Contexto Granular en Planes de Cuotas:**
+  - Visualización del número total de cuotas en el botón de confirmación de borrado de plan en el editor.
+- **Feedback Visual en Cambio de Cuenta:**
+  - Resplandor activo en el carrusel de cuentas al modificar la cuenta de una transacción.
 
 ---
 

@@ -44,6 +44,7 @@ export function TransactionEditSheet({
   const [receiptUrl, setReceiptUrl] = useState<string | undefined>(undefined);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [accountChanged, setAccountChanged] = useState(false);
 
   useEffect(() => {
     if (transaction) {
@@ -201,7 +202,7 @@ export function TransactionEditSheet({
                         onClick={handleDeletePlan}
                         className="w-full h-10 rounded-xl bg-destructive text-destructive-foreground text-[13px] font-semibold active:scale-[0.98] transition-transform shadow-xs"
                       >
-                        {t("txedit.deleteInstallmentPlan")}
+                        {t("txedit.deleteInstallmentPlan")} · {transaction.installmentInfo?.total} cuotas
                       </button>
                       <button
                         type="button"
@@ -237,42 +238,48 @@ export function TransactionEditSheet({
             <div className="hero-balance-surface p-4 rounded-2xl relative overflow-hidden flex flex-col items-center">
               {/* Type toggle pill & Currency selector */}
               <div className="flex items-center justify-between w-full mb-3 relative z-10 px-1">
-                <div className="inline-flex p-1 rounded-full bg-secondary/60 border border-border/40 shadow-2xs">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic(8);
-                      setType("expense");
-                      if (selectedCategory?.type !== "expense") {
-                        setSelectedCategory(null);
-                      }
-                    }}
-                    className={`px-4 py-1 rounded-full text-xs font-semibold tracking-wide transition-all ${
-                      type === "expense"
-                        ? "bg-card text-foreground shadow-xs"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {t("quickadd.expense")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic(8);
-                      setType("income");
-                      if (selectedCategory?.type !== "income") {
-                        setSelectedCategory(null);
-                      }
-                    }}
-                    className={`px-4 py-1 rounded-full text-xs font-semibold tracking-wide transition-all ${
-                      type === "income"
-                        ? "bg-card text-emerald-500 shadow-xs"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {t("quickadd.income")}
-                  </button>
-                </div>
+                {transaction?.isTransfer || transaction?.isCardPayment ? (
+                  <div className="inline-flex px-3 py-1 rounded-full bg-secondary/80 border border-border/40 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    {transaction.isTransfer ? t("nav.transfer") : "Pago de Tarjeta"}
+                  </div>
+                ) : (
+                  <div className="inline-flex p-1 rounded-full bg-secondary/60 border border-border/40 shadow-2xs">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic(8);
+                        setType("expense");
+                        if (selectedCategory?.type !== "expense") {
+                          setSelectedCategory(null);
+                        }
+                      }}
+                      className={`px-4 py-1 rounded-full text-xs font-semibold tracking-wide transition-all ${
+                        type === "expense"
+                          ? "bg-card text-foreground shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {t("quickadd.expense")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic(8);
+                        setType("income");
+                        if (selectedCategory?.type !== "income") {
+                          setSelectedCategory(null);
+                        }
+                      }}
+                      className={`px-4 py-1 rounded-full text-xs font-semibold tracking-wide transition-all ${
+                        type === "income"
+                          ? "bg-card text-emerald-500 shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {t("quickadd.income")}
+                    </button>
+                  </div>
+                )}
 
                 {/* Selector táctil de divisa para la transacción */}
                 <div className="flex items-center gap-0.5 bg-secondary/60 p-0.5 rounded-full border border-border/40 shadow-2xs">
@@ -439,20 +446,28 @@ export function TransactionEditSheet({
                   </span>
                 )}
               </div>
-              <div className="flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar touch-pan-x -mx-1 px-1">
+              <div className={`flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar touch-pan-x -mx-1 px-1 rounded-xl transition-all duration-300 ${accountChanged ? "ring-2 ring-primary/50 bg-primary/5" : ""}`}>
                 {accounts.map((acc) => {
                   const isSelected = selectedAccount === acc.id;
+                  const isLocked = transaction?.isTransfer || transaction?.isCardPayment;
                   return (
                     <button
                       key={acc.id}
                       type="button"
+                      disabled={isLocked && !isSelected}
                       onClick={() => {
                         triggerHaptic(6);
-                        setSelectedAccount(acc.id);
+                        if (acc.id !== selectedAccount) {
+                          setSelectedAccount(acc.id);
+                          setAccountChanged(true);
+                          setTimeout(() => setAccountChanged(false), 600);
+                        }
                       }}
                       className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[12px] font-medium shrink-0 transition-all active:scale-95 ${
                         isSelected
                           ? "bg-card text-foreground ring-2 ring-primary border-primary/30 shadow-xs"
+                          : isLocked
+                          ? "opacity-40 cursor-not-allowed bg-secondary/20 text-muted-foreground border border-border/20"
                           : "bg-secondary/40 text-muted-foreground hover:text-foreground hover:bg-secondary/70 border border-border/40"
                       }`}
                     >
