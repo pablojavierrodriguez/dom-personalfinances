@@ -1,4 +1,4 @@
-# Global Agent Instructions — IMPERO (Autogobierno • Claridad • Soberanía)
+# Global Agent Instructions — DOM (El dominio no se conquista. Se administra)
 
 ---
 
@@ -18,6 +18,8 @@
 4. **Documentar decisiones importantes.** Cualquier decisión de arquitectura, patrón o desvío del estándar del proyecto debe quedar documentado.
 5. **No romper lo que funciona.** Antes de refactorizar, entender el impacto completo y pedir confirmación al usuario antes de actuar.
 6. **Ante inconsistencia entre reglas y código, consultar al usuario antes de actuar.**
+7. **Autonomía y Decisión Dinámica de Modos de Trabajo:** El usuario no debe solicitar explícitamente cuándo usar el playbook o qué rol activar. El agente clasifica automáticamente cada input entre: (a) *Foco Quirúrgico / Fast-Track* (Principal Engineer directo para bugfixes/invariantes, cero burocracia), (b) *Dúo Táctico* (Designer + Engineer para rediseños de UI/modales), o (c) *Sprint Playbook Completo* (PM Orchestrator liderando las 5 fases para features del backlog o cambios estructurales). Consultar [.agents/TEAM_PLAYBOOK.md](file:///Users/adrisol/Pablo/code/m3/.agents/TEAM_PLAYBOOK.md).
+8. **Autonomía de Subagentes (Paralelización vs. Foco):** Regla de oro: *"Foco absoluto en la lógica de dominio; manos paralelas en la exploración y verificación"*. El PM o Principal Engineer deciden cuándo convocar subagentes (`browser_subagent` para QA visual/a11y en mobile 375px, benchmarking) y cuándo mantener foco exclusivo en un solo hilo secuencial (invariantes de balances, contabilidad, esquemas de Supabase y RLS).
 
 ---
 
