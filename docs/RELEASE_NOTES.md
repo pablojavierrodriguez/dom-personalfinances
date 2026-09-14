@@ -4,6 +4,25 @@
 
 ## [Unreleased] — En Desarrollo (Próxima Versión)
 
+### 🔍 Auditor de Suscripciones & Detector de Fugas (Épica C3)
+- **Detección Heurística Autónoma:**
+  - Motor de identificación en el historial de transacciones de patrones periódicos y suscripciones mensuales, semanales o anuales con normalización inteligente de nombres bancarios (Netflix, Spotify, ChatGPT, YouTube Premium, abonos y servicios).
+- **Shock Visual y Consciencia Patrimonial:**
+  - Desglose del costo mensual comprometido y proyección anualizada.
+  - Calculadora de costo de oportunidad con interés compuesto a 1, 3 y 5 años (referencia 8% anual): visibiliza cuánto capital acumulado representaría ese gasto si fuera invertido.
+- **Diagnóstico y Clasificación Ergonómica en 1-Tap:**
+  - Chips táctiles (≥ 44px) para categorizar cada ítem entre *Indispensable*, *En duda* o *Fuga confirmada*.
+  - Filtros instantáneos y creación directa de recordatorios de cancelación o vinculación con pagos fijos.
+- **Acceso Omnicanal:**
+  - Botón de acceso directo en el encabezado de *Compromisos* (`ObligationsManager`) e integración en la paleta de comandos `Cmd+K`.
+
+### ⚡ Blindaje Ergonómico de Inputs y Formato Regional (es-AR)
+- **Separadores de Miles en Todos los Inputs:**
+  - Corrección integral de cotizaciones de cambio de referencia (USD y EUR) y presupuesto diario en *Configuración*, garantizando el formateo con punto separador de miles (`1.200`, `1.300`, `50.000`) y modo de teclado decimal optimizado.
+  - Integración de `MoneyInput` en el modal de liquidación de resúmenes de tarjetas de crédito (`PayStatementModal`).
+  - Sustitución de inputs nativos `type="number"` por `inputMode="numeric"` en selectores de días de ciclo y cantidades en listas de compras (`CreditCardManager` y `ShoppingListManager`).
+  - Sanitización de campos de correo electrónico en perfil móvil (`autoCapitalize="none"`, `autoCorrect="off"`, `spellCheck={false}`).
+
 ---
 
 ## [0.4.0] — 2026-09-13 🚀 Identidad Soberana DOM, Geometría SIGIL y Gestión de Perfil

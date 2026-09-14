@@ -244,6 +244,9 @@ export function UserProfilePage() {
               type="email"
               value={profile.email}
               disabled
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               className="w-full h-12 pl-10 pr-4 rounded-xl bg-input border border-border text-foreground/50 text-[14px] outline-none cursor-not-allowed"
             />
           </div>

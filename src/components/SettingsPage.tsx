@@ -22,6 +22,7 @@ import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import type { Language } from "@/lib/i18n";
 import { APP_VERSION } from "@/lib/version";
+import { formatThousandsInput, parseThousandsInput } from "@/lib/utils";
 
 const LANGUAGES: { value: Language; label: string }[] = [
   { value: "es", label: "Español" },
@@ -215,10 +216,11 @@ export function SettingsPage({ onImportCsv, onOpenReleaseNotes, onOpenShortcuts,
                 <div className="flex items-center gap-1">
                   <span className="text-xs text-muted-foreground">$</span>
                   <input
-                    type="number"
-                    value={Math.round(1 / ((settings.customExchangeRates?.USD) || DEFAULT_EXCHANGE_RATES.USD))}
+                    type="text"
+                    inputMode="decimal"
+                    value={formatThousandsInput(Math.round(1 / ((settings.customExchangeRates?.USD) || DEFAULT_EXCHANGE_RATES.USD)))}
                     onChange={(e) => {
-                      const val = Number(e.target.value) || 1200;
+                      const val = parseThousandsInput(e.target.value) || 1200;
                       updateSettings({
                         customExchangeRates: {
                           ...DEFAULT_EXCHANGE_RATES,
@@ -227,7 +229,7 @@ export function SettingsPage({ onImportCsv, onOpenReleaseNotes, onOpenShortcuts,
                         },
                       });
                     }}
-                    className="w-16 h-7 text-xs text-right bg-secondary/50 rounded px-1 text-foreground font-mono-data focus:outline-none focus:ring-1 focus:ring-ring"
+                    className="w-20 h-7 text-xs text-right bg-secondary/50 rounded px-1.5 text-foreground font-mono-data focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
               </div>
@@ -236,10 +238,11 @@ export function SettingsPage({ onImportCsv, onOpenReleaseNotes, onOpenShortcuts,
                 <div className="flex items-center gap-1">
                   <span className="text-xs text-muted-foreground">$</span>
                   <input
-                    type="number"
-                    value={Math.round(1 / ((settings.customExchangeRates?.EUR) || DEFAULT_EXCHANGE_RATES.EUR))}
+                    type="text"
+                    inputMode="decimal"
+                    value={formatThousandsInput(Math.round(1 / ((settings.customExchangeRates?.EUR) || DEFAULT_EXCHANGE_RATES.EUR)))}
                     onChange={(e) => {
-                      const val = Number(e.target.value) || 1300;
+                      const val = parseThousandsInput(e.target.value) || 1300;
                       updateSettings({
                         customExchangeRates: {
                           ...DEFAULT_EXCHANGE_RATES,
@@ -248,7 +251,7 @@ export function SettingsPage({ onImportCsv, onOpenReleaseNotes, onOpenShortcuts,
                         },
                       });
                     }}
-                    className="w-16 h-7 text-xs text-right bg-secondary/50 rounded px-1 text-foreground font-mono-data focus:outline-none focus:ring-1 focus:ring-ring"
+                    className="w-20 h-7 text-xs text-right bg-secondary/50 rounded px-1.5 text-foreground font-mono-data focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
               </div>
@@ -376,9 +379,16 @@ export function SettingsPage({ onImportCsv, onOpenReleaseNotes, onOpenShortcuts,
           <SettingRow icon={Hash} label={t("settings.dailyBudget")}>
             <div className="flex items-center gap-1">
               <span className="text-xs text-muted-foreground">{currencySymbol}</span>
-              <input type="number" value={settings.dailyBudget}
-                onChange={(e) => updateSettings({ dailyBudget: Number(e.target.value) || 0 })}
-                className="w-20 h-8 text-xs text-right bg-background border border-border/50 rounded-md px-2 text-foreground focus:outline-none focus:ring-1 focus:ring-ring" />
+              <input
+                type="text"
+                inputMode="decimal"
+                value={formatThousandsInput(settings.dailyBudget || 0)}
+                onChange={(e) => {
+                  const val = parseThousandsInput(e.target.value);
+                  updateSettings({ dailyBudget: val });
+                }}
+                className="w-24 h-8 text-xs text-right bg-background border border-border/50 rounded-md px-2 text-foreground font-mono-data focus:outline-none focus:ring-1 focus:ring-ring"
+              />
             </div>
           </SettingRow>
 

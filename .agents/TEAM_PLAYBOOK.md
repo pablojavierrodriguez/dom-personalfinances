@@ -92,3 +92,5 @@ Al cerrar cada sprint:
 1. **¿Qué descubrimos sobre el comportamiento móvil o los inputs?** Se actualiza `.agents/skills/mobile-ux-design` o `.agents/skills/forms-rhf-zod`.
 2. **¿Qué patrón de arquitectura o base de datos se probó superior?** Se documenta como ADR en `docs/decisions/`.
 3. Ningún error de interfaz, accesibilidad o tipado se resuelve dos veces: **se convierte en una regla permanente del proyecto.**
+4. **Retroalimentación Upstream Automatizada:** Al descubrir o perfeccionar una skill o herramienta de valor universal (ej: `code-level-ux-auditor`, scripts de auditoría estática), el agente ejecuta automáticamente `npm run playbook:sync` para sincronizarla sanitizada con el repositorio central `agentic-team-playbook` en GitHub sin intervención manual del usuario.
+

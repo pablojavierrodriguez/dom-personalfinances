@@ -20,6 +20,7 @@
 6. **Ante inconsistencia entre reglas y código, consultar al usuario antes de actuar.**
 7. **Autonomía y Decisión Dinámica de Modos de Trabajo:** El usuario no debe solicitar explícitamente cuándo usar el playbook o qué rol activar. El agente clasifica automáticamente cada input entre: (a) *Foco Quirúrgico / Fast-Track* (Principal Engineer directo para bugfixes/invariantes, cero burocracia), (b) *Dúo Táctico* (Designer + Engineer para rediseños de UI/modales), o (c) *Sprint Playbook Completo* (PM Orchestrator liderando las 5 fases para features del backlog o cambios estructurales). Consultar [.agents/TEAM_PLAYBOOK.md](file:///Users/adrisol/Pablo/code/m3/.agents/TEAM_PLAYBOOK.md).
 8. **Autonomía de Subagentes (Paralelización vs. Foco):** Regla de oro: *"Foco absoluto en la lógica de dominio; manos paralelas en la exploración y verificación"*. El PM o Principal Engineer deciden cuándo convocar subagentes (`browser_subagent` para QA visual/a11y en mobile 375px, benchmarking) y cuándo mantener foco exclusivo en un solo hilo secuencial (invariantes de balances, contabilidad, esquemas de Supabase y RLS).
+9. **Retroalimentación Autónoma Upstream:** Al cerrar sprints o crear herramientas, scripts o skills de valor universal, el agente ejecuta automáticamente la sincronización con el repositorio central `agentic-team-playbook` (`npm run playbook:sync`) para mantener actualizada la memoria del sistema global sin requerir intervención manual del usuario.
 
 ---
 

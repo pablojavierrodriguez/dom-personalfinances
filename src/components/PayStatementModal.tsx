@@ -3,6 +3,8 @@ import { Account } from "@/lib/types";
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import { DollarSign, CreditCard } from "lucide-react";
 import { useSettings } from "@/lib/settings-store";
+import { MoneyInput } from "./ui/MoneyInput";
+import { formatThousandsInput, parseThousandsInput } from "@/lib/utils";
 
 interface PayStatementModalProps {
   open: boolean;
@@ -23,7 +25,7 @@ export function PayStatementModal({
 }: PayStatementModalProps) {
   const { formatAmount, t } = useSettings();
   const [payMode, setPayMode] = useState<"total" | "minimum" | "custom">("total");
-  const [amount, setAmount] = useState(suggestedAmount > 0 ? suggestedAmount.toString() : "");
+  const [amount, setAmount] = useState(suggestedAmount > 0 ? formatThousandsInput(suggestedAmount) : "");
   const [fromAccountId, setFromAccountId] = useState(sourceAccounts[0]?.id || "");
 
   // Calcular pago mínimo de referencia (típico 10% del total o $1.000 como estándar de la industria)
@@ -31,20 +33,20 @@ export function PayStatementModal({
 
   if (!card) return null;
 
-  const currentAmountNum = parseFloat(amount) || 0;
+  const currentAmountNum = parseThousandsInput(amount);
   const remainingDebt = Math.max(0, suggestedAmount - currentAmountNum);
 
   const handleSelectMode = (mode: "total" | "minimum" | "custom") => {
     setPayMode(mode);
     if (mode === "total") {
-      setAmount(suggestedAmount > 0 ? suggestedAmount.toString() : "");
+      setAmount(suggestedAmount > 0 ? formatThousandsInput(suggestedAmount) : "");
     } else if (mode === "minimum") {
-      setAmount(minimumAmount.toString());
+      setAmount(formatThousandsInput(minimumAmount));
     }
   };
 
   const handlePay = () => {
-    const parsed = parseFloat(amount);
+    const parsed = parseThousandsInput(amount);
     if (isNaN(parsed) || parsed <= 0 || !fromAccountId) return;
     onConfirmPay(card.id, fromAccountId, parsed);
     onClose();
@@ -117,12 +119,10 @@ export function PayStatementModal({
           <label className="text-xs font-medium text-muted-foreground block mb-1.5">
             {t("card.payStatementAmount")}
           </label>
-          <input
-            type="number"
-            step="0.01"
+          <MoneyInput
             value={amount}
-            onChange={(e) => {
-              setAmount(e.target.value);
+            onChange={(val) => {
+              setAmount(val);
               setPayMode("custom");
             }}
             className="w-full h-11 px-3 rounded-xl bg-input border border-border text-foreground font-mono-data text-base focus:border-primary outline-none transition-colors"

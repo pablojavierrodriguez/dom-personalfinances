@@ -12,6 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "audit:ux": "node scripts/audit-ux-code.cjs",
+    "playbook:sync": "node scripts/sync-upstream-playbook.cjs",
     "check:all": "node scripts/check-all.cjs"
   },
   "dependencies": {

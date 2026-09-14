@@ -775,10 +775,10 @@ export function ShoppingListManager({ accounts, categories, onCheckout }: Shoppi
                 />
                 <input
                   value={newItemQty}
-                  onChange={e => setNewItemQty(e.target.value)}
-                  type="number"
-                  min="1"
-                  step="1"
+                  onChange={e => setNewItemQty(e.target.value.replace(/\D/g, ""))}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder={t("shopping.qty")}
                   className="w-14 h-10 px-2 rounded-[10px] bg-input border border-border text-foreground text-[13px] font-mono-data text-center focus:border-primary outline-none transition-colors"
                 />
@@ -1107,11 +1107,11 @@ export function ShoppingListManager({ accounts, categories, onCheckout }: Shoppi
               <div>
                 <label className="text-[12px] text-muted-foreground font-medium mb-1 block">{t("shopping.quantity")}</label>
                 <input
-                  type="number"
-                  min="1"
-                  step="1"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={editingItem?.quantity || "1"}
-                  onChange={(e) => setEditingItem(prev => prev ? { ...prev, quantity: e.target.value } : null)}
+                  onChange={(e) => setEditingItem(prev => prev ? { ...prev, quantity: e.target.value.replace(/\D/g, "") } : null)}
                   className="w-full h-10 px-3 rounded-[10px] bg-input border border-border text-foreground text-[13px] font-mono-data text-center focus:border-primary outline-none transition-colors"
                 />
               </div>

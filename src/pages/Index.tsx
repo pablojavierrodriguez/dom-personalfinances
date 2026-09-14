@@ -708,6 +708,7 @@ const Index = ({ initialTab }: IndexProps = {}) => {
               recurringTxs={store.recurringTxs}
               accounts={store.getActiveAccounts()}
               categories={store.getAllActiveCategories()}
+              transactions={store.transactions}
               initialSubTab={activeTab === "recurring" ? "recurring" : "bills"}
               onAddBill={store.addBill}
               onUpdateBill={store.updateBill}

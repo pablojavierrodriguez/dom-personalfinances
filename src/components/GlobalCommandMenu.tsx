@@ -131,6 +131,11 @@ export function GlobalCommandMenu({
               <span>{t("command.whatsNew") || "Novedades y Mejoras"}</span>
             </CommandItem>
           )}
+
+          <CommandItem onSelect={() => handleSelect(() => onSelectTab("obligations"))}>
+            <Sparkles className="mr-2 h-4 w-4 text-amber-400" />
+            <span>{t("auditor.title") || "Auditor de Suscripciones & Fugas"}</span>
+          </CommandItem>
         </CommandGroup>
 
         <CommandSeparator />

@@ -426,10 +426,10 @@ export function CreditCardManager({
                 <label className="text-[12px] text-muted-foreground font-medium mb-1.5 block">{t("card.closingDayLabel")}</label>
                 <input
                   value={formClosingDay}
-                  onChange={e => setFormClosingDay(e.target.value)}
-                  type="number"
-                  min="1"
-                  max="28"
+                  onChange={e => setFormClosingDay(e.target.value.replace(/\D/g, "").slice(0, 2))}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="15"
                   className="w-full h-11 px-4 rounded-[12px] bg-input border border-border text-foreground font-mono-data text-[14px] focus:border-muted-foreground outline-none transition-colors"
                 />
@@ -438,10 +438,10 @@ export function CreditCardManager({
                 <label className="text-[12px] text-muted-foreground font-medium mb-1.5 block">{t("card.paymentDayLabel")}</label>
                 <input
                   value={formPaymentDay}
-                  onChange={e => setFormPaymentDay(e.target.value)}
-                  type="number"
-                  min="1"
-                  max="28"
+                  onChange={e => setFormPaymentDay(e.target.value.replace(/\D/g, "").slice(0, 2))}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="5"
                   className="w-full h-11 px-4 rounded-[12px] bg-input border border-border text-foreground font-mono-data text-[14px] focus:border-muted-foreground outline-none transition-colors"
                 />

@@ -24,14 +24,18 @@ import {
   Repeat,
   Pause,
   Play,
+  Sparkles,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { SubscriptionAuditor } from "./SubscriptionAuditor";
+import { Transaction } from "@/lib/types";
 
 interface ObligationsManagerProps {
   bills: BillReminder[];
   recurringTxs: RecurringTransaction[];
   accounts: Account[];
   categories: Category[];
+  transactions?: Transaction[];
   initialSubTab?: "bills" | "recurring";
   onAddBill: (bill: BillReminder) => void;
   onUpdateBill: (id: string, updates: Partial<BillReminder>) => void;
@@ -76,6 +80,7 @@ export function ObligationsManager({
   recurringTxs,
   accounts,
   categories,
+  transactions = [],
   onAddBill,
   onUpdateBill,
   onDeleteBill,
@@ -92,6 +97,7 @@ export function ObligationsManager({
 
   // Sheet de creación / edición
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [auditorOpen, setAuditorOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<UnifiedObligationItem | null>(null);
 
   // Estados del formulario en sheet
@@ -304,13 +310,24 @@ export function ObligationsManager({
             {t("obligations.subtitle")}
           </p>
         </div>
-        <button
-          onClick={handleOpenNew}
-          className="h-8 px-3 rounded-xl bg-primary text-primary-foreground text-[12px] font-medium flex items-center gap-1.5 shadow-xs hover:bg-primary/90 active:scale-95 transition-all"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>{t("common.new")}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setAuditorOpen(true)}
+            className="h-8 px-2.5 rounded-xl bg-secondary/80 hover:bg-secondary text-foreground text-[12px] font-medium flex items-center gap-1.5 border border-border/50 shadow-xs active:scale-95 transition-all"
+            title={t("auditor.title")}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">{t("auditor.openAuditor")}</span>
+            <span className="sm:hidden">Auditor</span>
+          </button>
+          <button
+            onClick={handleOpenNew}
+            className="h-8 px-3 rounded-xl bg-primary text-primary-foreground text-[12px] font-medium flex items-center gap-1.5 shadow-xs hover:bg-primary/90 active:scale-95 transition-all"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>{t("common.new")}</span>
+          </button>
+        </div>
       </div>
 
       {/* Chips de filtro rápido con scroll horizontal fluido y padding de respiro */}
@@ -830,6 +847,21 @@ export function ObligationsManager({
           </div>
         </div>
       </ResponsiveSheet>
+
+      <SubscriptionAuditor
+        open={auditorOpen}
+        onClose={() => setAuditorOpen(false)}
+        transactions={transactions}
+        recurringTxs={recurringTxs}
+        bills={bills}
+        onOpenCreateBill={(name, amount) => {
+          setFormName(name);
+          setFormAmount(amount.toString());
+          setFormDueDate(format(new Date(), "yyyy-MM-dd"));
+          setFreq("monthly");
+          setSheetOpen(true);
+        }}
+      />
     </div>
   );
 }

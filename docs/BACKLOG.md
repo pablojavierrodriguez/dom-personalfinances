@@ -40,6 +40,7 @@ Documento vivo de priorización de producto basado en valor para el usuario fina
 | **P27** 🌐 | **Motor Global Offline-First & Outbox Sync (Toda la App)** | **Cero fricción y cero pérdida de datos:** apertura instantánea en 0ms mediante Stale-While-Revalidate, registro y mutaciones en las 9 entidades de dominio garantizadas sin señal celular con cola de sincronización diferida e indicador global de conectividad. | Medio | **Altísimo (Game Changer)** | [SPEC-029](specs/SPEC-029-global-offline-first-sync-engine.md) | Completada ✅ |
 | **P28** 🌐 | **Internacionalización Integral (ES / EN) y Erradicación de Textos Hardcodeados** | **Paridad absoluta y experiencia global:** 100% de paridad en 1.101 claves de traducción, cero textos o etiquetas hardcodeadas en vistas, componentes, filtros dinámicos, toasts y tooltips, con auditoría automatizada en CI/CD. | Bajo | **Altísimo** | [i18n-audit](scripts/check-i18n.cjs) | Completado ✅ |
 | **P29** 🏛️ | **Transición a Marca DOM: Identidad Soberana, Geometría SIGIL, Retrocompatibilidad & Cero Pérdida de Datos** | **Soberanía y longevidad:** Monograma arquitectónico forjado en carbón/esmeralda con geometría matemática SIGIL (`DOMSymbol`), tipografía contemporánea `Space Grotesk`, migración en cadena de claves locales hacia `dom-*`, rediseño de plantillas transaccionales e integración en todos los canales. | Medio | **Altísimo (Strategic Brand)** | [rebrand.md](reports/rebrand.md) | Completado ✅ |
+| **C3** 🔍 | **Detector de Fugas & Auditor de Suscripciones (Subscription Leak Detector)** | **Consciencia y ahorro real:** detección algorítmica de micro-gastos recurrentes en el historial, ranking por peso anual y cálculo de costo de oportunidad compuesto a 1, 3 y 5 años con acciones de diagnóstico táctil en 1-tap. | Bajo | **Altísimo** | [SPRINT-002](sprints/SPRINT-002-subscription-leak-detector.md) | Completado ✅ |
 
 ---
 
@@ -434,14 +435,17 @@ Habiendo liquidado la totalidad de las épicas fundamentales (**P0 a P20**) y el
 
 ---
 
-### C3 — Detector de Fugas & Auditor de Suscripciones (Subscription Leak Detector)
+### C3 — Detector de Fugas & Auditor de Suscripciones (Subscription Leak Detector) ✅
+- **Estado:** Implementado en Sprint 002 ([SPRINT-002](sprints/SPRINT-002-subscription-leak-detector.md)) para el release `v0.5.0`.
 - **Problema:** Micro-gastos recurrentes invisibles (streaming, membresías olvidadas, comisiones bancarias) drenan el ahorro sin que el usuario sea consciente de su impacto anual y plurianual.
 - **Alcance:**
-  - Detección automática en el historial de transacciones de patrones mensuales fijos.
-  - Cálculo del costo proyectado a 1 año, 3 años y 5 años con interés compuesto de costo de oportunidad.
+  - Detección automática en el historial de transacciones de patrones mensuales fijos y periódicos.
+  - Cálculo del costo proyectado a 1 año, 3 años y 5 años con interés compuesto de costo de oportunidad (8% de referencia).
   - Acciones rápidas: *"Pausar suscripción"*, *"Establecer recordatorio de cancelación"* o *"Marcar como indispensable"*.
 - **Criterios de Aceptación:**
-  - El usuario visualiza un ranking de suscripciones activas ordenadas por peso anual sobre sus ingresos.
+  - [x] El usuario visualiza un ranking de suscripciones activas ordenadas por peso anual y costo de oportunidad compuesto.
+  - [x] Filtros y estados táctiles: Indispensable, En duda y Fuga.
+  - [x] Cero errores de compilación (`tsc --noEmit && npm run build`).
 
 ---
 
