@@ -138,3 +138,22 @@ Debe confirmar que `package.json` coincide con la nueva versión cerrada y que n
 >   git push origin main --force-with-lease && git push origin vX.Y.Z --force
 >   ```
 
+---
+
+## 9. Publicación Formal de GitHub Release (OBLIGATORIO)
+
+> [!IMPORTANT]
+> **UN GIT TAG NO ES UNA GITHUB RELEASE.**
+> Para que el repositorio en GitHub muestre la nueva versión como **Latest Release** en su portada y barra lateral derecha, es obligatorio crear el objeto formal de Release en la plataforma inmediatamente después del push.
+
+1. **Publicar la release mediante GitHub CLI (`gh`):**
+   ```bash
+   gh release create vX.Y.Z \
+     --title "DOM vX.Y.Z — <Título Oficial del Release>" \
+     --notes "<Extracto consolidado de docs/RELEASE_NOTES.md>"
+   ```
+2. **Validación post-publicación:**
+   ```bash
+   gh release list
+   ```
+   Debe confirmar que `vX.Y.Z` figura arriba de todo con el badge `Latest`.

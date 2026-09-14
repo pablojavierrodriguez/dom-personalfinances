@@ -8,6 +8,7 @@ import { CategoryIcon } from "./CategoryIcon";
 import { useSettings, CURRENCIES, Currency } from "@/lib/settings-store";
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import { uploadReceipt } from "@/services/storage.service";
+import { toast } from "sonner";
 
 interface QuickAddSheetProps {
   open: boolean;
@@ -168,9 +169,15 @@ export function QuickAddSheet({ open, onClose, onSubmit, accounts, categories, t
   };
 
   const handleSubmit = () => {
-    if (!selectedCategory) return;
+    if (!selectedCategory) {
+      toast.error(t("quickadd.selectCategoryError") || "Selecciona una categoría para continuar");
+      return;
+    }
     const effectiveAccountId = selectedAccount || accounts[0]?.id;
-    if (!effectiveAccountId) return;
+    if (!effectiveAccountId) {
+      toast.error(t("quickadd.noAccountError") || "Debes registrar al menos una cuenta antes de agregar transacciones");
+      return;
+    }
     const parsedDate = parseLocalDate(formDate);
     const extras: { installments?: number; receiptUrl?: string; currency?: Currency; date?: Date } = {
       currency: selectedCurrency,
@@ -451,22 +458,38 @@ export function QuickAddSheet({ open, onClose, onSubmit, accounts, categories, t
               </div>
             </div>
             <span className="text-[12px] text-muted-foreground font-medium mb-2 block">{t("quickadd.account")}</span>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {accounts.map(acc => (
+            {accounts.length === 0 ? (
+              <div className="p-3 mb-4 rounded-xl border border-dashed border-amber-500/40 bg-amber-500/10 text-amber-500 text-xs flex items-center justify-between">
+                <span>No tienes cuentas creadas aún.</span>
                 <button
-                  key={acc.id}
-                  onClick={() => setSelectedAccount(acc.id)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] transition-colors ${
-                    selectedAccount === acc.id
-                      ? "bg-secondary text-foreground ring-1 ring-muted-foreground/30"
-                      : "bg-secondary/50 text-muted-foreground hover:bg-secondary/70"
-                  }`}
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onTransferRequest?.();
+                  }}
+                  className="font-semibold underline ml-2 shrink-0"
                 >
-                  <div className={`category-dot ${acc.color}`} />
-                  {acc.name}
+                  Crear cuenta
                 </button>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {accounts.map(acc => (
+                  <button
+                    key={acc.id}
+                    onClick={() => setSelectedAccount(acc.id)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] transition-colors ${
+                      selectedAccount === acc.id
+                        ? "bg-secondary text-foreground ring-1 ring-muted-foreground/30"
+                        : "bg-secondary/50 text-muted-foreground hover:bg-secondary/70"
+                    }`}
+                  >
+                    <div className={`category-dot ${acc.color}`} />
+                    {acc.name}
+                  </button>
+                ))}
+              </div>
+            )}
             {isCreditCard && type === "expense" && (
               <div className="mb-4 bg-secondary/30 p-3 rounded-[12px] border border-border/50">
                 <div className="flex items-center justify-between mb-2">

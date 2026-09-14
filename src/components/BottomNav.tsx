@@ -10,6 +10,7 @@ import {
 import { useSettings } from "@/lib/settings-store";
 import { useAuth } from "@/lib/auth-context";
 import { DOMSymbol } from "@/components/ui/DOMSymbol";
+import { cn } from "@/lib/utils";
 
 interface BottomNavProps {
   activeTab: string;
@@ -86,7 +87,10 @@ export function BottomNav({ activeTab, onTabChange, onQuickAdd, onTransfer, onIm
             <motion.button
               whileTap={{ scale: 0.92 }}
               onClick={() => onQuickAdd("expense")}
-              className="h-12 w-12 rounded-full bg-primary flex items-center justify-center fab-glow -mt-3 shadow-lg"
+              className={cn(
+                "h-12 w-12 rounded-full bg-primary flex items-center justify-center fab-glow -mt-3 shadow-lg transition-all duration-200",
+                moreOpen ? "opacity-0 pointer-events-none scale-75" : "opacity-100 scale-100"
+              )}
               title={t("tx.newExpense") || "Nuevo Gasto"}
               aria-label={t("tx.newExpense") || "Nuevo Gasto"}
             >
@@ -103,8 +107,10 @@ export function BottomNav({ activeTab, onTabChange, onQuickAdd, onTransfer, onIm
         >
           <div>
             <SheetHeader className="px-5 pt-6 pb-4 border-b border-border/50 pr-12">
-              <div className="flex items-center gap-2 mb-1">
-                <DOMSymbol size={22} variant="badge" />
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/25 flex items-center justify-center shrink-0 shadow-xs">
+                  <DOMSymbol size={18} variant="emerald" />
+                </div>
                 <SheetTitle className="text-base font-display tracking-wider uppercase">DOM</SheetTitle>
               </div>
               <SheetDescription className="text-xs text-muted-foreground">{t("nav.advancedMgmt")}</SheetDescription>

@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Category, Account, Transaction } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Search, Filter, X, ChevronDown, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "@/lib/settings-store";
+import { parseThousandsInput } from "@/lib/utils";
 import {
   startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth,
   subMonths, addDays, startOfYear, endOfYear, format,
@@ -50,7 +51,23 @@ function getDatePresets(t: (k: any) => string): DatePreset[] {
 
 export function TransactionFilters({ filters, onChange, categories, accounts }: TransactionFiltersProps) {
   const [expanded, setExpanded] = useState(false);
+  const [localSearch, setLocalSearch] = useState(filters.search);
   const { t } = useSettings();
+
+  // Sincronizar localSearch si filters.search cambia desde el exterior
+  useEffect(() => {
+    setLocalSearch(filters.search);
+  }, [filters.search]);
+
+  // Debounce de 250ms para evitar re-filtrado en cada frame de tecleo
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== filters.search) {
+        onChange({ ...filters, search: localSearch });
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [localSearch, filters, onChange]);
 
   // Active chips for quick removal
   const activeChips = useMemo(() => {
@@ -125,10 +142,16 @@ export function TransactionFilters({ filters, onChange, categories, accounts }: 
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder={t("filters.search")} value={filters.search} onChange={e => update({ search: e.target.value })}
+          <Input placeholder={t("filters.search")} value={localSearch} onChange={e => setLocalSearch(e.target.value)}
             className="pl-9 h-9 bg-secondary border-0 text-[13px] theme-pill-btn" />
-          {filters.search && (
-            <button onClick={() => update({ search: "" })} className="absolute right-3 top-1/2 -translate-y-1/2">
+          {localSearch && (
+            <button
+              onClick={() => {
+                setLocalSearch("");
+                onChange({ ...filters, search: "" });
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2"
+            >
               <X className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
           )}
@@ -250,10 +273,22 @@ export function TransactionFilters({ filters, onChange, categories, accounts }: 
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5 block">{t("filters.amountRange")}</label>
                 <div className="flex gap-2">
-                  <Input type="number" placeholder={t("filters.min")} value={filters.amountMin}
-                    onChange={e => update({ amountMin: e.target.value })} className="flex-1 h-9 bg-secondary border-0 text-[13px] rounded-xl" />
-                  <Input type="number" placeholder={t("filters.max")} value={filters.amountMax}
-                    onChange={e => update({ amountMax: e.target.value })} className="flex-1 h-9 bg-secondary border-0 text-[13px] rounded-xl" />
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder={t("filters.min")}
+                    value={filters.amountMin}
+                    onChange={e => update({ amountMin: e.target.value.replace(/[^0-9.,]/g, "") })}
+                    className="flex-1 h-9 bg-secondary border-0 text-[13px] rounded-xl font-mono-data"
+                  />
+                  <Input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder={t("filters.max")}
+                    value={filters.amountMax}
+                    onChange={e => update({ amountMax: e.target.value.replace(/[^0-9.,]/g, "") })}
+                    className="flex-1 h-9 bg-secondary border-0 text-[13px] rounded-xl font-mono-data"
+                  />
                 </div>
               </div>
 
@@ -273,6 +308,9 @@ export function TransactionFilters({ filters, onChange, categories, accounts }: 
 }
 
 export function applyFilters(transactions: Transaction[], filters: TransactionFilterValues): Transaction[] {
+  const minVal = filters.amountMin ? parseThousandsInput(filters.amountMin) : null;
+  const maxVal = filters.amountMax ? parseThousandsInput(filters.amountMax) : null;
+
   return transactions.filter(tx => {
     if (filters.search) {
       const q = filters.search.toLowerCase();
@@ -286,8 +324,8 @@ export function applyFilters(transactions: Transaction[], filters: TransactionFi
     if (filters.accountId && tx.accountId !== filters.accountId) return false;
     if (filters.dateFrom && tx.date < new Date(filters.dateFrom + "T00:00:00")) return false;
     if (filters.dateTo && tx.date > new Date(filters.dateTo + "T23:59:59")) return false;
-    if (filters.amountMin && tx.amount < parseFloat(filters.amountMin)) return false;
-    if (filters.amountMax && tx.amount > parseFloat(filters.amountMax)) return false;
+    if (minVal !== null && !isNaN(minVal) && tx.amount < minVal) return false;
+    if (maxVal !== null && !isNaN(maxVal) && tx.amount > maxVal) return false;
     return true;
   });
 }

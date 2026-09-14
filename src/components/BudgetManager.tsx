@@ -11,6 +11,7 @@ import { formatThousandsInput, parseThousandsInput } from "@/lib/utils";
 import { usePrivacy } from "@/contexts/PrivacyContext";
 
 interface BudgetManagerProps {
+  selectedDate?: Date;
   budgets: Budget[];
   categories: Category[];
   transactions?: Transaction[];
@@ -22,6 +23,7 @@ interface BudgetManagerProps {
 }
 
 export function BudgetManager({
+  selectedDate,
   budgets, categories, transactions = [], getBudgetSpent, getAllActiveCategories,
   onAdd, onUpdate, onDelete,
 }: BudgetManagerProps) {
@@ -33,15 +35,15 @@ export function BudgetManager({
   const [limitAmount, setLimitAmount] = useState("");
   const [enableRollover, setEnableRollover] = useState(false);
 
-  const now = new Date();
-  const month = now.getMonth();
-  const year = now.getFullYear();
+  const effectiveDate = selectedDate || new Date();
+  const month = effectiveDate.getMonth();
+  const year = effectiveDate.getFullYear();
   const currentBudgets = budgets.filter(b => b.month === month && b.year === year);
   const expenseCategories = getAllActiveCategories("expense");
 
   const handleSuggest = () => {
     if (!selectedCat) return;
-    const suggested = calculateSuggestedBudget(transactions, selectedCat, 3, now);
+    const suggested = calculateSuggestedBudget(transactions, selectedCat, 3, effectiveDate);
     if (suggested > 0) {
       setLimitAmount(formatThousandsInput(suggested));
     }
@@ -178,7 +180,7 @@ export function BudgetManager({
             budget.accumulatedRollover || 0
           );
 
-          const metrics = calculateBudgetMetrics(spent, effectiveAmount, now);
+          const metrics = calculateBudgetMetrics(spent, effectiveAmount, effectiveDate);
 
           let progressColor = "bg-primary";
           if (metrics.status === "danger") progressColor = "bg-destructive";

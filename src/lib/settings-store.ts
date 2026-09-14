@@ -92,12 +92,19 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     };
   }, [user]);
 
+  const remoteSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const persistSettings = useCallback((next: AppSettings) => {
     localStorage.setItem("app-settings", JSON.stringify(next));
     if (user) {
-      saveRemoteSettings(next).catch(err => {
-        console.error("Error persisting settings to Supabase:", err);
-      });
+      if (remoteSaveTimeoutRef.current) {
+        clearTimeout(remoteSaveTimeoutRef.current);
+      }
+      remoteSaveTimeoutRef.current = setTimeout(() => {
+        saveRemoteSettings(next).catch(err => {
+          console.error("Error persisting settings to Supabase:", err);
+        });
+      }, 500);
     }
   }, [user]);
 

@@ -38,9 +38,14 @@ export default function AuthPage() {
     setLoading(true);
     setConnError(null);
 
+    const cleanEmail = email.trim().toLowerCase();
+
     try {
       if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({ 
+          email: cleanEmail, 
+          password 
+        });
         if (error) throw error;
         toast.success(t("auth.welcomeBack"));
       } else if (mode === "signup") {
@@ -48,17 +53,17 @@ export default function AuthPage() {
           throw new Error(t("auth.signupDisabled"));
         }
         const { error } = await supabase.auth.signUp({
-          email,
+          email: cleanEmail,
           password,
           options: {
-            data: { full_name: fullName },
+            data: { full_name: fullName.trim() },
             emailRedirectTo: window.location.origin,
           },
         });
         if (error) throw error;
         toast.success(t("auth.accountCreated"));
       } else {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
@@ -165,8 +170,13 @@ export default function AuthPage() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
+                onBlur={() => setEmail(prev => prev.trim().toLowerCase())}
                 placeholder={t("auth.emailPlaceholder")}
                 autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                inputMode="email"
                 required
                 className="w-full h-12 pl-10 pr-4 rounded-xl bg-input border border-border text-foreground text-sm placeholder:text-muted-foreground focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all"
               />
@@ -181,6 +191,9 @@ export default function AuthPage() {
                   onChange={e => setPassword(e.target.value)}
                   placeholder={t("auth.passwordPlaceholder")}
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   required
                   minLength={6}
                   className="w-full h-12 pl-10 pr-12 rounded-xl bg-input border border-border text-foreground text-sm placeholder:text-muted-foreground focus:border-primary/50 focus:ring-1 focus:ring-primary/20 outline-none transition-all"

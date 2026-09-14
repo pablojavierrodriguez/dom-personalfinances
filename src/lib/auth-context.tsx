@@ -36,7 +36,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.warn("[AuthProvider] Error al obtener sesión remota, intentando recuperar sesión local:", err);
+        try {
+          const raw = localStorage.getItem("dom-auth-session");
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed?.user) {
+              setUser(parsed.user);
+              if (parsed?.access_token) {
+                setSession(parsed as Session);
+              }
+            }
+          }
+        } catch {
+          // Ignorar error de parseo
+        }
         setLoading(false);
       });
 
@@ -44,7 +59,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Ignorar error de red al cerrar sesión
+    } finally {
+      setUser(null);
+      setSession(null);
+      try {
+        localStorage.removeItem("dom-auth-session");
+      } catch {}
+    }
   };
 
   return (

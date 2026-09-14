@@ -1,7 +1,6 @@
-import { useState, useMemo } from "react";
-import { motion, Reorder } from "framer-motion";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import {
-  GripVertical, RotateCcw, SlidersHorizontal, Search, BarChart3, PieChart,
+  GripVertical, RotateCcw, SlidersHorizontal, Search,
   Wallet, Zap, Target, Bell, Shield, TrendingUp, Clock,
   PiggyBank, LayoutGrid, ChevronUp, ChevronDown, Sparkles
 } from "lucide-react";
@@ -59,7 +58,7 @@ const CARD_METAS: Record<string, CardMeta> = {
   },
   breakdown: {
     id: "breakdown",
-    icon: PieChart,
+    icon: LayoutGrid,
     badgeColor: "bg-violet-500/10 text-violet-400 border-violet-500/20",
     previewType: "breakdown",
     descriptionEs: "Gráfico de torta/dona interactivo y ranking de gastos por categoría",
@@ -115,7 +114,7 @@ const CARD_METAS: Record<string, CardMeta> = {
   },
 };
 
-/** Mini ilustración vectorial elegante para previsualizar el widget */
+/** Mini ilustración vectorial para previsualizar el widget */
 function WidgetPreviewGraphic({
   type,
   t,
@@ -256,6 +255,21 @@ function WidgetPreviewGraphic({
   }
 }
 
+/**
+ * Encuentra el ancestro con scroll más cercano para compensar offsets y auto-scroll
+ */
+function getScrollParent(node: HTMLElement | null): HTMLElement | null {
+  let current = node?.parentElement;
+  while (current) {
+    const style = window.getComputedStyle(current);
+    if (style.overflowY === "auto" || style.overflowY === "scroll") {
+      return current;
+    }
+    current = current.parentElement;
+  }
+  return null;
+}
+
 export function DashboardCardPicker({ open, onClose }: DashboardCardPickerProps) {
   const {
     settings,
@@ -269,29 +283,236 @@ export function DashboardCardPicker({ open, onClose }: DashboardCardPickerProps)
   const [selectedCategory, setSelectedCategory] = useState<CardCategory | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const sections = settings.homeSections || [];
-  const enabledCount = useMemo(() => sections.filter(s => s.enabled).length, [sections]);
+  const sectionsFromSettings = settings.homeSections || [];
+  const [localSections, setLocalSections] = useState<HomeSection[]>(sectionsFromSettings);
+  const localSectionsRef = useRef<HomeSection[]>(localSections);
 
-  // Lista para Reorder (reorganizar la secuencia visual)
-  const handleReorder = (newOrderedList: HomeSection[]) => {
-    reorderHomeSections(newOrderedList);
+  useEffect(() => {
+    setLocalSections(sectionsFromSettings);
+    localSectionsRef.current = sectionsFromSettings;
+  }, [settings.homeSections]);
+
+  const enabledCount = useMemo(() => localSections.filter(s => s.enabled).length, [localSections]);
+
+  // =========================================================================
+  // SISTEMA DE DRAG & DROP NATIVO DE ALTA PRECISIÓN (120 FPS / CERO JANK)
+  // =========================================================================
+  const listContainerRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const [dragState, setDragState] = useState<{
+    isDragging: boolean;
+    startIndex: number;
+    currentOverIndex: number;
+    activeId: string | null;
+    offsetY: number;
+    itemHeight: number;
+  }>({
+    isDragging: false,
+    startIndex: -1,
+    currentOverIndex: -1,
+    activeId: null,
+    offsetY: 0,
+    itemHeight: 68,
+  });
+
+  const dragPointerIdRef = useRef<number | null>(null);
+  const dragStartYRef = useRef<number>(0);
+  const initialScrollTopRef = useRef<number>(0);
+  const scrollParentRef = useRef<HTMLElement | null>(null);
+  const autoScrollRafRef = useRef<number | null>(null);
+  const lastClientYRef = useRef<number>(0);
+
+  // Auto-scroll fluido al arrastrar cerca de los bordes
+  const checkAutoScroll = useCallback(() => {
+    const scrollEl = scrollParentRef.current;
+    if (!scrollEl || dragPointerIdRef.current === null) return;
+
+    const rect = scrollEl.getBoundingClientRect();
+    const clientY = lastClientYRef.current;
+    const topZone = rect.top + 60;
+    const bottomZone = rect.bottom - 60;
+
+    let scrollSpeed = 0;
+    if (clientY < topZone && scrollEl.scrollTop > 0) {
+      const factor = Math.max(0, (topZone - clientY) / 60);
+      scrollSpeed = -Math.round(factor * 12);
+    } else if (clientY > bottomZone && scrollEl.scrollTop < scrollEl.scrollHeight - scrollEl.clientHeight) {
+      const factor = Math.max(0, (clientY - bottomZone) / 60);
+      scrollSpeed = Math.round(factor * 12);
+    }
+
+    if (scrollSpeed !== 0) {
+      scrollEl.scrollTop += scrollSpeed;
+      // Actualizar offset compensando el delta de scroll
+      const currentScrollDiff = scrollEl.scrollTop - initialScrollTopRef.current;
+      const totalDelta = (clientY - dragStartYRef.current) + currentScrollDiff;
+
+      setDragState(prev => {
+        if (!prev.isDragging) return prev;
+        const targetOffset = Math.round(totalDelta / prev.itemHeight);
+        const newOverIndex = Math.max(0, Math.min(localSectionsRef.current.length - 1, prev.startIndex + targetOffset));
+        return {
+          ...prev,
+          offsetY: totalDelta,
+          currentOverIndex: newOverIndex,
+        };
+      });
+    }
+
+    autoScrollRafRef.current = requestAnimationFrame(checkAutoScroll);
+  }, []);
+
+  const handlePointerDown = (
+    e: React.PointerEvent<HTMLDivElement>,
+    index: number,
+    sectionId: string
+  ) => {
+    // Solo botón principal / toque
+    if (e.button !== 0) return;
+
+    const currentTarget = e.currentTarget;
+    const itemEl = itemRefs.current[index];
+    const itemHeight = itemEl ? itemEl.getBoundingClientRect().height + 8 : 68; // 8px de gap-2
+
+    const scrollEl = getScrollParent(currentTarget);
+    scrollParentRef.current = scrollEl;
+    initialScrollTopRef.current = scrollEl ? scrollEl.scrollTop : 0;
+    dragStartYRef.current = e.clientY;
+    lastClientYRef.current = e.clientY;
+    dragPointerIdRef.current = e.pointerId;
+
+    try {
+      currentTarget.setPointerCapture(e.pointerId);
+    } catch {}
+
+    // Háptico inicial al tomar la tarjeta
+    try {
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        navigator.vibrate(12);
+      }
+    } catch {}
+
+    // Prevenir selección de texto accidental
+    document.body.style.userSelect = "none";
+    (document.body.style as any).webkitUserSelect = "none";
+
+    setDragState({
+      isDragging: true,
+      startIndex: index,
+      currentOverIndex: index,
+      activeId: sectionId,
+      offsetY: 0,
+      itemHeight,
+    });
+
+    autoScrollRafRef.current = requestAnimationFrame(checkAutoScroll);
   };
 
-  // Movimiento accesible hacia arriba o abajo
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (dragPointerIdRef.current !== e.pointerId) return;
+
+    lastClientYRef.current = e.clientY;
+    const scrollEl = scrollParentRef.current;
+    const currentScrollDiff = scrollEl ? (scrollEl.scrollTop - initialScrollTopRef.current) : 0;
+    const totalDelta = (e.clientY - dragStartYRef.current) + currentScrollDiff;
+
+    setDragState(prev => {
+      if (!prev.isDragging) return prev;
+      const targetOffset = Math.round(totalDelta / prev.itemHeight);
+      const newOverIndex = Math.max(0, Math.min(localSectionsRef.current.length - 1, prev.startIndex + targetOffset));
+
+      // Si cambió de posición relativa, micro-háptico sutil
+      if (newOverIndex !== prev.currentOverIndex) {
+        try {
+          if (typeof navigator !== "undefined" && navigator.vibrate) {
+            navigator.vibrate(6);
+          }
+        } catch {}
+      }
+
+      return {
+        ...prev,
+        offsetY: totalDelta,
+        currentOverIndex: newOverIndex,
+      };
+    });
+  };
+
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (dragPointerIdRef.current !== e.pointerId) return;
+
+    if (autoScrollRafRef.current) {
+      cancelAnimationFrame(autoScrollRafRef.current);
+      autoScrollRafRef.current = null;
+    }
+
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {}
+
+    dragPointerIdRef.current = null;
+    document.body.style.userSelect = "";
+    (document.body.style as any).webkitUserSelect = "";
+
+    // Aplicar el reordenamiento definitivo si cambió de posición
+    const { startIndex, currentOverIndex, isDragging } = dragState;
+
+    if (isDragging && startIndex !== -1 && currentOverIndex !== -1 && startIndex !== currentOverIndex) {
+      const updated = [...localSectionsRef.current];
+      const [movedItem] = updated.splice(startIndex, 1);
+      updated.splice(currentOverIndex, 0, movedItem);
+
+      setLocalSections(updated);
+      localSectionsRef.current = updated;
+      reorderHomeSections(updated);
+
+      try {
+        if (typeof navigator !== "undefined" && navigator.vibrate) {
+          navigator.vibrate(10);
+        }
+      } catch {}
+    }
+
+    setDragState({
+      isDragging: false,
+      startIndex: -1,
+      currentOverIndex: -1,
+      activeId: null,
+      offsetY: 0,
+      itemHeight: 68,
+    });
+  };
+
+  // Movimiento directo y accesible por botones (Subir / Bajar)
   const handleMove = (index: number, direction: "up" | "down") => {
     const targetIndex = direction === "up" ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= sections.length) return;
+    if (targetIndex < 0 || targetIndex >= localSections.length) return;
 
-    const updated = [...sections];
+    const updated = [...localSections];
     const temp = updated[index];
     updated[index] = updated[targetIndex];
     updated[targetIndex] = temp;
+
+    setLocalSections(updated);
+    localSectionsRef.current = updated;
     reorderHomeSections(updated);
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        navigator.vibrate(8);
+      }
+    } catch {}
+  };
+
+  const handleDone = () => {
+    reorderHomeSections(localSectionsRef.current);
+    onClose();
   };
 
   // Filtrado de catálogo
   const filteredCatalog = useMemo(() => {
-    return sections.filter(section => {
+    return localSections.filter(section => {
       const meta = CARD_METAS[section.id];
       const matchesCat = selectedCategory === "all" || section.category === selectedCategory;
       if (!matchesCat) return false;
@@ -302,7 +523,7 @@ export function DashboardCardPicker({ open, onClose }: DashboardCardPickerProps)
       const desc = settings.language === "es" ? meta?.descriptionEs : meta?.descriptionEn;
       return label.includes(q) || (desc && desc.toLowerCase().includes(q));
     });
-  }, [sections, selectedCategory, searchQuery, t, settings.language]);
+  }, [localSections, selectedCategory, searchQuery, t, settings.language]);
 
   const categories: { id: CardCategory | "all"; label: string }[] = [
     { id: "all", label: t("picker.catAll") || "Todas" },
@@ -315,7 +536,7 @@ export function DashboardCardPicker({ open, onClose }: DashboardCardPickerProps)
   return (
     <ResponsiveSheet
       open={open}
-      onClose={onClose}
+      onClose={handleDone}
       title={
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-primary" />
@@ -324,19 +545,19 @@ export function DashboardCardPicker({ open, onClose }: DashboardCardPickerProps)
       }
       titleRight={
         <button
-          onClick={onClose}
+          onClick={handleDone}
           className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all active:scale-95"
         >
           {t("picker.done") || "Listo"}
         </button>
       }
     >
-      <div className="px-5 pt-3 pb-6 space-y-4">
+      <div className="px-4 sm:px-5 pt-3 pb-6 space-y-4">
         {/* Subtítulo descriptivo y contador de widgets activos */}
         <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground pb-1">
           <span className="truncate">{t("picker.subtitle") || "Organizá tus widgets, gráficos y métricas favoritas"}</span>
           <span className="font-mono px-2.5 py-1 rounded-full bg-secondary/80 text-foreground font-semibold text-[11px] whitespace-nowrap shrink-0">
-            {enabledCount}/{sections.length} {t("picker.activeCount") || "activas"}
+            {enabledCount}/{localSections.length} {t("picker.activeCount") || "activas"}
           </span>
         </div>
 
@@ -374,7 +595,7 @@ export function DashboardCardPicker({ open, onClose }: DashboardCardPickerProps)
         {activeTab === "organize" && (
           <div className="space-y-3">
             <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
-              <span>{t("picker.dragHint") || "Arrastrá para reordenar la posición en pantalla"}</span>
+              <span>{t("picker.dragHint") || "Arrastrá desde la manija para ordenar o usá las flechas"}</span>
               <button
                 type="button"
                 onClick={resetHomeSections}
@@ -385,38 +606,75 @@ export function DashboardCardPicker({ open, onClose }: DashboardCardPickerProps)
               </button>
             </div>
 
-            <Reorder.Group
-              axis="y"
-              values={sections}
-              onReorder={handleReorder}
-              className="space-y-2"
+            {/* Lista ultra-optimizada sin jank ni bloqueos de scroll */}
+            <div
+              ref={listContainerRef}
+              className="space-y-2 relative touch-pan-y"
+              style={{ touchAction: "pan-y" }}
             >
-              {sections.map((section, index) => {
+              {localSections.map((section, index) => {
                 const meta = CARD_METAS[section.id];
                 const IconComponent = meta?.icon || LayoutGrid;
+                const isItemDragging = dragState.isDragging && dragState.activeId === section.id;
+
+                // Cálculo de desplazamiento visual para las tarjetas que no se arrastran
+                let visualTranslateY = 0;
+                if (dragState.isDragging && !isItemDragging) {
+                  const { startIndex, currentOverIndex, itemHeight } = dragState;
+                  if (startIndex < currentOverIndex) {
+                    // Arrastrando hacia abajo: los ítems intermedios se mueven hacia arriba
+                    if (index > startIndex && index <= currentOverIndex) {
+                      visualTranslateY = -itemHeight;
+                    }
+                  } else if (startIndex > currentOverIndex) {
+                    // Arrastrando hacia arriba: los ítems intermedios se mueven hacia abajo
+                    if (index < startIndex && index >= currentOverIndex) {
+                      visualTranslateY = itemHeight;
+                    }
+                  }
+                }
 
                 return (
-                  <Reorder.Item
+                  <div
                     key={section.id}
-                    value={section}
+                    ref={el => (itemRefs.current[index] = el)}
+                    style={{
+                      transform: isItemDragging
+                        ? `translate3d(0, ${dragState.offsetY}px, 0) scale(1.025)`
+                        : visualTranslateY !== 0
+                        ? `translate3d(0, ${visualTranslateY}px, 0)`
+                        : "translate3d(0, 0, 0)",
+                      transition: isItemDragging
+                        ? "box-shadow 150ms ease, border-color 150ms ease"
+                        : "transform 220ms cubic-bezier(0.2, 0, 0, 1), background-color 150ms ease",
+                      zIndex: isItemDragging ? 40 : 1,
+                      position: "relative",
+                      touchAction: "pan-y",
+                    }}
                     className={cn(
-                      "flex items-center justify-between p-3 rounded-2xl border transition-all select-none relative bg-card/80 backdrop-blur-sm",
-                      section.enabled
-                        ? "border-border/60 hover:border-primary/50 shadow-xs"
+                      "flex items-center justify-between p-3 rounded-2xl border select-none bg-card/95 backdrop-blur-sm",
+                      isItemDragging
+                        ? "shadow-2xl border-primary/80 ring-2 ring-primary/20 bg-card cursor-grabbing"
+                        : section.enabled
+                        ? "border-border/60 hover:border-primary/40 shadow-xs"
                         : "border-border/30 opacity-50 bg-secondary/20"
                     )}
-                    whileDrag={{
-                      scale: 1.02,
-                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.4)",
-                      borderColor: "hsl(var(--primary))",
-                      zIndex: 50,
-                    }}
                   >
                     {/* Drag Handle & Info */}
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      {/* Manija con touchAction: none para captura exclusiva y setPointerCapture */}
                       <div
-                        className="cursor-grab active:cursor-grabbing p-2 -ml-1 text-muted-foreground/60 hover:text-foreground transition-colors touch-none"
-                        title={t("picker.dragToMove")}
+                        onPointerDown={e => handlePointerDown(e, index, section.id)}
+                        onPointerMove={handlePointerMove}
+                        onPointerUp={endDrag}
+                        onPointerCancel={endDrag}
+                        style={{ touchAction: "none" }}
+                        className={cn(
+                          "cursor-grab active:cursor-grabbing p-2.5 -ml-1 text-muted-foreground/60 hover:text-primary active:text-primary transition-colors touch-none select-none shrink-0 rounded-lg hover:bg-secondary/50",
+                          isItemDragging && "text-primary cursor-grabbing"
+                        )}
+                        title={t("picker.dragToMove") || "Arrastrar para mover"}
+                        aria-label={t("picker.dragToMove") || "Arrastrar para mover"}
                       >
                         <GripVertical className="w-4 h-4" />
                       </div>
@@ -435,26 +693,26 @@ export function DashboardCardPicker({ open, onClose }: DashboardCardPickerProps)
                       </div>
                     </div>
 
-                    {/* Quick controls: Flechas de mover arriba/abajo solo en desktop + Switch táctil */}
-                    <div className="flex items-center gap-2 shrink-0">
-                      <div className="hidden sm:flex flex-col gap-0.5 mr-1">
+                    {/* Controles: Flechas de mover arriba/abajo accesibles + Switch */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex flex-col gap-0.5 mr-1">
                         <button
                           type="button"
                           onClick={() => handleMove(index, "up")}
-                          disabled={index === 0}
+                          disabled={index === 0 || dragState.isDragging}
                           aria-label={t("picker.moveUp") || "Subir"}
-                          className="w-5 h-5 rounded hover:bg-secondary flex items-center justify-center text-muted-foreground disabled:opacity-20 transition-all"
+                          className="w-5 h-5 rounded hover:bg-secondary flex items-center justify-center text-muted-foreground disabled:opacity-20 transition-all active:scale-90"
                         >
-                          <ChevronUp className="w-3 h-3" />
+                          <ChevronUp className="w-3.5 h-3.5" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleMove(index, "down")}
-                          disabled={index === sections.length - 1}
+                          disabled={index === localSections.length - 1 || dragState.isDragging}
                           aria-label={t("picker.moveDown") || "Bajar"}
-                          className="w-5 h-5 rounded hover:bg-secondary flex items-center justify-center text-muted-foreground disabled:opacity-20 transition-all"
+                          className="w-5 h-5 rounded hover:bg-secondary flex items-center justify-center text-muted-foreground disabled:opacity-20 transition-all active:scale-90"
                         >
-                          <ChevronDown className="w-3 h-3" />
+                          <ChevronDown className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
@@ -462,12 +720,13 @@ export function DashboardCardPicker({ open, onClose }: DashboardCardPickerProps)
                         checked={section.enabled}
                         onCheckedChange={() => toggleHomeSection(section.id)}
                         aria-label={t(section.labelKey)}
+                        disabled={dragState.isDragging}
                       />
                     </div>
-                  </Reorder.Item>
+                  </div>
                 );
               })}
-            </Reorder.Group>
+            </div>
           </div>
         )}
 

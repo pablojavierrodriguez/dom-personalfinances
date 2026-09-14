@@ -14,11 +14,38 @@ const SUPABASE_PUBLISHABLE_KEY =
   (import.meta.env as any).NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   "";
 
+// Migración transparente de tokens de sesión previos hacia la clave determinista dom-auth-session
+if (typeof window !== "undefined" && window.localStorage) {
+  try {
+    if (!localStorage.getItem("dom-auth-session")) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith("sb-") || key.includes("supabase")) && key.endsWith("-auth-token")) {
+          const val = localStorage.getItem(key);
+          if (val) {
+            localStorage.setItem("dom-auth-session", val);
+            break;
+          }
+        }
+      }
+    }
+  } catch {
+    // Ignorar en caso de cuota o storage restringido
+  }
+}
+
 // Custom fetch with timeout to prevent infinite hanging when local backend/docker is paused or unreachable
 const fetchWithTimeout: typeof fetch = (input, init) => {
   const controller = new AbortController();
-  const timeoutMs = 8000; // 8 segundos de timeout
-  const timeoutId = setTimeout(() => controller.abort(new DOMException("Timeout al conectar con el servidor", "TimeoutError")), timeoutMs);
+  // Mayor tolerancia (25s) para peticiones de Auth / refresh token para resistir cold starts sin abortar la sesión
+  const inputUrl = typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request)?.url || "";
+  const isAuthRequest = inputUrl.includes("/auth/v1/");
+  const timeoutMs = isAuthRequest ? 25000 : 12000;
+
+  const timeoutId = setTimeout(
+    () => controller.abort(new DOMException("Timeout al conectar con el servidor", "TimeoutError")),
+    timeoutMs
+  );
 
   // Si el caller ya pasó una signal, encadenar el abort
   if (init?.signal) {
@@ -42,9 +69,10 @@ export const supabase = createClient<Database>(
   {
     auth: {
       storage: localStorage,
+      storageKey: "dom-auth-session",
       persistSession: true,
       autoRefreshToken: true,
-      throwOnError: true,
+      throwOnError: false, // Prevenir que un fallo de red descarte la sesión en localStorage
     },
     global: {
       fetch: fetchWithTimeout,

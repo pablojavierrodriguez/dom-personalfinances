@@ -1,7 +1,8 @@
 import { Transaction, Account, getStatementPeriod, getPaymentDueDate } from "@/lib/types";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, memo } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo, animate } from "framer-motion";
 import { format, isToday, isYesterday, isFuture, differenceInCalendarDays } from "date-fns";
+import { es, enUS } from "date-fns/locale";
 import { CategoryIcon } from "./CategoryIcon";
 import { Trash2, Pencil, ArrowLeftRight, CreditCard, ChevronDown, DollarSign, Calculator, Clock } from "lucide-react";
 import { useSettings, Currency } from "@/lib/settings-store";
@@ -9,6 +10,7 @@ import { useCurrencyConversion } from "@/hooks/useCurrencyConversion";
 import { usePrivacy } from "@/contexts/PrivacyContext";
 import { EmptyState } from "./EmptyState";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface TransactionListProps {
   title?: string;
@@ -19,7 +21,7 @@ interface TransactionListProps {
   onPayStatement?: (cardId: string, amount: number) => void;
 }
 
-function SwipeableTransaction({
+const SwipeableTransaction = memo(function SwipeableTransaction({
   tx,
   account,
   currentCurrency,
@@ -41,7 +43,8 @@ function SwipeableTransaction({
   isHint?: boolean;
 }) {
   const { maskAmount } = usePrivacy();
-  const { t } = useSettings();
+  const { t, settings } = useSettings();
+  const activeLocale = settings.language === "en" ? enUS : es;
   const [isPendingDelete, setIsPendingDelete] = useState(false);
   const deleteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const executedRef = useRef(false);
@@ -122,6 +125,14 @@ function SwipeableTransaction({
   const displayedAmount = convert(tx.amount, txCurrency, currentCurrency);
   const sign = tx.type === "income" ? "+" : "-";
 
+  const formattedDate = isToday(tx.date)
+    ? format(tx.date, "h:mm a")
+    : isYesterday(tx.date)
+    ? `${t("common.yesterday")} ${format(tx.date, "h:mm a")}`
+    : format(tx.date, "d MMM", { locale: activeLocale });
+
+  const showCategoryName = tx.category.name.trim().toLowerCase() !== tx.description.trim().toLowerCase();
+
   return (
     <div className="relative overflow-hidden">
       {/* Delete background */}
@@ -141,23 +152,31 @@ function SwipeableTransaction({
         dragConstraints={{ left: -120, right: 120 }}
         dragElastic={0.1}
         onDragEnd={handleDragEnd}
-        className="transaction-row bg-transparent hover:bg-secondary/30 transition-colors relative z-10 cursor-grab active:cursor-grabbing px-2"
+        className="transaction-row bg-transparent hover:bg-secondary/30 transition-colors relative z-10 cursor-grab active:cursor-grabbing px-2 py-2"
         onClick={() => onSelect?.(tx)}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1 mr-3">
           <div className={`w-9 h-9 theme-pill-btn ${tx.category.color} flex items-center justify-center flex-shrink-0 shadow-xs`}>
             <CategoryIcon name={tx.category.icon || "circle-dot"} className="w-4 h-4 text-white" />
           </div>
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-[14px] text-foreground font-medium truncate block leading-snug">{tx.description}</span>
-            <span className="text-[11px] text-muted-foreground flex items-center gap-1 truncate">
-              <span className="truncate">
-                {tx.category.name} · {isToday(tx.date) ? format(tx.date, "h:mm a") : isYesterday(tx.date) ? `${t("common.yesterday")} ${format(tx.date, "h:mm a")}` : format(tx.date, "MMM d")}
+          <div className="flex flex-col min-w-0 flex-1 justify-center">
+            <span className="text-[13.5px] text-foreground font-medium truncate block leading-tight">
+              {tx.description}
+            </span>
+            <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 min-w-0 mt-0.5 overflow-hidden">
+              {showCategoryName && (
+                <span className="truncate max-w-[110px] shrink-0 font-medium text-foreground/75">
+                  {tx.category.name}
+                </span>
+              )}
+              {showCategoryName && <span className="text-muted-foreground/40 shrink-0">·</span>}
+              <span className="text-muted-foreground/70 text-[10.5px] shrink-0">
+                {formattedDate}
               </span>
               {showAccountChip && account && (
-                <span className="inline-flex items-center gap-1 shrink-0 px-1.5 py-0.2 rounded bg-secondary/60 border border-border/30">
+                <span className="inline-flex items-center gap-1 shrink-0 px-1.5 py-0.5 rounded bg-secondary/80 border border-border/40 text-[10px]">
                   <span className={`w-1.5 h-1.5 rounded-full ${account.color} shrink-0`} />
-                  <span className="text-[10px] text-muted-foreground/90 font-medium truncate max-w-[70px]">
+                  <span className="text-muted-foreground font-medium truncate max-w-[95px]">
                     {account.name}
                   </span>
                 </span>
@@ -173,20 +192,20 @@ function SwipeableTransaction({
                 </span>
               )}
               {tx.installmentInfo && (
-                <span className="text-primary font-medium shrink-0">
+                <span className="text-primary font-medium shrink-0 text-[10px]">
                   ({tx.installmentInfo.current}/{tx.installmentInfo.total})
                 </span>
               )}
               {tx.receiptUrl && (
-                <span className="text-primary/70 shrink-0" title={t("tx.hasReceipt")}>
+                <span className="text-primary/70 shrink-0 text-[10px]" title={t("tx.hasReceipt")}>
                   📎
                 </span>
               )}
-            </span>
+            </div>
           </div>
         </div>
-        <div className="flex flex-col items-end shrink-0">
-          <span className={`font-mono-data text-[14px] tracking-tight font-medium ${tx.type === "income" ? "text-primary" : "text-foreground"}`}>
+        <div className="flex flex-col items-end shrink-0 justify-center">
+          <span className={`font-mono-data text-[14px] tracking-tight font-semibold ${tx.type === "income" ? "text-primary" : "text-foreground"}`}>
             {maskAmount(formatInCurrency(displayedAmount, currentCurrency, { sign }))}
           </span>
           {isDifferentCurrency && (
@@ -198,7 +217,7 @@ function SwipeableTransaction({
       </motion.div>
     </div>
   );
-}
+});
 
 // Fila de resumen de tarjeta de crédito que se ve exactamente como cualquier otro gasto
 function StatementGroupRow({
@@ -222,13 +241,14 @@ function StatementGroupRow({
   onToggleExpand: () => void;
   onPay?: (cardId: string, amount: number) => void;
 }) {
-  const { t } = useSettings();
+  const { t, settings } = useSettings();
+  const activeLocale = settings.language === "en" ? enUS : es;
   const { account, periodEnd, total, txs } = group;
 
   return (
     <div className="mb-0">
       <div
-        className="transaction-row bg-transparent hover:bg-secondary/30 transition-colors cursor-pointer active:bg-secondary/40 select-none flex items-center justify-between px-2"
+        className="transaction-row bg-transparent hover:bg-secondary/30 transition-colors cursor-pointer active:bg-secondary/40 select-none flex items-center justify-between px-2 py-2"
         onClick={onToggleExpand}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1 mr-3">
@@ -245,7 +265,7 @@ function StatementGroupRow({
               </span>
             </div>
             <span className="text-[11px] text-muted-foreground flex items-center gap-1 truncate">
-              <span className="truncate">{t("card.closingDayLabel")} {format(periodEnd, "MMM d")} · {txs.length} {t("cards.charges")}</span>
+              <span className="truncate">{t("card.closingDayLabel")} {format(periodEnd, "d MMM", { locale: activeLocale })} · {txs.length} {t("cards.charges")}</span>
               <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 shrink-0 ${isExpanded ? "rotate-180" : ""}`} />
             </span>
           </div>
@@ -276,7 +296,7 @@ function StatementGroupRow({
                   <div>
                     <span className="text-[13px] text-foreground font-medium block">{tx.description}</span>
                     <span className="text-[11px] text-muted-foreground">
-                      {tx.category.name} · {format(tx.date, "MMM d")}
+                      {tx.category.name} · {format(tx.date, "d MMM", { locale: activeLocale })}
                       {tx.installmentInfo && ` (${tx.installmentInfo.current}/${tx.installmentInfo.total})`}
                     </span>
                   </div>
@@ -328,6 +348,7 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
 
   const currentCurrency = settings.currency || "ARS";
+  const activeLocale = settings.language === "en" ? enUS : es;
   const accountsMap = useMemo(() => new Map<string, Account>(accounts.map(a => [a.id, a])), [accounts]);
   const showAccountChip = useMemo(() => accounts.filter(a => !a.archived).length > 1, [accounts]);
 
@@ -380,116 +401,154 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
     );
   }
 
-  // 1. Modo desglosado estándar (por fecha)
-  const detailedGroupedByDate = transactions.reduce<Record<string, Transaction[]>>((acc, tx) => {
-    const key = format(tx.date, "MMM d, yyyy");
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(tx);
-    return acc;
-  }, {});
-
-  // 2. Modo agrupado por resumen de tarjeta
-  // Cada compra con tarjeta se asocia a su ciclo de facturación (resumen) según closingDay
-  const statementGroupsMap = new Map<string, {
-    id: string;
-    account: Account;
-    periodEnd: Date;
-    total: number;
-    txs: Transaction[];
-  }>();
-
-  const nonCardTransactions: Transaction[] = [];
-
-  for (const tx of transactions) {
-    const isCreditExpense = creditCardAccountIds.has(tx.accountId) && tx.type === "expense" && !tx.isCardPayment;
-    if (isCreditExpense) {
-      const account = accounts.find(a => a.id === tx.accountId) || {
-        id: tx.accountId,
-        name: "Credit Card",
-        balance: 0,
-        type: "credit",
-        color: "bg-red-400",
-      };
-
-      const closingDay = account.closingDay || 15;
-      const { periodEnd } = getStatementPeriod(closingDay, tx.date);
-      const statementKey = `${account.id}-${periodEnd.getFullYear()}-${periodEnd.getMonth()}-${periodEnd.getDate()}`;
-
-      let group = statementGroupsMap.get(statementKey);
-      if (!group) {
-        group = {
-          id: statementKey,
-          account,
-          periodEnd,
-          total: 0,
-          txs: [],
-        };
-        statementGroupsMap.set(statementKey, group);
+  // 1. Modo desglosado estándar (por fecha ordenada)
+  const detailedGroups = useMemo(() => {
+    const map = new Map<string, { date: Date; label: string; txs: Transaction[] }>();
+    for (const tx of transactions) {
+      const key = format(tx.date, "yyyy-MM-dd");
+      let entry = map.get(key);
+      if (!entry) {
+        const label = isToday(tx.date)
+          ? t("common.today") || "Hoy"
+          : isYesterday(tx.date)
+          ? t("common.yesterday") || "Ayer"
+          : format(tx.date, "d 'de' MMMM, yyyy", { locale: activeLocale });
+        entry = { date: tx.date, label, txs: [] };
+        map.set(key, entry);
       }
-      group.txs.push(tx);
-      // Para el total del resumen de tarjeta, consolidar a la divisa activa o de la cuenta
-      const txCurr: Currency = tx.currency || (account.currency as Currency) || "ARS";
-      const accCurr: Currency = (account.currency as Currency) || "ARS";
-      group.total += convert(tx.amount, txCurr, accCurr);
-    } else {
-      nonCardTransactions.push(tx);
+      entry.txs.push(tx);
     }
-  }
+    return Array.from(map.entries())
+      .sort(([keyA], [keyB]) => keyB.localeCompare(keyA))
+      .map(([key, value]) => ({ key, ...value }));
+  }, [transactions, activeLocale, t]);
 
-  // Integrar items agrupados por resumen dentro de la línea de tiempo por fecha
-  const timelineGroupedByDate: Record<string, ListItem[]> = {};
+  // 2. Modo agrupado por resumen de tarjeta de crédito
+  const timelineGroups = useMemo(() => {
+    const statementGroupsMap = new Map<string, {
+      id: string;
+      account: Account;
+      periodEnd: Date;
+      total: number;
+      txs: Transaction[];
+    }>();
 
-  // Insertar resúmenes consolidados en la fecha de cierre de cada resumen
-  for (const group of statementGroupsMap.values()) {
-    const dateKey = format(group.periodEnd, "MMM d, yyyy");
-    if (!timelineGroupedByDate[dateKey]) timelineGroupedByDate[dateKey] = [];
-    timelineGroupedByDate[dateKey].push({ kind: "statement", ...group });
-  }
+    const nonCardTransactions: Transaction[] = [];
 
-  // Insertar las demás transacciones normales (débito, efectivo, transferencias, pagos)
-  for (const tx of nonCardTransactions) {
-    const dateKey = format(tx.date, "MMM d, yyyy");
-    if (!timelineGroupedByDate[dateKey]) timelineGroupedByDate[dateKey] = [];
-    timelineGroupedByDate[dateKey].push({ kind: "transaction", tx });
-  }
+    for (const tx of transactions) {
+      const isCreditExpense = creditCardAccountIds.has(tx.accountId) && tx.type === "expense" && !tx.isCardPayment;
+      if (isCreditExpense) {
+        const account = accounts.find(a => a.id === tx.accountId) || {
+          id: tx.accountId,
+          name: "Credit Card",
+          balance: 0,
+          type: "credit" as const,
+          color: "bg-red-400",
+        };
+
+        const closingDay = account.closingDay || 15;
+        const { periodEnd } = getStatementPeriod(closingDay, tx.date);
+        const statementKey = `${account.id}-${periodEnd.getFullYear()}-${periodEnd.getMonth()}-${periodEnd.getDate()}`;
+
+        let group = statementGroupsMap.get(statementKey);
+        if (!group) {
+          group = {
+            id: statementKey,
+            account,
+            periodEnd,
+            total: 0,
+            txs: [],
+          };
+          statementGroupsMap.set(statementKey, group);
+        }
+        group.txs.push(tx);
+        const txCurr: Currency = tx.currency || (account.currency as Currency) || "ARS";
+        const accCurr: Currency = (account.currency as Currency) || "ARS";
+        group.total += convert(tx.amount, txCurr, accCurr);
+      } else {
+        nonCardTransactions.push(tx);
+      }
+    }
+
+    const map = new Map<string, { date: Date; label: string; items: ListItem[] }>();
+
+    for (const group of statementGroupsMap.values()) {
+      const key = format(group.periodEnd, "yyyy-MM-dd");
+      let entry = map.get(key);
+      if (!entry) {
+        const label = isToday(group.periodEnd)
+          ? t("common.today") || "Hoy"
+          : isYesterday(group.periodEnd)
+          ? t("common.yesterday") || "Ayer"
+          : format(group.periodEnd, "d 'de' MMMM, yyyy", { locale: activeLocale });
+        entry = { date: group.periodEnd, label, items: [] };
+        map.set(key, entry);
+      }
+      entry.items.push({ kind: "statement", ...group });
+    }
+
+    for (const tx of nonCardTransactions) {
+      const key = format(tx.date, "yyyy-MM-dd");
+      let entry = map.get(key);
+      if (!entry) {
+        const label = isToday(tx.date)
+          ? t("common.today") || "Hoy"
+          : isYesterday(tx.date)
+          ? t("common.yesterday") || "Ayer"
+          : format(tx.date, "d 'de' MMMM, yyyy", { locale: activeLocale });
+        entry = { date: tx.date, label, items: [] };
+        map.set(key, entry);
+      }
+      entry.items.push({ kind: "transaction", tx });
+    }
+
+    return Array.from(map.entries())
+      .sort(([keyA], [keyB]) => keyB.localeCompare(keyA))
+      .map(([key, value]) => ({ key, ...value }));
+  }, [transactions, creditCardAccountIds, accounts, convert, activeLocale, t]);
 
   return (
     <div className="px-4 pb-28 w-full max-w-full">
       <div className="flex items-center justify-between gap-2 mb-3">
         <h2 className="text-[13px] text-muted-foreground font-medium font-display shrink-0">{title || t("tx.title")}</h2>
         <div className="flex items-center gap-1.5 flex-wrap justify-end">
-          {/* Botón opcional de subtotales diarios */}
+          {/* Botón integrado de subtotales diarios con label y armonía */}
           <button
             onClick={toggleSubtotals}
-            className={`p-1.5 rounded-lg border text-[11px] font-medium transition-colors ${
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-all active:scale-95",
               showSubtotals
                 ? "bg-primary/15 text-primary border-primary/40 shadow-xs"
-                : "bg-secondary/60 text-muted-foreground border-border/50 hover:text-foreground"
-            }`}
-            title={showSubtotals ? t("tx.hideSubtotals") : t("tx.showSubtotals")}
+                : "bg-secondary/60 text-muted-foreground border-border/50 hover:text-foreground hover:bg-secondary"
+            )}
+            title={showSubtotals ? t("tx.hideSubtotals") || "Ocultar subtotales" : t("tx.showSubtotals") || "Ver subtotales"}
+            aria-label={showSubtotals ? t("tx.hideSubtotals") || "Ocultar subtotales" : t("tx.showSubtotals") || "Ver subtotales"}
           >
             <Calculator className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline text-[10px]">{t("tx.subtotals") || "Subtotales"}</span>
           </button>
 
           {showGroupingToggle && (
             <div className="flex items-center bg-secondary/80 p-0.5 rounded-lg border border-border/50 text-[11px]">
               <button
                 onClick={() => setViewMode("detailed")}
-                className={`px-2 py-1 rounded-md font-medium transition-colors ${
+                className={cn(
+                  "px-2 py-1 rounded-md font-medium transition-colors",
                   viewMode === "detailed"
                     ? "bg-background text-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                )}
               >
                 {t("tx.viewDetailed")}
               </button>
               <button
                 onClick={() => setViewMode("grouped")}
-                className={`px-2 py-1 rounded-md font-medium transition-colors ${
+                className={cn(
+                  "px-2 py-1 rounded-md font-medium transition-colors",
                   viewMode === "grouped"
                     ? "bg-background text-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                )}
               >
                 {t("tx.viewGrouped")}
               </button>
@@ -500,16 +559,18 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
 
       {viewMode === "detailed" ? (
         // Modo desglosado estándar
-        Object.entries(detailedGroupedByDate).map(([date, txs]) => {
-          const dayExpensesTxs = txs.filter(t => t.type === "expense");
-          const dayIncomeTxs = txs.filter(t => t.type === "income");
+        detailedGroups.map((group) => {
+          const dayExpensesTxs = group.txs.filter(t => t.type === "expense");
+          const dayIncomeTxs = group.txs.filter(t => t.type === "income");
           const dayExpenses = calculateConsolidatedTransactions(dayExpensesTxs, currentCurrency, accountsMap);
           const dayIncome = calculateConsolidatedTransactions(dayIncomeTxs, currentCurrency, accountsMap);
 
           return (
-            <div key={date} className="mb-4">
-              <div className="flex items-center justify-between py-1 px-1 mb-1.5">
-                <span className="text-[11px] text-muted-foreground/80 font-semibold uppercase tracking-wider font-display">{date}</span>
+            <div key={group.key} className="mb-4">
+              <div className="flex items-center justify-between py-1 px-1 mb-1.5 min-h-[26px]">
+                <span className="text-[11px] text-muted-foreground/80 font-semibold uppercase tracking-wider font-display">
+                  {group.label}
+                </span>
                 {showSubtotals && (
                   <div className="flex items-center gap-2 text-[11px] font-mono-data font-semibold">
                     {dayIncome > 0 && (
@@ -522,12 +583,12 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
                 )}
               </div>
               <div className="card-surface p-1.5 divide-y divide-border/40">
-                {txs.map((tx, i) => (
+                {group.txs.map((tx, i) => (
                   <motion.div
                     key={tx.id}
-                    initial={{ opacity: 0, x: -6 }}
+                    initial={{ opacity: 0, x: -4 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.02, type: "spring", stiffness: 400, damping: 40 }}
+                    transition={{ delay: Math.min(i, 6) * 0.015, duration: 0.15 }}
                   >
                     <SwipeableTransaction
                       tx={tx}
@@ -547,17 +608,21 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
           );
         })
       ) : (
-        // Modo agrupado por resumen con apariencia idéntica a cualquier otro gasto
-        Object.entries(timelineGroupedByDate).map(([date, items]) => (
-          <div key={date} className="mb-4">
-            <span className="text-[11px] text-muted-foreground/80 font-semibold uppercase tracking-wider font-display px-1 block mb-1.5">{date}</span>
+        // Modo agrupado por resumen con idénticos contenedores, márgenes y alturas
+        timelineGroups.map((group) => (
+          <div key={group.key} className="mb-4">
+            <div className="flex items-center justify-between py-1 px-1 mb-1.5 min-h-[26px]">
+              <span className="text-[11px] text-muted-foreground/80 font-semibold uppercase tracking-wider font-display">
+                {group.label}
+              </span>
+            </div>
             <div className="card-surface p-1.5 divide-y divide-border/40">
-              {items.map((item, i) => (
+              {group.items.map((item, i) => (
                 <motion.div
                   key={item.kind === "statement" ? item.id : item.tx.id}
-                  initial={{ opacity: 0, x: -6 }}
+                  initial={{ opacity: 0, x: -4 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.02, type: "spring", stiffness: 400, damping: 40 }}
+                  transition={{ delay: Math.min(i, 6) * 0.015, duration: 0.15 }}
                 >
                   {item.kind === "statement" ? (
                     <StatementGroupRow

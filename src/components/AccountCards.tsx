@@ -5,14 +5,15 @@ import { useCurrencyConversion } from "@/hooks/useCurrencyConversion";
 import { Currency } from "@/lib/settings-types";
 import { usePrivacy } from "@/contexts/PrivacyContext";
 import { useSettings } from "@/lib/settings-store";
-import { LayoutList, Columns } from "lucide-react";
+import { LayoutList, Columns, Plus, Wallet } from "lucide-react";
 
 interface AccountCardsProps {
   accounts: Account[];
   onSelectAccount?: (account: Account) => void;
+  onAddAccount?: () => void;
 }
 
-export function AccountCards({ accounts, onSelectAccount }: AccountCardsProps) {
+export function AccountCards({ accounts, onSelectAccount, onAddAccount }: AccountCardsProps) {
   const { formatInCurrency } = useCurrencyConversion();
   const { maskAmount } = usePrivacy();
   const { settings, updateSettings, t } = useSettings();
@@ -22,6 +23,46 @@ export function AccountCards({ accounts, onSelectAccount }: AccountCardsProps) {
   const toggleViewMode = () => {
     updateSettings({ accountViewMode: viewMode === "list" ? "carousel" : "list" });
   };
+
+  if (accounts.length === 0) {
+    return (
+      <div className="px-4 w-full">
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center gap-2">
+            <h2 className="text-[13px] text-muted-foreground font-medium font-display">
+              {t("settings.sectionAccounts") || "Cuentas y tarjetas"}
+            </h2>
+            <span className="text-[11px] text-muted-foreground font-mono-data">
+              (0)
+            </span>
+          </div>
+        </div>
+        <div
+          onClick={onAddAccount}
+          className="border border-dashed border-border/70 hover:border-primary/50 bg-card/30 hover:bg-card/60 transition-all rounded-2xl p-6 text-center cursor-pointer flex flex-col items-center justify-center gap-2.5 group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center transition-transform group-hover:scale-105">
+            <Wallet className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[13px] font-medium text-foreground">No tienes cuentas registradas</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Crea tu primera cuenta bancaria, billetera o tarjeta para comenzar
+            </p>
+          </div>
+          {onAddAccount && (
+            <button
+              type="button"
+              className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground shadow-xs active:scale-95 transition-all"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Crear primera cuenta</span>
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 w-full">

@@ -18,8 +18,7 @@ interface CashFlowForecastProps {
 
 export function CashFlowForecast({ accounts, transactions, recurringTxs, bills }: CashFlowForecastProps) {
   const { maskAmount } = usePrivacy();
-  const { formatAmount: baseFormatAmount, language } = useSettings();
-  const t = createTranslator(language);
+  const { formatAmount: baseFormatAmount, t } = useSettings();
   const formatAmount = (n: number, opts?: any) => maskAmount(baseFormatAmount(n, opts));
   const [daysAhead, setDaysAhead] = useState<30 | 60 | 90>(30);
   const [simulatedAmount, setSimulatedAmount] = useState("");

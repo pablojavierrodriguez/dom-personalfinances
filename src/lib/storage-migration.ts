@@ -67,6 +67,8 @@ export const STORAGE_MIGRATION_PAIRS: StorageMigrationPair[] = [
   { legacyKey: "dominus-transactions",           newKey: "dom-transactions" },
   { legacyKey: "dominus-accounts",              newKey: "dom-accounts" },
   { legacyKey: "dominus-categories",            newKey: "dom-categories" },
+  { legacyKey: "dominus-onboarding-complete",   newKey: "dom-onboarding-complete" },
+  { legacyKey: "onboarding-complete",           newKey: "dom-onboarding-complete" },
 ];
 
 /**

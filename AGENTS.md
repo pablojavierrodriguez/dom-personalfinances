@@ -91,6 +91,9 @@
   6. **Solicitud de Git interactiva (OBLIGATORIO):**
      - Presentar la propuesta de commit (`release(vX.Y.Z): ...`) y de tagging (`git tag -a vX.Y.Z -m "Release vX.Y.Z"`).
      - **Esperar confirmación verbal explícita antes de ejecutar `git commit`, `git tag` o `git push`.**
+  7. **Publicación Oficial de GitHub Release (OBLIGATORIO):**
+     - Inmediatamente tras el push del tag y las ramas, publicar la release formal en GitHub mediante `gh release create vX.Y.Z --title "DOM vX.Y.Z — <Título>" --notes "<extracto_user_facing>"`.
+     - Prohibido dejar el tag huérfano sin GitHub Release formal; garantizar que la barra lateral del repositorio muestre la nueva versión como `Latest`.
   - Consultar siempre la skill [.agents/skills/release-management/SKILL.md](file:///Users/adrisol/Pablo/code/m3/.agents/skills/release-management/SKILL.md).
 
 ---

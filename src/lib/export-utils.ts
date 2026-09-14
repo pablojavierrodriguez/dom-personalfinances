@@ -156,7 +156,7 @@ export function generateTransactionsExcel(
  * Triggers a browser download of the generated Excel (.xlsx) file
  */
 export function downloadExcelFile(data: Uint8Array, filename = "transacciones_dom.xlsx"): void {
-  const blob = new Blob([data], {
+  const blob = new Blob([data as any], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
   const url = URL.createObjectURL(blob);

@@ -26,8 +26,7 @@ export function RulesManager({
   onApplyRetroactively,
   onProvisionDefaults,
 }: RulesManagerProps) {
-  const { language } = useSettings();
-  const t = createTranslator(language);
+  const { t } = useSettings();
 
   const [openCreate, setOpenCreate] = useState(false);
   const [ruleName, setRuleName] = useState("");
@@ -128,15 +127,17 @@ export function RulesManager({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 shrink-0">
           {rules.length > 0 && (
             <button
               onClick={handleRunRetroactive}
-              className="px-3 py-1.5 rounded-xl bg-secondary text-[12px] font-medium text-foreground hover:bg-secondary/80 transition-colors flex items-center gap-1.5"
-              title={t("rules.runHistoryTitle")}
+              className="h-8 px-2.5 sm:px-3 rounded-xl bg-secondary text-[12px] font-medium text-foreground hover:bg-secondary/80 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
+              title={t("rules.runHistoryTitle") || "Ejecutar reglas"}
+              aria-label={t("rules.runHistoryTitle") || "Ejecutar reglas"}
             >
-              <Play className="w-3.5 h-3.5 text-primary fill-primary" />
-              {t("rules.runHistory")}
+              <Play className="w-3.5 h-3.5 text-primary fill-primary shrink-0" />
+              <span className="hidden sm:inline">{t("rules.runHistory")}</span>
+              <span className="sm:hidden text-[11px]">Ejecutar</span>
             </button>
           )}
 
@@ -144,11 +145,13 @@ export function RulesManager({
             <button
               onClick={handleProvisionDefaults}
               disabled={isProvisioning}
-              className="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-[12px] font-medium text-amber-400 hover:bg-amber-500/25 transition-colors flex items-center gap-1.5 disabled:opacity-50"
-              title={t("rules.cleanDuplicatesTitle")}
+              className="h-8 px-2.5 sm:px-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-[12px] font-medium text-amber-400 hover:bg-amber-500/25 transition-colors flex items-center gap-1.5 disabled:opacity-50 whitespace-nowrap shrink-0"
+              title={t("rules.cleanDuplicatesTitle") || "Limpiar duplicados"}
+              aria-label={t("rules.cleanDuplicatesTitle") || "Limpiar duplicados"}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              {t("rules.cleanDuplicates")}
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="hidden sm:inline">{t("rules.cleanDuplicates")}</span>
+              <span className="sm:hidden text-[11px]">Limpiar</span>
             </button>
           )}
 
@@ -156,11 +159,13 @@ export function RulesManager({
             <button
               onClick={handleProvisionDefaults}
               disabled={isProvisioning}
-              className="px-3 py-1.5 rounded-xl bg-secondary text-[12px] font-medium text-foreground hover:bg-secondary/80 transition-colors flex items-center gap-1.5 disabled:opacity-50"
-              title={t("rules.defaultRulesTitle")}
+              className="h-8 px-2.5 sm:px-3 rounded-xl bg-secondary text-[12px] font-medium text-foreground hover:bg-secondary/80 transition-colors flex items-center gap-1.5 disabled:opacity-50 whitespace-nowrap shrink-0"
+              title={t("rules.defaultRulesTitle") || "Reglas base"}
+              aria-label={t("rules.defaultRulesTitle") || "Reglas base"}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              {t("rules.defaultRules")}
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="hidden sm:inline">{t("rules.defaultRules")}</span>
+              <span className="sm:hidden text-[11px]">Base</span>
             </button>
           )}
 
@@ -210,7 +215,7 @@ export function RulesManager({
               }`}
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1 min-w-0">
+                <div className="space-y-1 min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[14px] font-medium text-foreground truncate">{rule.name}</span>
                     <span
@@ -222,14 +227,36 @@ export function RulesManager({
                     </span>
                   </div>
 
-                  {rule.conditions.map((cond, i) => (
-                    <div key={i} className="text-[12px] text-muted-foreground flex items-center gap-1">
-                      <span className="font-semibold text-foreground">{t("rules.conditionIf")}</span>
-                      <span>{cond.field}</span>
-                      <span className="font-mono-data text-primary">{cond.operator}</span>
-                      <span className="font-medium text-foreground">"{cond.value}"</span>
-                    </div>
-                  ))}
+                  {rule.conditions.map((cond, i) => {
+                    const isKeywordList = typeof cond.value === "string" && cond.value.includes(",");
+                    const keywords = isKeywordList
+                      ? (cond.value as string).split(",").map((k) => k.trim()).filter(Boolean)
+                      : [];
+
+                    return (
+                      <div key={i} className="text-[12px] text-muted-foreground flex items-baseline gap-1.5 flex-wrap mt-1">
+                        <span className="font-semibold text-foreground/90">{t("rules.conditionIf")}</span>
+                        <span className="text-muted-foreground font-medium">{cond.field}</span>
+                        <span className="font-mono-data text-primary text-[11px] px-1 py-0.2 rounded bg-primary/10">
+                          {cond.operator}
+                        </span>
+                        {isKeywordList ? (
+                          <div className="flex flex-wrap gap-1 mt-0.5 max-w-full">
+                            {keywords.map((kw, kwIdx) => (
+                              <span
+                                key={kwIdx}
+                                className="px-1.5 py-0.5 rounded-md bg-secondary/80 border border-border/50 text-foreground font-mono-data text-[11px]"
+                              >
+                                {kw}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="font-medium text-foreground">"{String(cond.value)}"</span>
+                        )}
+                      </div>
+                    );
+                  })}
 
                   <div className="text-[12px] text-muted-foreground flex flex-wrap items-center gap-2 pt-1">
                     <span className="font-semibold text-foreground">{t("rules.conditionThen")}</span>

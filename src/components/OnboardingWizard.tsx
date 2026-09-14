@@ -34,6 +34,7 @@ export function OnboardingWizard({
       if (enableDefaultRules && onProvisionDefaultRules) {
         onProvisionDefaultRules().catch(console.error);
       }
+      localStorage.setItem("dom-onboarding-complete", "true");
       localStorage.setItem("onboarding-complete", "true");
       onComplete();
     }
@@ -43,6 +44,7 @@ export function OnboardingWizard({
     if (enableDefaultRules && onProvisionDefaultRules) {
       onProvisionDefaultRules().catch(console.error);
     }
+    localStorage.setItem("dom-onboarding-complete", "true");
     localStorage.setItem("onboarding-complete", "true");
     onComplete();
   };

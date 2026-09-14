@@ -23,6 +23,15 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const startYRef = useRef<number | null>(null);
   const hasVibratedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const rafIdRef = useRef<number | null>(null);
+  const currentDistanceRef = useRef(0);
+
+  // Limpiar rAF pendiente al desmontar
+  React.useEffect(() => {
+    return () => {
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+    };
+  }, []);
 
   const isAtTop = useCallback(() => {
     if (typeof window === "undefined") return true;
@@ -58,9 +67,9 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     const delta = currentY - startYRef.current;
 
     if (delta > 0 && isAtTop()) {
-      // Resistencia elástica logarítmica progresiva
+      // Resistencia elástica logarítmica progresiva throttled por rAF para el re-render
       const elasticDistance = Math.min(maxPull, Math.pow(delta, 0.85) * 1.8);
-      setPullDistance(elasticDistance);
+      currentDistanceRef.current = elasticDistance;
 
       if (elasticDistance >= threshold) {
         if (!hasVibratedRef.current) {
@@ -70,16 +79,29 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
       } else {
         hasVibratedRef.current = false;
       }
+
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = requestAnimationFrame(() => {
+        setPullDistance(elasticDistance);
+      });
     } else {
-      setPullDistance(0);
+      if (currentDistanceRef.current > 0) {
+        currentDistanceRef.current = 0;
+        if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = requestAnimationFrame(() => {
+          setPullDistance(0);
+        });
+      }
     }
   };
 
   const handleTouchEnd = async () => {
+    if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     if (startYRef.current === null || isRefreshing) return;
 
-    if (pullDistance >= threshold) {
+    if (currentDistanceRef.current >= threshold) {
       setIsRefreshing(true);
+      currentDistanceRef.current = threshold;
       setPullDistance(threshold);
 
       try {
@@ -88,11 +110,13 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
         console.error("Error refreshing data:", err);
       } finally {
         setIsRefreshing(false);
+        currentDistanceRef.current = 0;
         setPullDistance(0);
         startYRef.current = null;
         hasVibratedRef.current = false;
       }
     } else {
+      currentDistanceRef.current = 0;
       setPullDistance(0);
       startYRef.current = null;
       hasVibratedRef.current = false;

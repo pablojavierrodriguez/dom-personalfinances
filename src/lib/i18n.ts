@@ -108,6 +108,8 @@ const translations = {
     "quickadd.attachReceipt": "Adjuntar ticket o comprobante",
     "quickadd.uploadingReceipt": "Subiendo archivo...",
     "quickadd.viewReceipt": "Ver comprobante adjunto",
+    "quickadd.selectCategoryError": "Por favor seleccioná una categoría para registrar el movimiento",
+    "quickadd.noAccountError": "Necesitás al menos una cuenta activa para guardar transacciones",
 
     // TransactionEdit
     "txedit.title": "Editar transacción",
@@ -121,6 +123,9 @@ const translations = {
     "txedit.dateTime": "Fecha y hora",
     "txedit.saveChanges": "Guardar cambios",
     "txedit.duplicate": "Duplicar",
+    "txedit.tagsSection": "Etiquetas",
+    "txedit.noteSection": "Nota adicional",
+    "txedit.notePlaceholder": "Escribí un detalle o recordatorio sobre este movimiento...",
 
     // Transfer
     "transfer.title": "Transferencia entre cuentas",
@@ -1149,6 +1154,7 @@ const translations = {
     "tx.settleStatementPrompt": "¿Liquidar resumen?",
     "tx.hideSubtotals": "Ocultar subtotales diarios",
     "tx.showSubtotals": "Mostrar subtotales por día",
+    "tx.subtotals": "Subtotales",
     "transfer.bimonetaryConversion": "Conversión Bimonetaria",
     "transfer.amountToCredit": "Monto a Acreditar en {account} ({currency})",
     "breakdown.donutChart": "Gráfico de Torta / Dona interactivo",
@@ -1329,6 +1335,8 @@ const translations = {
     "quickadd.attachReceipt": "Attach receipt or ticket",
     "quickadd.uploadingReceipt": "Uploading file...",
     "quickadd.viewReceipt": "View attached receipt",
+    "quickadd.selectCategoryError": "Please select a category to record the transaction",
+    "quickadd.noAccountError": "You need at least one active account to save transactions",
 
     // TransactionEdit
     "txedit.title": "Edit Transaction",
@@ -1342,6 +1350,9 @@ const translations = {
     "txedit.dateTime": "Date & Time",
     "txedit.saveChanges": "Save Changes",
     "txedit.duplicate": "Duplicate",
+    "txedit.tagsSection": "Tags",
+    "txedit.noteSection": "Additional note",
+    "txedit.notePlaceholder": "Write a detail or reminder about this transaction...",
 
     // Transfer
     "transfer.title": "Transfer Between Accounts",
@@ -2370,6 +2381,7 @@ const translations = {
     "tx.settleStatementPrompt": "Settle statement?",
     "tx.hideSubtotals": "Hide daily subtotals",
     "tx.showSubtotals": "Show daily subtotals",
+    "tx.subtotals": "Subtotals",
     "transfer.bimonetaryConversion": "Bi-Monetary Conversion",
     "transfer.amountToCredit": "Amount to Credit in {account} ({currency})",
     "breakdown.donutChart": "Interactive Donut / Pie chart",

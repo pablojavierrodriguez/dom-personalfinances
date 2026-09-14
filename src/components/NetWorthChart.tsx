@@ -12,14 +12,14 @@ interface NetWorthChartProps {
 }
 
 export function NetWorthChart({ accounts, transactions }: NetWorthChartProps) {
-  const { formatAmount, t } = useSettings();
+  const { formatAmount, t, settings } = useSettings();
   const { calculateConsolidatedBalance } = useCurrencyConversion();
   const { maskAmount } = usePrivacy();
   const [range, setRange] = useState<"30D" | "90D">("30D");
 
   const currentNetWorth = useMemo(() => {
-    return calculateConsolidatedBalance(accounts);
-  }, [accounts, calculateConsolidatedBalance]);
+    return calculateConsolidatedBalance(accounts, settings.currency);
+  }, [accounts, calculateConsolidatedBalance, settings.currency]);
 
   const data = useMemo(() => {
     const days = range === "30D" ? 30 : 90;
@@ -61,8 +61,9 @@ export function NetWorthChart({ accounts, transactions }: NetWorthChartProps) {
   const isPositive = diff >= 0;
 
   return (
-    <div className="card-surface mx-4 mb-4">
-      <div className="card-inner">
+    <div className="px-4 w-full mb-4">
+      <div className="card-surface">
+        <div className="card-inner">
         <div className="flex items-center justify-between mb-2">
           <div>
             <h2 className="text-[13px] text-muted-foreground font-medium font-display">
@@ -140,5 +141,6 @@ export function NetWorthChart({ accounts, transactions }: NetWorthChartProps) {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }

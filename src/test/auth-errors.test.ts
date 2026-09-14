@@ -21,7 +21,7 @@ describe("auth-errors unit tests", () => {
   });
 
   afterEach(() => {
-    window.location = originalLocation;
+    window.location = originalLocation as any;
   });
 
   describe("getHumanAuthErrorMessage", () => {

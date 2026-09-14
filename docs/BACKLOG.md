@@ -2,6 +2,8 @@
 
 Documento vivo de priorización de producto basado en valor para el usuario final, robustez financiera y arquitectura sobre Supabase.
 
+> 🐞 **Tracker de Emergentes y Calidad:** Para el registro exhaustivo de defectos, fricciones de UX/UI y bugs menores, consultar [docs/QUALITY_LOG.md](file:///Users/adrisol/Pablo/code/m3/docs/QUALITY_LOG.md).
+
 ---
 
 ## 🎯 Resumen de Prioridades (Matriz de Valor Real vs. Esfuerzo)

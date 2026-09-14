@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useFinanceStore } from "@/lib/finance-store";
 import { useSettings } from "@/lib/settings-store";
@@ -43,6 +43,8 @@ import { PageTransition } from "@/components/PageTransition";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { usePrivacy } from "@/contexts/PrivacyContext";
 import { TrendingDown, TrendingUp, Calendar, Sparkles, SlidersHorizontal, Search, Keyboard } from "lucide-react";
+
+import { getMigratedStorageItem } from "@/lib/storage-migration";
 
 const VALID_TAB_SET = new Set([
   "dashboard",
@@ -100,7 +102,27 @@ const Index = ({ initialTab }: IndexProps = {}) => {
     }
   }, [navigate, location.pathname]);
 
-  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("onboarding-complete"));
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    const isCompleted = getMigratedStorageItem("dom-onboarding-complete", [
+      "dominus-onboarding-complete",
+      "onboarding-complete",
+    ]);
+    return !isCompleted;
+  });
+
+  // INVARIANTE ESTRICTA: Si el usuario ya tiene cuentas o transacciones, JAMÁS mostrar onboarding
+  useEffect(() => {
+    if (store.accounts.length > 0 || store.transactions.length > 0) {
+      setShowOnboarding(false);
+      try {
+        localStorage.setItem("dom-onboarding-complete", "true");
+        localStorage.setItem("onboarding-complete", "true");
+      } catch {
+        // Ignorar
+      }
+    }
+  }, [store.accounts.length, store.transactions.length]);
+
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [quickAddType, setQuickAddType] = useState<"expense" | "income">("expense");
   const [csvImportOpen, setCsvImportOpen] = useState(false);
@@ -127,13 +149,16 @@ const Index = ({ initialTab }: IndexProps = {}) => {
   // Notificar novedades de versión tras completar el onboarding si aún no fueron vistas
   useEffect(() => {
     if (shouldShowReleaseNotes()) {
-      const onboardingComplete = localStorage.getItem("onboarding-complete");
-      if (onboardingComplete) {
+      const onboardingComplete = getMigratedStorageItem("dom-onboarding-complete", [
+        "dominus-onboarding-complete",
+        "onboarding-complete",
+      ]);
+      if (onboardingComplete || store.accounts.length > 0 || store.transactions.length > 0) {
         setReleaseNotesOpen(true);
         markReleaseNotesAsSeen();
       }
     }
-  }, []);
+  }, [store.accounts.length, store.transactions.length]);
 
   const anyModalOpen =
     commandMenuOpen ||
@@ -291,43 +316,61 @@ const Index = ({ initialTab }: IndexProps = {}) => {
 
   const pendingBillsCount = store.getPendingBills().filter(b => b.status !== "paid").length;
 
-  // Métricas reactivas al mes seleccionado
+  // Métricas reactivas al mes seleccionado (memoizadas para evitar lag y re-renders innecesarios)
   const selMonth = selectedDate.getMonth();
   const selYear = selectedDate.getFullYear();
 
-  const selectedMonthTxs = store.transactions.filter(
-    t => t.date.getMonth() === selMonth && t.date.getFullYear() === selYear
-  );
+  const selectedMonthTxs = useMemo(() => {
+    return store.transactions.filter(
+      t => t.date.getMonth() === selMonth && t.date.getFullYear() === selYear
+    );
+  }, [store.transactions, selMonth, selYear]);
 
-  const selectedMonthExpenses = selectedMonthTxs
-    .filter(t => t.type === "expense" && !t.isCardPayment && !t.isTransfer)
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const selectedMonthIncome = selectedMonthTxs
-    .filter(t => t.type === "income" && !t.isCardPayment && !t.isTransfer)
-    .reduce((sum, t) => sum + t.amount, 0);
+  const { selectedMonthExpenses, selectedMonthIncome } = useMemo(() => {
+    let exp = 0;
+    let inc = 0;
+    for (const t of selectedMonthTxs) {
+      if (!t.isCardPayment && !t.isTransfer) {
+        if (t.type === "expense") exp += t.amount;
+        else if (t.type === "income") inc += t.amount;
+      }
+    }
+    return { selectedMonthExpenses: exp, selectedMonthIncome: inc };
+  }, [selectedMonthTxs]);
 
   // Comparativa contra mes anterior
-  const prevDate = new Date(selYear, selMonth - 1, 1);
-  const prevMonthExpenses = store.transactions
-    .filter(t => t.type === "expense" && !t.isCardPayment && !t.isTransfer && t.date.getMonth() === prevDate.getMonth() && t.date.getFullYear() === prevDate.getFullYear())
-    .reduce((sum, t) => sum + t.amount, 0);
+  const { prevMonthExpenses, expenseDiffPct } = useMemo(() => {
+    const prevDate = new Date(selYear, selMonth - 1, 1);
+    const prevM = prevDate.getMonth();
+    const prevY = prevDate.getFullYear();
+    const prevExp = store.transactions
+      .filter(t => t.type === "expense" && !t.isCardPayment && !t.isTransfer && t.date.getMonth() === prevM && t.date.getFullYear() === prevY)
+      .reduce((sum, t) => sum + t.amount, 0);
 
-  const expenseDiffPct = prevMonthExpenses > 0
-    ? Math.round(((selectedMonthExpenses - prevMonthExpenses) / prevMonthExpenses) * 100)
-    : 0;
+    const diffPct = prevExp > 0
+      ? Math.round(((selectedMonthExpenses - prevExp) / prevExp) * 100)
+      : 0;
+
+    return { prevMonthExpenses: prevExp, expenseDiffPct: diffPct };
+  }, [store.transactions, selYear, selMonth, selectedMonthExpenses]);
 
   // Health score computations para el mes seleccionado
-  const selectedBudgets = store.budgets.filter(b => b.month === selMonth && b.year === selYear);
-  const avgBudgetUsage = selectedBudgets.length > 0
-    ? selectedBudgets.reduce((sum, b) => {
-        const spent = store.getBudgetSpent(b.categoryId, b.month, b.year);
-        return sum + (spent / b.amount) * 100;
-      }, 0) / selectedBudgets.length
-    : 50;
-  const goalsProgress = store.goals.length > 0
-    ? store.goals.reduce((sum, g) => sum + (g.currentAmount / g.targetAmount) * 100, 0) / store.goals.length
-    : 0;
+  const selectedBudgets = useMemo(() => {
+    return store.budgets.filter(b => b.month === selMonth && b.year === selYear);
+  }, [store.budgets, selMonth, selYear]);
+
+  const avgBudgetUsage = useMemo(() => {
+    if (selectedBudgets.length === 0) return 50;
+    return selectedBudgets.reduce((sum, b) => {
+      const spent = store.getBudgetSpent(b.categoryId, b.month, b.year);
+      return sum + (spent / b.amount) * 100;
+    }, 0) / selectedBudgets.length;
+  }, [selectedBudgets, store]);
+
+  const goalsProgress = useMemo(() => {
+    if (store.goals.length === 0) return 0;
+    return store.goals.reduce((sum, g) => sum + (g.currentAmount / g.targetAmount) * 100, 0) / store.goals.length;
+  }, [store.goals]);
 
   return (
     <div className="min-h-screen md:h-screen md:overflow-hidden bg-background flex w-full overflow-x-hidden" key="app-root">
@@ -342,30 +385,17 @@ const Index = ({ initialTab }: IndexProps = {}) => {
         onOpenReleaseNotes={() => setReleaseNotesOpen(true)}
         pendingBillsCount={pendingBillsCount}
       />
-      <div className="flex-1 w-full min-w-0 max-w-2xl mx-auto relative pb-20 md:pb-6 md:px-6 md:max-w-5xl lg:max-w-6xl md:h-screen md:overflow-y-auto overflow-x-hidden">
-        {/* Mobile Search Bar & Shortcuts Trigger Header */}
-        <div className="md:hidden px-4 pt-3 pb-1 flex items-center gap-2">
+      <div className="flex-1 w-full min-w-0 max-w-2xl mx-auto relative pb-32 md:pb-6 md:px-6 md:max-w-5xl lg:max-w-6xl md:h-screen md:overflow-y-auto overflow-x-hidden">
+        {/* Mobile Search Bar Trigger Header */}
+        <div className="md:hidden px-4 pt-3 pb-1">
           <button
             type="button"
             onClick={() => setCommandMenuOpen(true)}
-            className="flex-1 flex items-center justify-between px-3 py-2 rounded-xl bg-secondary/50 border border-border/40 text-xs text-muted-foreground active:scale-[0.99] transition-all"
+            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-secondary/50 border border-border/40 text-xs text-muted-foreground active:scale-[0.99] transition-all shadow-xs"
+            aria-label={t("nav.searchOrCommand") || "Buscar o ejecutar comando"}
           >
-            <div className="flex items-center gap-2 truncate">
-              <Search className="w-3.5 h-3.5 text-primary" />
-              <span className="truncate">{t("nav.searchOrCommand")}</span>
-            </div>
-            <span className="px-1.5 py-0.5 text-[10px] font-mono-data bg-background border border-border/60 rounded text-muted-foreground shrink-0">
-              ⌘K
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setShortcutsOpen(true)}
-            className="w-8 h-8 rounded-xl bg-secondary/50 border border-border/40 flex items-center justify-center text-muted-foreground hover:text-foreground active:scale-95 transition-all shrink-0"
-            title={`${t("nav.keyboardShortcuts")} (?)`}
-            aria-label={t("nav.keyboardShortcuts")}
-          >
-            <Keyboard className="w-4 h-4" />
+            <Search className="w-3.5 h-3.5 text-primary shrink-0" />
+            <span className="truncate">{t("nav.searchOrCommand") || "Buscar transacciones, cuentas o acciones..."}</span>
           </button>
         </div>
 
@@ -411,6 +441,7 @@ const Index = ({ initialTab }: IndexProps = {}) => {
                       <AccountCards
                         accounts={store.getActiveAccounts()}
                         onSelectAccount={handleSelectAccountFromHome}
+                        onAddAccount={() => setActiveTab("accounts")}
                       />
                     </div>
                   );
@@ -652,10 +683,17 @@ const Index = ({ initialTab }: IndexProps = {}) => {
           )}
 
           {activeTab === "budgets" && (
-            <BudgetManager budgets={store.budgets} categories={store.categories}
+            <BudgetManager
+              selectedDate={selectedDate}
+              budgets={store.budgets}
+              categories={store.categories}
               transactions={store.transactions}
-              getBudgetSpent={store.getBudgetSpent} getAllActiveCategories={store.getAllActiveCategories}
-              onAdd={store.addBudget} onUpdate={store.updateBudget} onDelete={store.deleteBudget} />
+              getBudgetSpent={store.getBudgetSpent}
+              getAllActiveCategories={store.getAllActiveCategories}
+              onAdd={store.addBudget}
+              onUpdate={store.updateBudget}
+              onDelete={store.deleteBudget}
+            />
           )}
 
           {activeTab === "goals" && (

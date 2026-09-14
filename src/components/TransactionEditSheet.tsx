@@ -32,10 +32,13 @@ export function TransactionEditSheet({
   onDuplicate,
   accounts,
   categories,
+  tags = [],
 }: TransactionEditSheetProps) {
   const { t, currencySymbol } = useSettings();
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
+  const [note, setNote] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [type, setType] = useState<"income" | "expense">("expense");
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedAccount, setSelectedAccount] = useState("");
@@ -50,6 +53,8 @@ export function TransactionEditSheet({
     if (transaction) {
       setAmount(formatThousandsInput(transaction.amount));
       setDescription(transaction.description || "");
+      setNote(transaction.note || "");
+      setSelectedTags(transaction.tags || []);
       setType(transaction.type);
       setSelectedCategory(transaction.category);
       setSelectedAccount(transaction.accountId);
@@ -94,6 +99,8 @@ export function TransactionEditSheet({
     onUpdate(transaction.id, {
       amount: parsedAmount,
       description: description.trim() || selectedCategory.name,
+      note: note.trim() || undefined,
+      tags: selectedTags.length > 0 ? selectedTags : undefined,
       type,
       category: selectedCategory,
       accountId: selectedAccount,
@@ -477,6 +484,56 @@ export function TransactionEditSheet({
                   );
                 })}
               </div>
+            </div>
+
+            {/* ETIQUETAS (TAGS) */}
+            {tags.length > 0 && (
+              <div className="p-3 rounded-2xl bg-secondary/20 border border-border/40 space-y-2">
+                <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider block font-display flex items-center gap-1.5">
+                  <TagIcon className="w-3.5 h-3.5 text-primary" />
+                  {t("txedit.tagsSection") || "Etiquetas"}
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {tags.map((tag) => {
+                    const isSelected = selectedTags.includes(tag.name);
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic(8);
+                          setSelectedTags((prev) =>
+                            isSelected ? prev.filter((t) => t !== tag.name) : [...prev, tag.name]
+                          );
+                        }}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all active:scale-95 ${
+                          isSelected
+                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                            : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary border border-border/40"
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${tag.color || "bg-primary"}`} />
+                        <span>{tag.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* NOTA / DETALLE */}
+            <div className="p-3 rounded-2xl bg-secondary/20 border border-border/40 space-y-2">
+              <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider block font-display flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-primary" />
+                {t("txedit.noteSection") || "Nota o detalle"}
+              </span>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder={t("txedit.notePlaceholder") || "Agregar notas o detalles sobre este movimiento..."}
+                rows={2}
+                className="w-full px-3 py-2 rounded-xl bg-card border border-border/60 text-foreground text-[13px] placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none transition-colors resize-none"
+              />
             </div>
 
             {/* COMPROBANTE / RECIBO (MICRO-CARD ELEGANTE) */}
