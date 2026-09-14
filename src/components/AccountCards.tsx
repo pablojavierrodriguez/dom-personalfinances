@@ -45,9 +45,9 @@ export function AccountCards({ accounts, onSelectAccount, onAddAccount }: Accoun
             <Wallet className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[13px] font-medium text-foreground">No tienes cuentas registradas</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              Crea tu primera cuenta bancaria, billetera o tarjeta para comenzar
+            <p className="text-sm font-medium text-foreground">{t("acct.noAccountsRegistered")}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {t("acct.createFirstDesc")}
             </p>
           </div>
           {onAddAccount && (
@@ -56,7 +56,7 @@ export function AccountCards({ accounts, onSelectAccount, onAddAccount }: Accoun
               className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground shadow-xs active:scale-95 transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Crear primera cuenta</span>
+              <span>{t("acct.createFirst")}</span>
             </button>
           )}
         </div>
@@ -125,13 +125,13 @@ export function AccountCards({ accounts, onSelectAccount, onAddAccount }: Accoun
                       <span className="text-[14px] text-foreground font-semibold truncate block leading-snug">
                         {account.name}
                       </span>
-                      <span className="text-[11px] text-muted-foreground capitalize block leading-tight">
+                      <span className="text-xs text-muted-foreground capitalize block leading-tight">
                         {isCredit ? (
                           limit > 0
-                            ? `Límite disp: ${maskAmount(formatInCurrency(available, accCurrency))}`
-                            : "Tarjeta de crédito"
+                            ? `${t("acct.limitAvailablePrefix") || "Límite disp:"} ${maskAmount(formatInCurrency(available, accCurrency))}`
+                            : t("acct.credit")
                         ) : (
-                          account.type || "Cuenta corriente"
+                          account.type || t("acct.checking")
                         )}
                       </span>
                     </div>
@@ -199,8 +199,8 @@ export function AccountCards({ accounts, onSelectAccount, onAddAccount }: Accoun
                     </div>
 
                     <div className="mt-1">
-                      <span className="text-[10px] text-muted-foreground block leading-tight">
-                        {isCredit ? "Saldo adeudado" : "Balance"}
+                      <span className="text-xs text-muted-foreground block leading-tight">
+                        {isCredit ? t("acct.balanceOwed") : (t("balance.title") || "Balance")}
                       </span>
                       <span className={`font-mono-data text-[16px] font-semibold tracking-tight ${account.balance < 0 ? "text-destructive" : "text-foreground"}`}>
                         {maskAmount(formatInCurrency(account.balance, accCurrency))}

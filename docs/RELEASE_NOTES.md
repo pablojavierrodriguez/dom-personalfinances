@@ -16,12 +16,20 @@
 - **Acceso Omnicanal:**
   - Botón de acceso directo en el encabezado de *Compromisos* (`ObligationsManager`) e integración en la paleta de comandos `Cmd+K`.
 
-### ⚡ Blindaje Ergonómico de Inputs y Formato Regional (es-AR)
-- **Separadores de Miles en Todos los Inputs:**
-  - Corrección integral de cotizaciones de cambio de referencia (USD y EUR) y presupuesto diario en *Configuración*, garantizando el formateo con punto separador de miles (`1.200`, `1.300`, `50.000`) y modo de teclado decimal optimizado.
-  - Integración de `MoneyInput` en el modal de liquidación de resúmenes de tarjetas de crédito (`PayStatementModal`).
-  - Sustitución de inputs nativos `type="number"` por `inputMode="numeric"` en selectores de días de ciclo y cantidades en listas de compras (`CreditCardManager` y `ShoppingListManager`).
-  - Sanitización de campos de correo electrónico en perfil móvil (`autoCapitalize="none"`, `autoCorrect="off"`, `spellCheck={false}`).
+### 📥 Ingesta Masiva de Extractos Bancarios & Tarjetas (CSV / Mobills)
+- **Inversión Masiva de Signos en 1-Tap:**
+  - Selector ágil para invertir el sentido de débitos y créditos en extractos con signos opuestos habituales en exportaciones de tarjetas de crédito o plataformas como Mobills.
+  - Botón de alternancia global en la previsualización interactiva antes de confirmar la carga masiva.
+- **Mapeo Predictivo de Categorías:**
+  - Detección y homologación automática de categorías provenientes de archivos externos hacia el árbol de categorías de DOM, eliminando la edición manual fila por fila.
+
+### 💎 Consolidación de UX Móvil, Ergonomía y Paridad de Idiomas
+- **Fluidez y Lectura Tabular en Transacciones:**
+  - Tipografía tabular monoespaciada en todos los montos para evitar saltos horizontales o parpadeos durante el desplazamiento.
+  - Saneamiento del área inferior de desplazamiento respetando las barras de navegación móviles y áreas seguras sin espacios vacíos redundantes.
+  - Homogeneización de la escala tipográfica según los estándares del sistema de diseño.
+- **Paridad Bilingüe Total (100% i18n):**
+  - Erradicación completa de textos huérfanos o etiquetas no localizadas en tarjetas de cuentas, selectores de reglas, importador de extractos y auditor de suscripciones, con soporte íntegro en español e inglés.
 
 ---
 

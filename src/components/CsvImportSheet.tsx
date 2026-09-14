@@ -453,8 +453,8 @@ export function CsvImportSheet({
       })
     );
     toast({
-      title: "Signos invertidos",
-      description: "Se alternaron todos los movimientos entre Gastos e Ingresos.",
+      title: t("csv.signsInvertedToastTitle"),
+      description: t("csv.signsInvertedToastDesc"),
     });
   };
 
@@ -1041,8 +1041,8 @@ export function CsvImportSheet({
                           <button
                             type="button"
                             onClick={invertAllTypes}
-                            className="inline-flex items-center gap-1.5 text-[11px] font-medium py-1 px-2.5 rounded-[8px] bg-secondary/80 hover:bg-secondary text-foreground hover:text-primary transition-colors border border-border/50"
-                            title="Invertir todos los gastos a ingresos e ingresos a gastos"
+                            className="inline-flex items-center gap-1.5 text-xs font-medium py-1 px-2.5 rounded-lg bg-secondary/80 hover:bg-secondary text-foreground hover:text-primary transition-colors border border-border/50"
+                            title={t("csv.invertAllSignsDesc")}
                           >
                             <ArrowUpDown className="w-3 h-3 text-primary" />
                             <span>{t("csv.invertAllSigns")}</span>

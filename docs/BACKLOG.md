@@ -39,8 +39,9 @@ Documento vivo de priorización de producto basado en valor para el usuario fina
 | **P26** 🚀 | **Centro de Novedades In-App ("What's New Modal")** | **Celebración de valor:** modal interactivo que comunica automáticamente los avances de versión al usuario con highlights visuales y badges. | Bajo | **Medio** | [SPEC-028](specs/SPEC-028-whats-new-modal.md) | Completado |
 | **P27** 🌐 | **Motor Global Offline-First & Outbox Sync (Toda la App)** | **Cero fricción y cero pérdida de datos:** apertura instantánea en 0ms mediante Stale-While-Revalidate, registro y mutaciones en las 9 entidades de dominio garantizadas sin señal celular con cola de sincronización diferida e indicador global de conectividad. | Medio | **Altísimo (Game Changer)** | [SPEC-029](specs/SPEC-029-global-offline-first-sync-engine.md) | Completada ✅ |
 | **P28** 🌐 | **Internacionalización Integral (ES / EN) y Erradicación de Textos Hardcodeados** | **Paridad absoluta y experiencia global:** 100% de paridad en 1.101 claves de traducción, cero textos o etiquetas hardcodeadas en vistas, componentes, filtros dinámicos, toasts y tooltips, con auditoría automatizada en CI/CD. | Bajo | **Altísimo** | [i18n-audit](scripts/check-i18n.cjs) | Completado ✅ |
-| **P29** 🏛️ | **Transición a Marca DOM: Identidad Soberana, Geometría SIGIL, Retrocompatibilidad & Cero Pérdida de Datos** | **Soberanía y longevidad:** Monograma arquitectónico forjado en carbón/esmeralda con geometría matemática SIGIL (`DOMSymbol`), tipografía contemporánea `Space Grotesk`, migración en cadena de claves locales hacia `dom-*`, rediseño de plantillas transaccionales e integración en todos los canales. | Medio | **Altísimo (Strategic Brand)** | [rebrand.md](reports/rebrand.md) | Completado ✅ |
+| **P29** 🏛️ | **Transición a Marca DOM: Identidad Soberana, Geometría SIGIL, Retrocompatibilidad & Cero Pérdida de Datos** | **Soberanía y longevidad:** Monograma arquitectónico forjado en carbón/esmeralda con geometría matemática SIGIL (`DOMSymbol`), tipografía contemporánea `Space Grotesk`, migración en cadena de claves locales hacia `dom-*`, rediseño de plantillas transaccionales e integración en todos los canales. | Medio | **Altísimo (Strategic Brand)** | [rebrand.md](brand/rebrand.md) | Completado ✅ |
 | **C3** 🔍 | **Detector de Fugas & Auditor de Suscripciones (Subscription Leak Detector)** | **Consciencia y ahorro real:** detección algorítmica de micro-gastos recurrentes en el historial, ranking por peso anual y cálculo de costo de oportunidad compuesto a 1, 3 y 5 años con acciones de diagnóstico táctil en 1-tap. | Bajo | **Altísimo** | [SPRINT-002](sprints/SPRINT-002-subscription-leak-detector.md) | Completado ✅ |
+| **P30** 💎 | **Consolidación Integral de UX, Ergonomía Móvil & Cierre de Release v0.5.0** | **Experiencia de clase mundial:** Pulido de TransactionList (gestos, densidad, hooks incondicionales), inversión de signos y mapeo de categorías en importador CSV, erradicación de 100% de fugas i18n y validación a 120 FPS. | Medio | **Altísimo (Release Block)** | [SPRINT-003](sprints/SPRINT-003-ux-consolidation-v050.md) | En Progreso 🔄 |
 
 ---
 
@@ -470,5 +471,20 @@ Habiendo liquidado la totalidad de las épicas fundamentales (**P0 a P20**) y el
 - **Criterios de Aceptación:**
   - Cero pérdida de datos o desconfiguración de sesiones para usuarios preexistentes.
   - La suite de validación (`npm run check:all`) pasa al 100% con cero errores y cero advertencias.
+
+---
+
+### P30 — Consolidación Integral de UX, Ergonomía Móvil & Cierre de Release v0.5.0
+- **Estado:** En Progreso ([SPRINT-003](sprints/SPRINT-003-ux-consolidation-v050.md)).
+- **Problema:** Para empaquetar un release soberano `v0.5.0` indiscutible, se deben integrar las mejoras recientes de ingesta y reconciliar los detalles de interacción móvil: saltos de renderizado en listas de transacciones, inversión de signos y mapeo de categorías en importaciones de tarjetas/Mobills, y erradicación total de textos en bruto o warnings en el auditor de i18n.
+- **Alcance:**
+  - **Ingesta Robusta (CsvImportSheet):** Inversión masiva de signos en 1-tap (`__sign_inverted__`), mapeo automático por similitud de categorías (`matchCategoryByName`) y feedback sensorial sin strings hardcodeados.
+  - **Fluidez en Historial (TransactionList):** Respeto estricto del orden de hooks React, soporte ergonómico para swipe hints y eliminación de parpadeos en alternancia de vistas ("Desglosado" vs "Agrupado").
+  - **Paridad 100% i18n:** Supresión de las últimas cadenas en bruto en `AccountCards`, `CsvImportSheet`, `QuickAddSheet`, `RulesManager` y `SubscriptionAuditor`.
+  - **Suite de Calidad:** `check:all` 100% verde + `audit:ux` en 0 errores y 0 advertencias.
+- **Criterios de Aceptación:**
+  - Todas las pantallas y diálogos de DOM superan la auditoría estática sin textos huérfanos.
+  - Cero warnings de React hooks y rendimiento consistente a 60/120 FPS.
+  - `npm run check:all` pasa limpiamente.
 
 

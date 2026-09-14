@@ -290,7 +290,7 @@ export function SubscriptionAuditor({
                     <div className="flex items-center justify-between text-[11px] py-1.5 px-2 rounded-lg bg-secondary/30 mb-3 border border-border/30">
                       <span className="text-muted-foreground flex items-center gap-1">
                         <TrendingDown className="w-3 h-3 text-amber-400" />
-                        <span>En 3 años con interés:</span>
+                        <span>{t("auditor.opportunityAt3Y")}</span>
                       </span>
                       <span className="font-mono-data font-medium text-foreground">
                         {formatAmount(sub.opportunityCost3Y)}

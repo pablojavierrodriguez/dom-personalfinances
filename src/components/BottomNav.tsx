@@ -58,10 +58,15 @@ export function BottomNav({ activeTab, onTabChange, onQuickAdd, onTransfer, onIm
         <div className="bg-card/95 backdrop-blur-lg border-t border-border/50 pb-safe">
           <div className="flex items-center justify-around px-1 h-16 max-w-md mx-auto">
             {tabs.map(tab => (
-              <button key={tab.id} onClick={() => onTabChange(tab.id)}
-                className="flex flex-col items-center justify-center w-14 h-12 relative">
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                className="flex flex-col items-center justify-center w-14 h-12 relative active:scale-95 transition-transform"
+                aria-label={tab.label}
+                aria-selected={activeTab === tab.id}
+              >
                 <tab.icon className={`w-5 h-5 transition-colors ${activeTab === tab.id ? "text-primary" : "text-muted-foreground"}`} />
-                <span className={`text-[9px] mt-0.5 transition-colors ${activeTab === tab.id ? "text-primary" : "text-muted-foreground"}`}>{tab.label}</span>
+                <span className={`text-[10.5px] font-medium tracking-tight mt-0.5 transition-colors ${activeTab === tab.id ? "text-primary font-semibold" : "text-muted-foreground"}`}>{tab.label}</span>
                 {activeTab === tab.id && (
                   <motion.div layoutId="nav-indicator" className="absolute -top-px left-2 right-2 h-0.5 rounded-full bg-primary"
                     transition={{ type: "spring", stiffness: 400, damping: 40 }} />
@@ -69,12 +74,15 @@ export function BottomNav({ activeTab, onTabChange, onQuickAdd, onTransfer, onIm
               </button>
             ))}
 
-            <button onClick={() => setMoreOpen(true)}
-              className="flex flex-col items-center justify-center w-14 h-12 relative">
+            <button
+              onClick={() => setMoreOpen(true)}
+              className="flex flex-col items-center justify-center w-14 h-12 relative active:scale-95 transition-transform"
+              aria-label={t("nav.more")}
+            >
               <MoreHorizontal className={`w-5 h-5 transition-colors ${moreTabIds.includes(activeTab) ? "text-primary" : "text-muted-foreground"}`} />
-              <span className={`text-[9px] mt-0.5 transition-colors ${moreTabIds.includes(activeTab) ? "text-primary" : "text-muted-foreground"}`}>{t("nav.more")}</span>
+              <span className={`text-[10.5px] font-medium tracking-tight mt-0.5 transition-colors ${moreTabIds.includes(activeTab) ? "text-primary font-semibold" : "text-muted-foreground"}`}>{t("nav.more")}</span>
               {pendingBillsCount > 0 && (
-                <span className="absolute top-0.5 right-2 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[9px] flex items-center justify-center font-medium">
+                <span className="absolute top-0.5 right-2 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center font-bold font-mono-data">
                   {pendingBillsCount}
                 </span>
               )}

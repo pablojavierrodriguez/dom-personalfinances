@@ -26,19 +26,31 @@ const checks = [
     critical: true,
   },
   {
-    name: '2. Tipado TypeScript (tsc --noEmit)',
+    name: '2. Paridad de Localización e i18n',
+    command: 'node',
+    args: ['scripts/check-i18n.cjs'],
+    critical: true,
+  },
+  {
+    name: '3. Auditoría Estática de UX y Ergonomía Móvil',
+    command: 'node',
+    args: ['scripts/audit-ux-code.cjs'],
+    critical: true,
+  },
+  {
+    name: '4. Tipado TypeScript (tsc --noEmit)',
     command: 'npx',
     args: ['tsc', '--noEmit'],
     critical: true,
   },
   {
-    name: '3. Tests Unitarios (vitest)',
+    name: '5. Tests Unitarios (vitest)',
     command: 'npm',
     args: ['run', 'test'],
     critical: true,
   },
   {
-    name: '4. Build de Producción (vite build)',
+    name: '6. Build de Producción (vite build)',
     command: 'npm',
     args: ['run', 'build'],
     critical: true,
@@ -69,7 +81,7 @@ for (const check of checks) {
       status: 'FAILED',
       duration,
       critical: true,
-      output: res.stdout || res.stderr,
+      output: (res.stdout || '') + (res.stderr ? '\n' + res.stderr : ''),
     });
   }
 }

@@ -152,29 +152,29 @@ const SwipeableTransaction = memo(function SwipeableTransaction({
         dragConstraints={{ left: -120, right: 120 }}
         dragElastic={0.1}
         onDragEnd={handleDragEnd}
-        className="transaction-row bg-transparent hover:bg-secondary/30 transition-colors relative z-10 cursor-grab active:cursor-grabbing px-2 py-2"
+        className="transaction-row bg-transparent hover:bg-secondary/30 transition-colors relative z-10 cursor-grab active:cursor-grabbing px-2.5 py-2.5"
         onClick={() => onSelect?.(tx)}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1 mr-3">
-          <div className={`w-9 h-9 theme-pill-btn ${tx.category.color} flex items-center justify-center flex-shrink-0 shadow-xs`}>
+          <div className={`w-9 h-9 rounded-xl ${tx.category.color} flex items-center justify-center flex-shrink-0 shadow-xs`}>
             <CategoryIcon name={tx.category.icon || "circle-dot"} className="w-4 h-4 text-white" />
           </div>
           <div className="flex flex-col min-w-0 flex-1 justify-center">
-            <span className="text-[13.5px] text-foreground font-medium truncate block leading-tight">
+            <span className="text-sm text-foreground font-medium truncate block leading-tight">
               {tx.description}
             </span>
-            <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 min-w-0 mt-0.5 overflow-hidden">
+            <div className="text-xs text-muted-foreground flex items-center gap-1.5 min-w-0 mt-0.5 overflow-hidden">
               {showCategoryName && (
-                <span className="truncate max-w-[110px] shrink-0 font-medium text-foreground/75">
+                <span className="truncate max-w-[120px] shrink-0 font-medium text-foreground/80">
                   {tx.category.name}
                 </span>
               )}
               {showCategoryName && <span className="text-muted-foreground/40 shrink-0">·</span>}
-              <span className="text-muted-foreground/70 text-[10.5px] shrink-0">
+              <span className="text-muted-foreground/70 text-xs shrink-0">
                 {formattedDate}
               </span>
               {showAccountChip && account && (
-                <span className="inline-flex items-center gap-1 shrink-0 px-1.5 py-0.5 rounded bg-secondary/80 border border-border/40 text-[10px]">
+                <span className="inline-flex items-center gap-1 shrink-0 px-1.5 py-0.5 rounded-md bg-secondary/80 border border-border/40 text-xs">
                   <span className={`w-1.5 h-1.5 rounded-full ${account.color} shrink-0`} />
                   <span className="text-muted-foreground font-medium truncate max-w-[95px]">
                     {account.name}
@@ -182,7 +182,7 @@ const SwipeableTransaction = memo(function SwipeableTransaction({
                 </span>
               )}
               {isFuture(tx.date) && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500 font-semibold text-[10px] tracking-tight shrink-0">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500 font-semibold text-xs tracking-tight shrink-0">
                   <Clock className="w-2.5 h-2.5 shrink-0" />
                   {differenceInCalendarDays(tx.date, new Date()) === 1
                     ? t("common.tomorrow")
@@ -192,12 +192,12 @@ const SwipeableTransaction = memo(function SwipeableTransaction({
                 </span>
               )}
               {tx.installmentInfo && (
-                <span className="text-primary font-medium shrink-0 text-[10px]">
+                <span className="text-primary font-medium shrink-0 text-xs font-mono-data">
                   ({tx.installmentInfo.current}/{tx.installmentInfo.total})
                 </span>
               )}
               {tx.receiptUrl && (
-                <span className="text-primary/70 shrink-0 text-[10px]" title={t("tx.hasReceipt")}>
+                <span className="text-primary/70 shrink-0 text-xs" title={t("tx.hasReceipt")}>
                   📎
                 </span>
               )}
@@ -205,11 +205,11 @@ const SwipeableTransaction = memo(function SwipeableTransaction({
           </div>
         </div>
         <div className="flex flex-col items-end shrink-0 justify-center">
-          <span className={`font-mono-data text-[14px] tracking-tight font-semibold ${tx.type === "income" ? "text-primary" : "text-foreground"}`}>
+          <span className={`font-mono-data text-sm tracking-tight font-semibold tabular-nums ${tx.type === "income" ? "text-primary" : "text-foreground"}`}>
             {maskAmount(formatInCurrency(displayedAmount, currentCurrency, { sign }))}
           </span>
           {isDifferentCurrency && (
-            <span className="font-mono-data text-[10px] text-muted-foreground/80 leading-none mt-0.5">
+            <span className="font-mono-data text-xs text-muted-foreground/80 leading-none mt-0.5 tabular-nums">
               orig. {formatInCurrency(tx.amount, txCurrency)}
             </span>
           )}
@@ -248,29 +248,29 @@ function StatementGroupRow({
   return (
     <div className="mb-0">
       <div
-        className="transaction-row bg-transparent hover:bg-secondary/30 transition-colors cursor-pointer active:bg-secondary/40 select-none flex items-center justify-between px-2 py-2"
+        className="transaction-row bg-transparent hover:bg-secondary/30 transition-colors cursor-pointer active:bg-secondary/40 select-none flex items-center justify-between px-2.5 py-2.5"
         onClick={onToggleExpand}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1 mr-3">
-          <div className={`w-9 h-9 theme-pill-btn ${account.color} flex items-center justify-center flex-shrink-0 text-white shadow-xs`}>
+          <div className={`w-9 h-9 rounded-xl ${account.color} flex items-center justify-center flex-shrink-0 text-white shadow-xs`}>
             <CreditCard className="w-4 h-4" />
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-[14px] text-foreground font-medium truncate block leading-snug">
+              <span className="text-sm text-foreground font-medium truncate block leading-snug">
                 {t("cards.statement")} {account.name}
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-secondary text-muted-foreground font-medium shrink-0">
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-secondary text-muted-foreground font-medium shrink-0 font-mono-data">
                 {txs.length}
               </span>
             </div>
-            <span className="text-[11px] text-muted-foreground flex items-center gap-1 truncate">
+            <span className="text-xs text-muted-foreground flex items-center gap-1 truncate">
               <span className="truncate">{t("card.closingDayLabel")} {format(periodEnd, "d MMM", { locale: activeLocale })} · {txs.length} {t("cards.charges")}</span>
-              <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 shrink-0 ${isExpanded ? "rotate-180" : ""}`} />
+              <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 shrink-0 ${isExpanded ? "rotate-180" : ""}`} />
             </span>
           </div>
         </div>
-        <span className="font-mono-data text-[14px] tracking-tight text-foreground shrink-0 font-medium">
+        <span className="font-mono-data text-sm tracking-tight text-foreground shrink-0 font-semibold tabular-nums">
           {formatAmount(total, { sign: "-" })}
         </span>
       </div>
@@ -281,43 +281,44 @@ function StatementGroupRow({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="pl-6 pr-2 py-1 bg-secondary/15 border-l-2 border-border/70 my-1 rounded-r-lg divide-y divide-border/20"
+            className="pl-6 pr-2 py-1 bg-secondary/15 border-l-2 border-border/70 my-1 rounded-r-xl divide-y divide-border/20"
           >
             {txs.map(tx => (
               <div
                 key={tx.id}
                 onClick={() => onSelect?.(tx)}
-                className="py-2 px-2 flex items-center justify-between cursor-pointer hover:bg-secondary/40 rounded-md transition-colors"
+                className="py-2.5 px-2 flex items-center justify-between cursor-pointer hover:bg-secondary/40 rounded-lg transition-colors active:scale-[0.99]"
               >
-                <div className="flex items-center gap-2.5">
-                  <div className={`w-6 h-6 rounded-[6px] ${tx.category.color} flex items-center justify-center text-white flex-shrink-0`}>
-                    <CategoryIcon name={tx.category.icon || "circle-dot"} className="w-3 h-3" />
+                <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
+                  <div className={`w-6 h-6 rounded-md ${tx.category.color} flex items-center justify-center text-white flex-shrink-0`}>
+                    <CategoryIcon name={tx.category.icon || "circle-dot"} className="w-3.5 h-3.5" />
                   </div>
-                  <div>
-                    <span className="text-[13px] text-foreground font-medium block">{tx.description}</span>
-                    <span className="text-[11px] text-muted-foreground">
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm text-foreground font-medium block truncate">{tx.description}</span>
+                    <span className="text-xs text-muted-foreground truncate block">
                       {tx.category.name} · {format(tx.date, "d MMM", { locale: activeLocale })}
                       {tx.installmentInfo && ` (${tx.installmentInfo.current}/${tx.installmentInfo.total})`}
                     </span>
                   </div>
                 </div>
-                <span className="font-mono-data text-[13px] text-foreground">
+                <span className="font-mono-data text-sm text-foreground shrink-0 tabular-nums font-medium">
                   {formatAmount(tx.amount, { sign: "-" })}
                 </span>
               </div>
             ))}
             {onPay && total > 0 && (
-              <div className="py-2.5 px-2 flex items-center justify-between bg-primary/5 rounded-md mt-1">
-                <span className="text-xs text-muted-foreground font-medium">{t("tx.settleStatementPrompt")}</span>
+              <div className="py-2.5 px-2 flex items-center justify-between bg-primary/5 rounded-lg mt-1 gap-2">
+                <span className="text-xs text-muted-foreground font-medium truncate">{t("tx.settleStatementPrompt")}</span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onPay(account.id, total);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium active:scale-95 transition-all shadow-xs"
+                  className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium active:scale-95 transition-all shadow-xs shrink-0 font-mono-data"
+                  aria-label={`${t("card.pay")} ${formatAmount(total)}`}
                 >
                   <DollarSign className="w-3.5 h-3.5" />
-                  {t("card.pay")} {formatAmount(total)}
+                  <span>{t("card.pay")} {formatAmount(total)}</span>
                 </button>
               </div>
             )}
@@ -497,7 +498,7 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
 
   if (transactions.length === 0) {
     return (
-      <div className="px-4 pb-28">
+      <div className="px-4 pb-4">
         <EmptyState
           icon={ArrowLeftRight}
           title={t("common.noData")}
@@ -508,15 +509,15 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
   }
 
   return (
-    <div className="px-4 pb-28 w-full max-w-full">
-      <div className="flex items-center justify-between gap-2 mb-3">
-        <h2 className="text-[13px] text-muted-foreground font-medium font-display shrink-0">{title || t("tx.title")}</h2>
+    <div className="px-4 pb-4 w-full max-w-full">
+      <div className="flex items-center justify-between gap-2 mb-3 min-w-0">
+        <h2 className="text-xs text-muted-foreground font-semibold uppercase tracking-wider font-display shrink-0">{title || t("tx.title")}</h2>
         <div className="flex items-center gap-1.5 flex-wrap justify-end">
-          {/* Botón integrado de subtotales diarios con label y armonía */}
+          {/* Botón integrado de subtotales diarios con label y ergonomía táctil */}
           <button
             onClick={toggleSubtotals}
             className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-all active:scale-95",
+              "flex items-center gap-1.5 h-8 px-2.5 sm:px-3 rounded-lg border text-xs font-medium transition-all active:scale-95 min-h-[36px]",
               showSubtotals
                 ? "bg-primary/15 text-primary border-primary/40 shadow-xs"
                 : "bg-secondary/60 text-muted-foreground border-border/50 hover:text-foreground hover:bg-secondary"
@@ -524,16 +525,16 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
             title={showSubtotals ? t("tx.hideSubtotals") || "Ocultar subtotales" : t("tx.showSubtotals") || "Ver subtotales"}
             aria-label={showSubtotals ? t("tx.hideSubtotals") || "Ocultar subtotales" : t("tx.showSubtotals") || "Ver subtotales"}
           >
-            <Calculator className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline text-[10px]">{t("tx.subtotals") || "Subtotales"}</span>
+            <Calculator className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline text-xs">{t("tx.subtotals") || "Subtotales"}</span>
           </button>
 
           {showGroupingToggle && (
-            <div className="flex items-center bg-secondary/80 p-0.5 rounded-lg border border-border/50 text-[11px]">
+            <div className="flex items-center bg-secondary/80 p-0.5 rounded-lg border border-border/50 text-xs h-8">
               <button
                 onClick={() => setViewMode("detailed")}
                 className={cn(
-                  "px-2 py-1 rounded-md font-medium transition-colors",
+                  "h-7 px-2.5 rounded-md font-medium transition-colors flex items-center justify-center text-xs active:scale-95",
                   viewMode === "detailed"
                     ? "bg-background text-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
@@ -544,7 +545,7 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
               <button
                 onClick={() => setViewMode("grouped")}
                 className={cn(
-                  "px-2 py-1 rounded-md font-medium transition-colors",
+                  "h-7 px-2.5 rounded-md font-medium transition-colors flex items-center justify-center text-xs active:scale-95",
                   viewMode === "grouped"
                     ? "bg-background text-foreground shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
@@ -567,12 +568,12 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
 
           return (
             <div key={group.key} className="mb-4">
-              <div className="flex items-center justify-between py-1 px-1 mb-1.5 min-h-[26px]">
-                <span className="text-[11px] text-muted-foreground/80 font-semibold uppercase tracking-wider font-display">
+              <div className="flex items-center justify-between py-1 px-1 mb-1.5 min-h-[26px] min-w-0">
+                <span className="text-xs text-muted-foreground/80 font-semibold uppercase tracking-wider font-display truncate">
                   {group.label}
                 </span>
                 {showSubtotals && (
-                  <div className="flex items-center gap-2 text-[11px] font-mono-data font-semibold">
+                  <div className="flex items-center gap-2 text-xs font-mono-data font-semibold shrink-0 tabular-nums">
                     {dayIncome > 0 && (
                       <span className="text-primary">+{maskAmount(formatInCurrency(dayIncome, currentCurrency))}</span>
                     )}
@@ -611,8 +612,8 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
         // Modo agrupado por resumen con idénticos contenedores, márgenes y alturas
         timelineGroups.map((group) => (
           <div key={group.key} className="mb-4">
-            <div className="flex items-center justify-between py-1 px-1 mb-1.5 min-h-[26px]">
-              <span className="text-[11px] text-muted-foreground/80 font-semibold uppercase tracking-wider font-display">
+            <div className="flex items-center justify-between py-1 px-1 mb-1.5 min-h-[26px] min-w-0">
+              <span className="text-xs text-muted-foreground/80 font-semibold uppercase tracking-wider font-display truncate">
                 {group.label}
               </span>
             </div>

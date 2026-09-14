@@ -151,7 +151,7 @@ export function RulesManager({
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="hidden sm:inline">{t("rules.cleanDuplicates")}</span>
-              <span className="sm:hidden text-[11px]">Limpiar</span>
+              <span className="sm:hidden text-xs">{t("rules.cleanShort")}</span>
             </button>
           )}
 

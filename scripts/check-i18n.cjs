@@ -159,12 +159,10 @@ if (report.length > 0) {
   for (const [f, count] of Object.entries(byFile)) {
     console.log(`  - ${f}: ${count} textos hardcodeados`);
   }
-  if (process.argv.includes('--verbose')) {
-    console.log('\n[i18n-audit] Ocurrencias detalladas:');
-    report.forEach(r => {
-      console.log(`  ${r.file}:${r.line} [palabra: ${r.word}] -> ${r.content}`);
-    });
-  }
+  console.log('\n[i18n-audit] Ocurrencias detalladas:');
+  report.forEach(r => {
+    console.log(`  ${r.file}:${r.line} [palabra: ${r.word}] -> ${r.content}`);
+  });
 }
 
 // 3. Scan code for referenced translation keys and verify they exist in dictionary

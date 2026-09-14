@@ -132,7 +132,7 @@ export function AccountManager({
   const { formatInCurrency } = useCurrencyConversion();
 
   return (
-    <div className="pt-4 pb-28">
+    <div className="pt-4 pb-6">
       {/* Header */}
       <div className="px-4 pb-3 flex items-center justify-between">
         {view === "list" ? (

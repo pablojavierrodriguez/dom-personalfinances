@@ -460,16 +460,16 @@ export function QuickAddSheet({ open, onClose, onSubmit, accounts, categories, t
             <span className="text-[12px] text-muted-foreground font-medium mb-2 block">{t("quickadd.account")}</span>
             {accounts.length === 0 ? (
               <div className="p-3 mb-4 rounded-xl border border-dashed border-amber-500/40 bg-amber-500/10 text-amber-500 text-xs flex items-center justify-between">
-                <span>No tienes cuentas creadas aún.</span>
+                <span>{t("quickadd.noAccountsCreated")}</span>
                 <button
                   type="button"
                   onClick={() => {
                     onClose();
                     onTransferRequest?.();
                   }}
-                  className="font-semibold underline ml-2 shrink-0"
+                  className="font-semibold underline ml-2 shrink-0 active:scale-95 transition-transform"
                 >
-                  Crear cuenta
+                  {t("acct.new")}
                 </button>
               </div>
             ) : (
