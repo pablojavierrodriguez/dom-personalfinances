@@ -389,18 +389,6 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
     setExpandedCards(prev => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
-  if (transactions.length === 0) {
-    return (
-      <div className="px-4 pb-28">
-        <EmptyState
-          icon={ArrowLeftRight}
-          title={t("common.noData")}
-          description={t("tx.title")}
-        />
-      </div>
-    );
-  }
-
   // 1. Modo desglosado estándar (por fecha ordenada)
   const detailedGroups = useMemo(() => {
     const map = new Map<string, { date: Date; label: string; txs: Transaction[] }>();
@@ -506,6 +494,18 @@ export function TransactionList({ title, transactions, accounts = [], onSelect, 
       .sort(([keyA], [keyB]) => keyB.localeCompare(keyA))
       .map(([key, value]) => ({ key, ...value }));
   }, [transactions, creditCardAccountIds, accounts, convert, activeLocale, t]);
+
+  if (transactions.length === 0) {
+    return (
+      <div className="px-4 pb-28">
+        <EmptyState
+          icon={ArrowLeftRight}
+          title={t("common.noData")}
+          description={t("tx.title")}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 pb-28 w-full max-w-full">

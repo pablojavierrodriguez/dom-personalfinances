@@ -84,6 +84,7 @@ export function CsvImportSheet({
     debit: "",
     credit: "",
     installments: "",
+    category: "",
   });
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
   const [previewItems, setPreviewItems] = useState<PreviewItem[]>([]);
@@ -125,7 +126,7 @@ export function CsvImportSheet({
     setPdfMetadata(null);
     setHeaders([]);
     setRows([]);
-    setMapping({ date: "", description: "", amount: "", type: "", debit: "", credit: "", installments: "" });
+    setMapping({ date: "", description: "", amount: "", type: "", debit: "", credit: "", installments: "", category: "" });
     setPreviewItems([]);
     setError("");
     setIsImporting(false);
@@ -427,6 +428,34 @@ export function CsvImportSheet({
         };
       })
     );
+  };
+
+  const invertAllTypes = () => {
+    setPreviewItems((prev) =>
+      prev.map((item) => {
+        const nextType: "income" | "expense" = item.tx.type === "income" ? "expense" : "income";
+        let nextCat = item.tx.category;
+        if (nextCat.type !== nextType) {
+          const compatibleCat =
+            categories.find((c) => c.type === nextType && /otros?|general/i.test(c.name)) ??
+            categories.find((c) => c.type === nextType) ??
+            nextCat;
+          nextCat = compatibleCat;
+        }
+        return {
+          ...item,
+          tx: {
+            ...item.tx,
+            type: nextType,
+            category: nextCat,
+          },
+        };
+      })
+    );
+    toast({
+      title: "Signos invertidos",
+      description: "Se alternaron todos los movimientos entre Gastos e Ingresos.",
+    });
   };
 
   const toggleIsTransfer = (index: number) => {
@@ -787,8 +816,31 @@ export function CsvImportSheet({
                               className="w-full h-11 px-3.5 pr-8 rounded-[12px] bg-secondary/40 border border-border text-foreground text-[13px] appearance-none outline-none focus:ring-2 focus:ring-primary/30 transition-colors truncate"
                             >
                               <option key="type-opt-none" value="">{t("csv.detectBySign")}</option>
+                              <option key="type-opt-inverted" value="__sign_inverted__">{t("csv.detectBySignInverted")}</option>
                               {headers.map((h, hIdx) => (
                                 <option key={`type-opt-${hIdx}-${h}`} value={h}>
+                                  {h}
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                          </div>
+                        </div>
+
+                        {/* Categoría opcional */}
+                        <div className="min-w-0">
+                          <label className="text-[12px] text-muted-foreground mb-1 block">
+                            {t("csv.colCategory")}
+                          </label>
+                          <div className="relative">
+                            <select
+                              value={mapping.category || ""}
+                              onChange={(e) => setMapping((m) => ({ ...m, category: e.target.value }))}
+                              className="w-full h-11 px-3.5 pr-8 rounded-[12px] bg-secondary/40 border border-border text-foreground text-[13px] appearance-none outline-none focus:ring-2 focus:ring-primary/30 transition-colors truncate"
+                            >
+                              <option key="cat-opt-none" value="">{t("common.none")}</option>
+                              {headers.map((h, hIdx) => (
+                                <option key={`cat-opt-${hIdx}-${h}`} value={h}>
                                   {h}
                                 </option>
                               ))}
@@ -985,9 +1037,21 @@ export function CsvImportSheet({
                           <span>{selectedCount === previewItems.length ? "Deseleccionar todo" : "Seleccionar todo"}</span>
                         </button>
 
-                        <span className="text-[12px] text-muted-foreground truncate">
-                          {selectedCount} seleccionados {totalProjectedTxs > 0 && `(+${totalProjectedTxs} cuotas proyectadas)`}
-                        </span>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={invertAllTypes}
+                            className="inline-flex items-center gap-1.5 text-[11px] font-medium py-1 px-2.5 rounded-[8px] bg-secondary/80 hover:bg-secondary text-foreground hover:text-primary transition-colors border border-border/50"
+                            title="Invertir todos los gastos a ingresos e ingresos a gastos"
+                          >
+                            <ArrowUpDown className="w-3 h-3 text-primary" />
+                            <span>{t("csv.invertAllSigns")}</span>
+                          </button>
+
+                          <span className="text-[12px] text-muted-foreground truncate">
+                            {selectedCount} seleccionados {totalProjectedTxs > 0 && `(+${totalProjectedTxs} cuotas proyectadas)`}
+                          </span>
+                        </div>
                       </div>
 
                       {installmentsCount > 0 && (

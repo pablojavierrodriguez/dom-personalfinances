@@ -9,10 +9,11 @@ export interface ColumnMapping {
   date: string;
   description: string;
   amount: string;
-  type: string; // column name, or "" if using sign detection
+  type: string; // column name, "" if using sign detection, or "__sign_inverted__"
   debit?: string;
   credit?: string;
   installments?: string;
+  category?: string;
 }
 
 export function parseCsvText(text: string): { headers: string[]; rows: CsvRow[] } {
@@ -126,6 +127,7 @@ export function guessMapping(headers: string[]): ColumnMapping {
     headers[lower.findIndex((h) => /transaction_type|record_type|payment_method_type|tipo|type/i.test(h))] ?? "";
 
   const installmentsCol = headers[lower.findIndex((h) => /^installments$|cuotas/i.test(h))];
+  const categoryCol = headers[lower.findIndex((h) => /^categor[ií]a$|^category$|^rubro$/i.test(h))];
 
   return {
     date: dateCol,
@@ -135,6 +137,7 @@ export function guessMapping(headers: string[]): ColumnMapping {
     debit: debitCol,
     credit: creditCol,
     installments: installmentsCol,
+    category: categoryCol,
   };
 }
 
@@ -479,6 +482,82 @@ export function isPotentialDuplicate(
   });
 }
 
+/**
+ * Intenta encontrar una coincidencia entre el nombre de categoría importado y las categorías del sistema
+ */
+export function matchCategoryByName(
+  rawName: string,
+  availableCategories: Category[],
+  preferredType?: "income" | "expense"
+): Category | null {
+  if (!rawName) return null;
+  const clean = rawName
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  if (!clean) return null;
+
+  // Filtrar si hay preferencia de tipo
+  const pool = preferredType
+    ? [
+        ...availableCategories.filter((c) => c.type === preferredType),
+        ...availableCategories.filter((c) => c.type !== preferredType),
+      ]
+    : availableCategories;
+
+  // 1. Coincidencia exacta normalizada
+  for (const cat of pool) {
+    const catClean = cat.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (catClean === clean) return cat;
+  }
+
+  // 2. Coincidencia por contención bidireccional
+  for (const cat of pool) {
+    const catClean = cat.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (catClean.includes(clean) || clean.includes(catClean)) return cat;
+  }
+
+  // 3. Mapeos semánticos frecuentes (ej. Mobills -> DOM)
+  if (/salida|delivery|restauran|comida|gastronom/i.test(clean)) {
+    const found = pool.find(
+      (c) => /dining|restaurante|salidas/i.test(c.id) || /restaurante|delivery|salidas/i.test(c.name)
+    );
+    if (found) return found;
+  }
+  if (/almacen|super|comestible|mercado/i.test(clean)) {
+    const found = pool.find(
+      (c) => /groceries|super|almacen/i.test(c.id) || /supermercado|almacen/i.test(c.name)
+    );
+    if (found) return found;
+  }
+  if (/nafta|combustible|transporte|peaje|auto/i.test(clean)) {
+    const found = pool.find(
+      (c) => /transport|transporte|combustible/i.test(c.id) || /transporte|movilidad/i.test(c.name)
+    );
+    if (found) return found;
+  }
+  if (/salud|farmacia|medic/i.test(clean)) {
+    const found = pool.find(
+      (c) => /health|salud|farmacia/i.test(c.id) || /salud|farmacia/i.test(c.name)
+    );
+    if (found) return found;
+  }
+  if (/impuesto|tarjeta|servicio|comision/i.test(clean)) {
+    const found = pool.find(
+      (c) => /bills|servicios|impuestos/i.test(c.id) || /servicios|impuestos/i.test(c.name)
+    );
+    if (found) return found;
+  }
+  if (/formacion|educacion|curso/i.test(clean)) {
+    const found = pool.find((c) => /educacion|formacion/i.test(c.name));
+    if (found) return found;
+  }
+
+  return null;
+}
+
 export function rowsToTransactions(
   rows: CsvRow[],
   mapping: ColumnMapping,
@@ -505,7 +584,17 @@ export function rowsToTransactions(
       const rawAmount = row[mapping.amount] ?? "0";
       amount = parseAmount(rawAmount);
 
-      if (isNegativeAmount(rawAmount)) {
+      const isInvertedSign = mapping.type === "__sign_inverted__";
+
+      if (isInvertedSign) {
+        // En convención invertida (Mobills, resúmenes de tarjeta, etc.):
+        // Montos negativos son devoluciones/ingresos, y montos positivos son gastos
+        if (isNegativeAmount(rawAmount)) {
+          type = "income";
+        } else {
+          type = "expense";
+        }
+      } else if (isNegativeAmount(rawAmount)) {
         type = "expense";
       } else if (mapping.type && row[mapping.type]) {
         const tv = row[mapping.type].toLowerCase();
@@ -604,11 +693,19 @@ export function rowsToTransactions(
       icon: "circle-dot",
     };
 
+    // Si mapping.category está definido, intentar matchear la categoría importada
+    let importedCategory: Category | null = null;
+    if (mapping.category && row[mapping.category]) {
+      importedCategory = matchCategoryByName(row[mapping.category], availableCategories, type);
+    }
+
+    const initialCat = importedCategory || fallbackCat;
+
     // Crear draft para pasar por el motor de reglas
     const draft: DraftTransactionInput = {
       amount,
       description: desc,
-      category: fallbackCat,
+      category: initialCat,
       type,
       accountId,
       isTransfer,
@@ -623,8 +720,8 @@ export function rowsToTransactions(
 
     let finalCategory = evaluated.category;
 
-    // Si ninguna regla asignó categoría y se conserva el fallback, intentar deducción por nombre
-    if (finalCategory.id === fallbackCat.id) {
+    // Si ninguna regla asignó categoría y se conserva el fallback (y no había categoría importada válida), intentar deducción por nombre
+    if (finalCategory.id === fallbackCat.id && !importedCategory) {
       if (evaluated.isTransfer) {
         const transferCat = availableCategories.find(
           (c) => c.id === "transfer" || /transfer/i.test(c.name)

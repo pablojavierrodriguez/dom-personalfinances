@@ -12,6 +12,7 @@ import {
   generateFutureInstallments,
   detectCardPayment,
   detectPotentialTransfer,
+  matchCategoryByName,
 } from "@/lib/csv-parser";
 import { CATEGORIES } from "@/lib/types";
 
@@ -340,5 +341,65 @@ describe("csv-parser module", () => {
     expect(guessed.type).toBe("income");
     expect(guessed.name).toBe("Otros Ingresos");
     expect(guessed.name).not.toBe("Alimentación");
+  });
+
+  it("handles inverted signs convention for Mobills and card exports (__sign_inverted__)", () => {
+    // Filas reales como las de la exportación de Mobills
+    const mobillsRows = [
+      { Fecha: "25/10/2024", "Descripción": "IMPUESTO DE SELLOS", "Categoría": "Tarjeta", Valor: "$ 18.590,25" },
+      { Fecha: "24/10/2024", "Descripción": "Autopista", "Categoría": "Otros gastos", Valor: "$ 1224,50" },
+      { Fecha: "10/10/2024", "Descripción": "Puntos BBVA", "Categoría": "Chargeback**", Valor: "$ -10.728,00" },
+      { Fecha: "04/10/2024", "Descripción": "Supermercado Coco", "Categoría": "Almacén", Valor: "$ 24.800,00" },
+    ];
+
+    const mapping = {
+      date: "Fecha",
+      description: "Descripción",
+      amount: "Valor",
+      type: "__sign_inverted__",
+      category: "Categoría",
+    };
+
+    const txs = rowsToTransactions(mobillsRows, mapping, "acc-mobills");
+    expect(txs).toHaveLength(4);
+
+    // 1. Gasto positivo -> clasificado como expense
+    expect(txs[0].description).toBe("IMPUESTO DE SELLOS");
+    expect(txs[0].type).toBe("expense");
+    expect(txs[0].amount).toBe(18590.25);
+
+    // 2. Gasto positivo -> clasificado como expense
+    expect(txs[1].description).toBe("Autopista");
+    expect(txs[1].type).toBe("expense");
+    expect(txs[1].amount).toBe(1224.5);
+
+    // 3. Reintegro/devolución negativa -> clasificado como income
+    expect(txs[2].description).toBe("Puntos BBVA");
+    expect(txs[2].type).toBe("income");
+    expect(txs[2].amount).toBe(10728);
+
+    // 4. Supermercado -> expense
+    expect(txs[3].description).toBe("Supermercado Coco");
+    expect(txs[3].type).toBe("expense");
+    expect(txs[3].amount).toBe(24800);
+  });
+
+  it("matches imported category names with existing system categories", () => {
+    const customCats = [
+      { id: "cat-groceries", name: "Almacén y Supermercado", color: "bg-orange-500", type: "expense" as const },
+      { id: "cat-dining", name: "Salidas y Restaurantes", color: "bg-amber-500", type: "expense" as const },
+      { id: "cat-transport", name: "Transporte y Combustible", color: "bg-blue-500", type: "expense" as const },
+      { id: "cat-other-inc", name: "Otros Ingresos", color: "bg-emerald-500", type: "income" as const },
+    ];
+
+    // Prueba de matchCategoryByName
+    const matchedDining = matchCategoryByName("Salidas y delivery", customCats, "expense");
+    expect(matchedDining?.id).toBe("cat-dining");
+
+    const matchedAlmacen = matchCategoryByName("Almacén", customCats, "expense");
+    expect(matchedAlmacen?.id).toBe("cat-groceries");
+
+    const matchedNafta = matchCategoryByName("Nafta", customCats, "expense");
+    expect(matchedNafta?.id).toBe("cat-transport");
   });
 });
