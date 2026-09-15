@@ -86,6 +86,26 @@ El PM Orchestrator y el Principal Engineer deciden cuándo paralelizar tareas o 
 
 ---
 
+## 🌿 Estrategia de Ramas y Paralelización Segura de Agentes (Branching Strategy)
+
+Para evitar colisiones de código y despliegues accidentales, todo el equipo y sus subagentes operan bajo esta matriz de ramas:
+
+1. **`dev` — Trunk de Desarrollo e Integración Continua:**
+   - Todo trabajo cotidiano, resolución de bugs e integración de tareas reside en `dev`.
+   - Vercel despliega automáticamente `dev` como entorno de **Preview**.
+2. **`main` — Producción Exclusiva y Protegida:**
+   - Único destino oficial para releases desplegados en Cloud.
+   - Vercel despliega automáticamente `main` al dominio de **Production**.
+   - Los tags de release (`vX.Y.Z`) se crean exclusivamente sobre `main`.
+3. **Aislamiento de Refactors Mayores:**
+   - Cualquier refactor arquitectónico o reestructuración profunda debe desarrollarse en una rama dedicada (`refactor/<slug>` o `feat/<slug>`).
+   - Prohibido experimentar cambios desestabilizadores directamente sobre `dev`.
+4. **Agentes en Paralelo / Hilos Concurrentes:**
+   - Si múltiples agentes operan en paralelo y pueden tocar archivos superpuestos, DEBEN abrir ramas independientes (`work/<tarea>` o `agent/<tarea>`).
+   - **Prueba de Regresión e Integración Obligatoria en `dev`:** Al concluir el trabajo de cada rama, se mergean a `dev` y se ejecuta la suite completa de calidad (`npm run check:all`) en `dev` para garantizar ausencia de regresiones antes de solicitar release a `main`.
+
+---
+
 ## 🧠 Protocolo de Aprendizaje y Memoria Viva (Knowledge Feeder)
 
 Al cerrar cada sprint:

@@ -68,7 +68,29 @@
 
 ---
 
-## Reglas de Git — Commits y Pushes
+## Reglas de Git — Estrategia de Ramas, Commits y Pushes
+
+### 🌿 Estrategia de Ramas (`dev` vs `main`)
+
+- **`dev` (Desarrollo Activo e Integración Continua):**
+  - Todo el desarrollo diario, features, correcciones menores, pruebas y tareas cotidianas se desarrollan y commitean en **`dev`**.
+  - Vercel despliega automáticamente la rama `dev` como entorno de **Preview**.
+- **`main` (Producción Exclusiva y Protegida):**
+  - Exclusiva para releases estables desplegados en Producción (Cloud).
+  - **Los releases oficiales residen y se liberan obligatoriamente en `main`**.
+  - El tag formal `vX.Y.Z` y la GitHub Release corresponden al commit promovido en `main`.
+  - Vercel despliega automáticamente la rama `main` al dominio oficial de **Production**.
+  - Tras completar la liberación en `main`, retornar siempre a `dev` para continuar el trabajo.
+- **Refactors Mayores y Épicas Estructurales:**
+  - Prohibido experimentar cambios arquitectónicos profundos o refactors de alto riesgo directo en `dev`.
+  - Se abre una rama dedicada (`refactor/<nombre>` o `feat/<nombre>`), se desarrolla y valida allí, y una vez aprobada se mergea en `dev`.
+- **Paralelización de Agentes o Hilos Múltiples:**
+  - Si múltiples agentes o hilos de trabajo operan en paralelo sobre archivos superpuestos, DEBEN trabajar en ramas independientes (`work/<tarea>` o `agent/<tarea>`).
+  - **Integración y Regresión en `dev`:** Al concluir, las ramas se integran ordenadamente en `dev` mediante merge, y se ejecuta obligatoriamente la suite de regresión e integridad (`npm run check:all`, `audit:ux`) en `dev` antes de considerar la tarea lista o apta para release.
+
+---
+
+### ⚠️ Permisos Estrictos de Git
 
 > [!CAUTION]
 > **NUNCA realizar commits ni pushes sin autorización expresa y explícita del usuario para CADA acción.**
@@ -94,7 +116,7 @@
 - **PROHIBIDO INCREMENTAR VERSIONES EN TAREAS COTIDIANAS:** Durante el desarrollo diario de features o bugfixes, **NUNCA** se debe modificar `version` en `package.json`, ni crear cabeceras de nuevas versiones cerradas en `docs/RELEASE_NOTES.md`. Todo trabajo nuevo o parcial reside obligatoriamente bajo `## [Unreleased] — En Desarrollo (Próxima Versión)`.
 - **Corte de Release Exclusivo:** El proceso de release se ejecuta **única y exclusivamente cuando el usuario lo solicite de forma explícita** (ej: *"preparemos el release v0.2.0 para producción"* o *"hagamos el corte de versión"*).
 - **Flujo al ejecutar un Corte de Release (solicitado por el usuario):**
-  1. **Compilación previa obligatoria:** Validar con `npm run check:all` (`check-release-integrity`, `tsc --noEmit`, `vitest`, `npm run build`).
+  1. **Compilación previa obligatoria en `dev`:** Validar con `npm run check:all` (`check-release-integrity`, `check-i18n`, `audit:ux`, `tsc --noEmit`, `vitest`, `npm run build`).
   2. **Incrementar `version` en `package.json`:**
      - Paquete con nuevas features $\rightarrow$ **MINOR** (`0.1.0` $\rightarrow$ `0.2.0`).
      - Paquete exclusivo de hotfixes $\rightarrow$ **PATCH** (`0.1.0` $\rightarrow$ `0.1.1`).
@@ -106,11 +128,16 @@
      - Consolidar todos los cambios DDL/RPC en un único delta idempotente en `supabase/migrations/delta/YYYYMMDD_<nombre>.sql` listo para aplicar en Supabase Cloud.
   5. **Purgado de Backlog:**
      - Mover y actualizar ítems completados en `docs/BACKLOG.md`. El historial detallado de lo entregado vive en `docs/RELEASE_NOTES.md`.
-  6. **Solicitud de Git interactiva (OBLIGATORIO):**
-     - Presentar la propuesta de commit (`release(vX.Y.Z): ...`) y de tagging (`git tag -a vX.Y.Z -m "Release vX.Y.Z"`).
-     - **Esperar confirmación verbal explícita antes de ejecutar `git commit`, `git tag` o `git push`.**
-  7. **Publicación Oficial de GitHub Release (OBLIGATORIO):**
-     - Inmediatamente tras el push del tag y las ramas, publicar la release formal en GitHub mediante `gh release create vX.Y.Z --title "DOM vX.Y.Z — <Título>" --notes "<extracto_user_facing>"`.
+  6. **Commit de Release en `dev`:**
+     - Solicitar confirmación para commitear en `dev` (`release(vX.Y.Z): ...`).
+  7. **Promoción a Producción (`main`) y Tagging (OBLIGATORIO):**
+     - Pasarse a `main`: `git checkout main`.
+     - Mergear `dev` en `main`: `git merge dev`.
+     - Crear el tag formal sobre `main`: `git tag -a vX.Y.Z -m "Release vX.Y.Z: <Título>"`.
+     - Push de `main` y tag a remoto: `git push origin main && git push origin vX.Y.Z`.
+     - Retornar a `dev` para desarrollo: `git checkout dev`.
+  8. **Publicación Oficial de GitHub Release (OBLIGATORIO):**
+     - Inmediatamente tras el push de `main` y del tag, publicar la release formal en GitHub mediante `gh release create vX.Y.Z --title "DOM vX.Y.Z — <Título>" --notes "<extracto_user_facing>"`.
      - Prohibido dejar el tag huérfano sin GitHub Release formal; garantizar que la barra lateral del repositorio muestre la nueva versión como `Latest`.
   - Consultar siempre la skill [.agents/skills/release-management/SKILL.md](file:///Users/adrisol/Pablo/code/m3/.agents/skills/release-management/SKILL.md).
 

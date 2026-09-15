@@ -101,20 +101,32 @@ Debe confirmar que `package.json` coincide con la nueva versión cerrada y que n
 
 ---
 
-## 7. Solicitud Interactiva de Git y Tagging (OBLIGATORIO)
+## 7. Solicitud Interactiva de Git, Promoción a `main` y Tagging (OBLIGATORIO)
 
 > [!CAUTION]
 > **PROHIBIDO EJECUTAR `git commit`, `git tag` O `git push` DE FORMA AUTOMÁTICA.**
+> Todo release se desarrolla y valida en `dev`, pero se libera y taguea obligatoriamente en `main` (Producción).
 
-1. Presentar el resumen consolidado al usuario:
+1. **Presentar el resumen consolidado al usuario:**
    - Nueva versión (`X.Y.Z`).
    - Resumen de notas de release generadas.
    - Estado de migraciones SQL para Cloud.
-2. Proponer formalmente los comandos:
+2. **Proponer formalmente la secuencia de comandos:**
    ```bash
+   # Paso 1: Commit en dev
+   git checkout dev
    git add package.json docs/RELEASE_NOTES.md docs/BACKLOG.md supabase/migrations/
    git commit -m "release(vX.Y.Z): <título del release>"
+   git push origin dev
+
+   # Paso 2: Promoción a Producción en main
+   git checkout main
+   git merge dev
    git tag -a vX.Y.Z -m "Release vX.Y.Z: <título del release>"
+   git push origin main && git push origin vX.Y.Z
+
+   # Paso 3: Retorno a desarrollo
+   git checkout dev
    ```
 3. **Esperar autorización verbal explícita antes de ejecutar cualquier comando.**
 

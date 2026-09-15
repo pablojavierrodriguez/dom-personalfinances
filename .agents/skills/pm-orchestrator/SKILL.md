@@ -42,3 +42,8 @@ Garantizar que cada ciclo de trabajo tenga un objetivo nítido, medible y de alt
    - **Delegación a Subagentes ("Sumar Manos"):** Despachar autónomamente `browser_subagent` durante la Fase 5 para navegar en viewport 375px, probar flujos y validar consola sin ocupar el hilo principal de diseño/código.
    - **Garantía de Foco:** Blindar la lógica de balances y esquemas de base de datos para que se trabajen en hilo único y secuencial, prohibiendo la fragmentación de responsabilidades críticas.
 
+5. **Estrategia de Ramas y Paralelismo Seguro:**
+   - **`dev`** es el trunk de desarrollo; todo trabajo cotidiano y sprints integran ahí.
+   - **`main`** es Producción exclusiva: solo recibe merges al momento del release.
+   - **Refactors mayores o épicas estructurales** se aislan en ramas `refactor/<slug>` o `feat/<slug>` y se mergean a `dev` solo tras validación completa.
+   - **Paralelismo de agentes:** Si múltiples hilos operan sobre archivos superpuestos, abrir ramas independientes (`work/<tarea>` o `agent/<tarea>`) y al integrar en `dev` ejecutar obligatoriamente `npm run check:all` para prueba de regresión antes de cualquier release.
