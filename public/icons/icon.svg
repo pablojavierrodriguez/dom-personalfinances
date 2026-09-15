@@ -1,42 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Fondo carbón OLED -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%"   stop-color="#0d1017" />
       <stop offset="100%" stop-color="#06070a" />
     </linearGradient>
-    <!-- Gradiente esmeralda tech diagonal -->
-    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="emeraldGrad" x1="87" y1="87" x2="425" y2="425" gradientUnits="userSpaceOnUse">
       <stop offset="0%"   stop-color="#34f5a2" />
       <stop offset="35%"  stop-color="#10b981" />
       <stop offset="75%"  stop-color="#059669" />
       <stop offset="100%" stop-color="#0284c7" />
     </linearGradient>
-    <!-- Sombra de profundidad muy sutil -->
     <filter id="shadow" x="-15%" y="-10%" width="140%" height="140%">
       <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#000" flood-opacity="0.50" />
     </filter>
   </defs>
 
-  <!-- Fondo squircle carbon OLED -->
   <rect width="512" height="512" rx="114" fill="url(#bgGrad)" stroke="rgba(16,185,129,0.18)" stroke-width="2" />
 
-  <!-- SIGIL: D con contraforme circular
-       Outer D: M107,87 L256,87 → semicírculo CW → L107,425 → esquinas izq → Z
-       Circle: CCW — evenodd lo convierte en agujero automáticamente -->
+  <!--
+    SIGIL: D = dos formas geométricas independientes.
+
+    La muesca nace del redondeo de las esquinas DERECHAS del rectángulo (r≈6px):
+      • El rectángulo se retira ~6px de x=256 en los extremos superior e inferior.
+      • El brazo curvo arranca exactamente en (256,87) y termina en (256,425).
+      • El gap del bezier entre (250,87)→(256,93) es la muesca superior.
+      • El gap del bezier entre (256,419)→(250,425) es la muesca inferior.
+
+    Agujero circular dividido en dos mitades para evitar fills espurios con evenodd:
+      • Semicírculo izquierdo (CCW, pasa por x=186) → agujero del rectángulo.
+      • Semicírculo derecho (CW,  pasa por x=326) → agujero del brazo.
+  -->
   <g filter="url(#shadow)">
+
+    <!-- FORMA 1: Rectángulo con esquinas derechas redondeadas (r=6) + agujero semicírculo izquierdo -->
     <path fill-rule="evenodd" fill="url(#emeraldGrad)"
       d="M107,87
-         L256,87
-         A169,169 0 0,1 256,425
+         L242,87
+         Q256,87 256,101
+         L256,411
+         Q256,425 242,425
          L107,425
          Q87,425 87,405
          L87,107
          Q87,87 107,87
          Z
-         M326,256
-         A70,70 0 1,0 186,256
-         A70,70 0 1,0 326,256
+         M256,186
+         A70,70 0 0,0 256,326
          Z" />
+
+    <!-- FORMA 2: Brazo curvo derecho (semicírculo exterior r=169) + agujero semicírculo derecho -->
+    <path fill-rule="evenodd" fill="url(#emeraldGrad)"
+      d="M256,87
+         A169,169 0 0,1 256,425
+         Z
+         M256,186
+         A70,70 0 0,1 256,326
+         Z" />
+
   </g>
 </svg>
