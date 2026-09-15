@@ -32,6 +32,8 @@ Garantizar que cada ciclo de trabajo tenga un objetivo nítido, medible y de alt
    - Cero errores de compilación (`tsc --noEmit` y `npm run build` limpios).
    - Experiencia móvil impecable (tap targets ≥ 44px, safe areas, sin desbordes de scroll).
    - Cumplimiento de RLS y estándares de base de datos Supabase.
+   - **Validación Obligatoria de Cold Start (Estado Cero):** Probar el comportamiento de toda vista o métrica con 0 registros (`0/0`), garantizando estado neutral sereno y ausencia de falsos diagnósticos.
+   - **Soberanía y Anti-Paternalismo:** Verificar que todo flujo de inicio o purga admita la opción de arrancar 100% en blanco sin imposición forzada de seed data.
    - Signoff explícito de QA con verificación en navegador.
    - Actualización de documentación y memoria del sistema.
 

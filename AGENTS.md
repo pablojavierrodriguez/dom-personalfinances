@@ -45,6 +45,19 @@
   - En inputs editables con teclado, procesar con utilidades bidireccionales (`formatThousandsInput` y `parseThousandsInput`), evitando `<input type="number">` nativo que rechaza comas decimales en mobile.
 - **Invariantes de Dominio Financiero (Pasivos y Patrimonio Neto)**:
   - Todo pasivo financiero (deudas de tarjetas de crédito, préstamos) debe mantenerse garantizado como saldo no positivo (`balance <= 0`) en base de datos, servicios y stores (`Math.min(0, balance)` o `-Math.abs(balance)`). Prohibido permitir que un pasivo sume como activo al patrimonio neto (*Net Worth*).
+  - Toda eliminación o edición de transacciones en pasivos debe ejecutar una reversión atómica y determinista del balance.
+- **Invariante de Cold Start y Estado Cero (Neutralidad Financiera)**:
+  - Ante ausencia de movimientos (`monthlyIncome === 0 && monthlyExpenses === 0`), está terminantemente prohibido inferir déficit mediante comparaciones ingenuas (`income > expenses` que evalúa falso) o emitir alarmas rojas de descontrol de gasto.
+  - Toda métrica o score de salud financiera ante 0 registros debe presentarse como un estado ponderado **Neutral** (`50 - Neutro`) con microcopia serena, y suprimir bonus ficticios de presupuestos o metas no configuradas.
+- **Principio de Soberanía del Usuario (Anti-Paternalismo en Resets y Onboarding)**:
+  - El sistema nunca debe imponer datos de prueba o cuentas por defecto si el usuario elige partir de cero.
+  - Todo *Hard Reset* o purga de usuario debe ser total y destructivo por defecto (`reseed: false`), sin reinsertar cuentas ni categorías automáticamente a menos que el usuario lo elija.
+  - Todo asistente de inicio (*Onboarding*) debe ofrecer explícitamente la bifurcación entre "Cuentas recomendadas" y "Lienzo 100% en blanco".
+- **Resiliencia Offline y Desacoplamiento de Ciclos de Sesión**:
+  - La hidratación del almacenamiento local (`dom-*`) jamás debe purgarse ante estados transitorios de autenticación (ej: `user === null` en frío o verificaciones intermedias de token).
+  - Toda entidad local debe generarse obligatoriamente bajo identificadores UUID v4 válidos para garantizar compatibilidad estricta con PostgreSQL en Supabase.
+- **Normalización Multi-Divisa en Proyecciones**:
+  - En proyecciones de liquidez y flujo de caja (`CashFlowForecast`), todo saldo o compromiso en moneda heterogénea debe normalizarse y convertirse contra la divisa objetivo (`targetCurrency`) antes de computar acumulados o renderizar curvas.
 - **Homogeneidad de UI y reutilización**: Respetar el Design System y los componentes base en `src/components/ui`. Toda vista similar debe compartir los mismos tokens, espaciados y microtipografía.
 - **Seguridad**: validar y sanitizar inputs siempre (Zod schemas). Políticas RLS activas en todas las tablas de Supabase. Nunca exponer secrets o service role keys en código cliente o repositorios.
 - **Inputs controlados**: Todo `<input>` o `<textarea>` debe tener valor inicial definido (usar `""` en lugar de `undefined`) para evitar warnings de componentes no controlados a controlados.

@@ -18,6 +18,8 @@ Hacer que DOM se sienta tan pulida, reactiva y soberana de usar como Linear, Cro
 1. **Filosofía & Microcopia de Soberanía Financiera:**
    - La interfaz no juzga ni castiga: asiste al autogobierno financiero.
    - Microcopia afirmativa y serena: "Asignación de recursos" en lugar de "restricción", "Ritmo de gasto" en lugar de advertencias agresivas.
+   - **Anti-Paternalismo & Soberanía del Usuario:** El diseño debe respetar la autonomía del usuario. En onboarding o hard resets, jamás forzar datos predeterminados; ofrecer siempre una bifurcación diáfana entre "Recomendado" y "Lienzo 100% en blanco".
+   - **Diseño del Estado Cero (Neutralidad Protectora):** Ante ausencia de actividad o 0 movimientos, prohibido emitir alertas alarmistas rojas de déficit. Diseñar estados serenos y neutrales (`50 - Neutro` con ícono de escudo o calma) que den la bienvenida sin castigar por falta de datos.
    - Empty states proactivos: guiar al usuario a registrar su primer activo o hábito con contexto claro y un call-to-action directo.
 
 2. **Jerarquía Visual y Tipografía:**
