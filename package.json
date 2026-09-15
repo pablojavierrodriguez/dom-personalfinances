@@ -14,7 +14,9 @@
     "test:e2e": "playwright test",
     "audit:ux": "node scripts/audit-ux-code.cjs",
     "playbook:sync": "node scripts/sync-upstream-playbook.cjs",
-    "check:all": "node scripts/check-all.cjs"
+    "check:all": "node scripts/check-all.cjs",
+    "generate:icons": "node scripts/generate-pwa-icons.js",
+    "generate:splash": "node scripts/generate-splash-screens.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -88,6 +90,7 @@
     "globals": "^15.15.0",
     "jsdom": "^20.0.3",
     "postcss": "^8.5.6",
+    "sharp": "^0.35.4",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
