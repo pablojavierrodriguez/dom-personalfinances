@@ -85,7 +85,7 @@ interface SettingsPageProps {
   onImportCsv: () => void;
   onOpenReleaseNotes?: () => void;
   onOpenShortcuts?: () => void;
-  onPurgeData?: () => Promise<void>;
+  onPurgeData?: (options?: { reseed?: boolean }) => Promise<void>;
 }
 
 function SettingRow({ icon: Icon, label, children }: { icon: React.ElementType; label: string; children: React.ReactNode }) {
@@ -127,6 +127,7 @@ export function SettingsPage({ onImportCsv, onOpenReleaseNotes, onOpenShortcuts,
   const [isPurgeModalOpen, setIsPurgeModalOpen] = useState(false);
   const [purgeConfirmedCheck, setPurgeConfirmedCheck] = useState(false);
   const [purgeConfirmationText, setPurgeConfirmationText] = useState("");
+  const [purgeMode, setPurgeMode] = useState<"blank" | "defaults">("blank");
   const [isPurging, setIsPurging] = useState(false);
 
   const isPurgeKeywordValid = (text: string) => {
@@ -145,9 +146,9 @@ export function SettingsPage({ onImportCsv, onOpenReleaseNotes, onOpenShortcuts,
     setIsPurging(true);
     try {
       if (onPurgeData) {
-        await onPurgeData();
+        await onPurgeData({ reseed: purgeMode === "defaults" });
       } else {
-        await purgeAllUserData(user?.id);
+        await purgeAllUserData(user?.id, { reseed: purgeMode === "defaults" });
       }
       setIsPurgeModalOpen(false);
       // Redirigir directamente al inicio "/" para entrar al estadio inicial (OnboardingWizard o Dashboard limpio en cero)
@@ -751,6 +752,58 @@ export function SettingsPage({ onImportCsv, onOpenReleaseNotes, onOpenShortcuts,
           </AlertDialogHeader>
 
           <div className="space-y-3 py-2">
+            {/* Selector de modo de reinicio: Total en blanco vs Datos base */}
+            <div className="space-y-1.5 text-left">
+              <label className="text-[11px] font-medium text-foreground block">
+                {t("settings.purgeModePrompt")}
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPurgeMode("blank")}
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
+                    purgeMode === "blank"
+                      ? "border-destructive bg-destructive/10 ring-1 ring-destructive"
+                      : "border-border/60 bg-secondary/30 hover:bg-secondary/60"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${purgeMode === "blank" ? "border-destructive bg-destructive" : "border-muted-foreground"}`}>
+                      {purgeMode === "blank" && <div className="w-1.5 h-1.5 rounded-full bg-background" />}
+                    </div>
+                    <span className="text-xs font-semibold text-foreground">
+                      {t("settings.purgeModeBlank")}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-1 ml-5.5 leading-relaxed">
+                    {t("settings.purgeModeBlankDesc")}
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPurgeMode("defaults")}
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
+                    purgeMode === "defaults"
+                      ? "border-destructive bg-destructive/10 ring-1 ring-destructive"
+                      : "border-border/60 bg-secondary/30 hover:bg-secondary/60"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${purgeMode === "defaults" ? "border-destructive bg-destructive" : "border-muted-foreground"}`}>
+                      {purgeMode === "defaults" && <div className="w-1.5 h-1.5 rounded-full bg-background" />}
+                    </div>
+                    <span className="text-xs font-semibold text-foreground">
+                      {t("settings.purgeModeDefaults")}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-1 ml-5.5 leading-relaxed">
+                    {t("settings.purgeModeDefaultsDesc")}
+                  </p>
+                </button>
+              </div>
+            </div>
+
             {/* Validación 1: Checkbox explícito */}
             <label className="flex items-start gap-2.5 p-2.5 rounded-xl border border-destructive/25 bg-destructive/5 cursor-pointer text-left select-none">
               <input

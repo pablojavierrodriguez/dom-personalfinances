@@ -1,4 +1,5 @@
 import { Account, Transaction, BillReminder, RecurringTransaction } from "./types";
+import { Currency, DEFAULT_EXCHANGE_RATES } from "./settings-types";
 
 export interface CashFlowDayEvent {
   name: string;
@@ -32,6 +33,22 @@ export interface CashFlowForecastSummary {
 export interface CashFlowForecastOptions {
   daysAhead?: 30 | 60 | 90;
   simulatedExpense?: { amount: number; date: Date; name: string };
+  targetCurrency?: Currency;
+  exchangeRates?: Record<Currency, number>;
+}
+
+function convertAmount(
+  amount: number,
+  from: Currency | undefined,
+  to: Currency,
+  rates: Record<Currency, number>
+): number {
+  const fromCurrency = from || "ARS";
+  if (fromCurrency === to) return amount;
+  const rateFrom = rates[fromCurrency] ?? 1;
+  const rateTo = rates[to] ?? 1;
+  const amountInArs = rateFrom > 0 ? amount / rateFrom : amount;
+  return amountInArs * rateTo;
 }
 
 function toLocalDateString(d: Date): string {
@@ -44,6 +61,7 @@ function toLocalDateString(d: Date): string {
 /**
  * Calcula la proyección día a día del saldo patrimonial líquido futuro
  * combinando saldo líquido actual, gastos recurrentes, facturas programadas y liquidaciones de tarjetas.
+ * BUG-A3 fix: Convierte todas las cuentas y flujos a la divisa objetivo (targetCurrency).
  */
 export function calculateCashFlowForecast(
   accounts: Account[],
@@ -53,12 +71,20 @@ export function calculateCashFlowForecast(
   options: CashFlowForecastOptions = {}
 ): CashFlowForecastSummary {
   const daysAhead = options.daysAhead || 30;
+  const targetCurrency: Currency = options.targetCurrency || "ARS";
+  const rates = options.exchangeRates || DEFAULT_EXCHANGE_RATES;
+  const toTarget = (amount: number, fromCurrency?: Currency) =>
+    convertAmount(amount, fromCurrency, targetCurrency, rates);
+
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
-  // 1. Saldo líquido de inicio: cuentas activas que NO sean tarjetas de crédito
+  // 1. Saldo líquido de inicio: cuentas activas que NO sean tarjetas de crédito, convertidas a targetCurrency
   const liquidAccounts = accounts.filter((a) => !a.archived && a.type !== "credit");
-  const startingBalance = liquidAccounts.reduce((sum, a) => sum + a.balance, 0);
+  const startingBalance = liquidAccounts.reduce(
+    (sum, a) => sum + toTarget(a.balance, a.currency as Currency),
+    0
+  );
 
   // 2. Preparar el mapa de días futuros
   const pointsMap = new Map<string, CashFlowDayPoint>();
@@ -88,24 +114,26 @@ export function calculateCashFlowForecast(
     let nextDate = new Date(rtx.nextDate);
     nextDate.setHours(0, 0, 0, 0);
 
+    const convertedAmount = toTarget(rtx.amount, rtx.currency as Currency);
+
     while (nextDate <= new Date(now.getTime() + daysAhead * 86400000)) {
       if (nextDate >= now) {
         const key = toLocalDateString(nextDate);
         const point = pointsMap.get(key);
         if (point) {
           if (rtx.type === "income") {
-            point.income += rtx.amount;
+            point.income += convertedAmount;
             point.events.push({
               name: rtx.description,
-              amount: rtx.amount,
+              amount: convertedAmount,
               type: "in",
               source: "recurring",
             });
           } else {
-            point.expense += rtx.amount;
+            point.expense += convertedAmount;
             point.events.push({
               name: rtx.description,
-              amount: rtx.amount,
+              amount: convertedAmount,
               type: "out",
               source: "recurring",
             });
@@ -140,6 +168,7 @@ export function calculateCashFlowForecast(
   }
 
   // 4. Proyectar facturas y recordatorios pendientes
+  const accountMap = new Map(accounts.map((a) => [a.id, a]));
   for (const bill of bills) {
     if (bill.status === "paid") continue;
     const dueDate = new Date(bill.dueDate);
@@ -149,10 +178,12 @@ export function calculateCashFlowForecast(
       const key = toLocalDateString(dueDate);
       const point = pointsMap.get(key);
       if (point) {
-        point.expense += bill.amount;
+        const billCurrency = (bill.accountId ? accountMap.get(bill.accountId)?.currency : undefined) as Currency | undefined;
+        const convertedAmount = toTarget(bill.amount, billCurrency);
+        point.expense += convertedAmount;
         point.events.push({
           name: bill.name,
-          amount: bill.amount,
+          amount: convertedAmount,
           type: "out",
           source: "bill",
         });
@@ -164,8 +195,9 @@ export function calculateCashFlowForecast(
   const creditCards = accounts.filter((a) => !a.archived && a.type === "credit");
   for (const card of creditCards) {
     if (!card.paymentDay) continue;
-    const owed = Math.abs(Math.min(card.balance, 0));
-    if (owed <= 0) continue;
+    const owedRaw = Math.abs(Math.min(card.balance, 0));
+    if (owedRaw <= 0) continue;
+    const owed = toTarget(owedRaw, card.currency as Currency);
 
     // Calcular el próximo día de vencimiento de la tarjeta
     const currentMonthDue = new Date(now.getFullYear(), now.getMonth(), card.paymentDay);
@@ -189,15 +221,16 @@ export function calculateCashFlowForecast(
 
   // 6. Simulación opcional de gasto puntual
   if (options.simulatedExpense && options.simulatedExpense.amount > 0) {
+    const simAmount = toTarget(options.simulatedExpense.amount, targetCurrency);
     const simDate = new Date(options.simulatedExpense.date);
     simDate.setHours(0, 0, 0, 0);
     const key = toLocalDateString(simDate);
     const point = pointsMap.get(key);
     if (point) {
-      point.expense += options.simulatedExpense.amount;
+      point.expense += simAmount;
       point.events.push({
         name: `[Simulación] ${options.simulatedExpense.name}`,
-        amount: options.simulatedExpense.amount,
+        amount: simAmount,
         type: "out",
         source: "simulated",
       });

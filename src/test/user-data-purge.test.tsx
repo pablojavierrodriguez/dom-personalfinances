@@ -116,6 +116,17 @@ describe("User Data Purge Suite", () => {
     rpcSpy.mockRestore();
   });
 
+  it("purgeRemoteUserData invokes atomic RPC purge_user_data with p_reseed: false when requesting total wipe", async () => {
+    const { supabase } = await import("../integrations/supabase/client");
+    const rpcSpy = vi.spyOn(supabase, "rpc").mockResolvedValue({ data: { success: true }, error: null } as any);
+
+    const { purgeRemoteUserData } = await import("../services/user-data.service");
+    await purgeRemoteUserData("user-uuid-123", { reseed: false });
+
+    expect(rpcSpy).toHaveBeenCalledWith("purge_user_data", { p_reseed: false });
+    rpcSpy.mockRestore();
+  });
+
   it("SettingsPage enables confirm button when typing 'DELETE' as well", async () => {
     const onPurgeData = vi.fn().mockResolvedValue(undefined);
 

@@ -5,20 +5,26 @@ import { useSettings, CURRENCIES, type Currency } from "@/lib/settings-store";
 import type { Language } from "@/lib/i18n";
 import { DOMSymbol } from "@/components/ui/DOMSymbol";
 
-const STEPS = ["welcome", "language", "currency", "rules", "ready"] as const;
+const STEPS = ["welcome", "language", "currency", "starter", "rules", "ready"] as const;
 type Step = typeof STEPS[number];
+
+export interface OnboardingCompleteOptions {
+  starterMode: "defaults" | "blank";
+  enableDefaultRules: boolean;
+}
 
 export function OnboardingWizard({
   onComplete,
   onProvisionDefaultRules,
 }: {
-  onComplete: () => void;
+  onComplete: (options?: OnboardingCompleteOptions) => void | Promise<void>;
   onProvisionDefaultRules?: () => Promise<any>;
 }) {
   const { settings, updateSettings, t } = useSettings();
   const [step, setStep] = useState<Step>("welcome");
   const [selectedLang, setSelectedLang] = useState<Language>(settings.language);
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>(settings.currency);
+  const [starterMode, setStarterMode] = useState<"defaults" | "blank">("defaults");
   const [enableDefaultRules, setEnableDefaultRules] = useState(true);
 
   const stepIndex = STEPS.indexOf(step);
@@ -36,7 +42,7 @@ export function OnboardingWizard({
       }
       localStorage.setItem("dom-onboarding-complete", "true");
       localStorage.setItem("onboarding-complete", "true");
-      onComplete();
+      onComplete({ starterMode, enableDefaultRules });
     }
   };
 
@@ -46,7 +52,7 @@ export function OnboardingWizard({
     }
     localStorage.setItem("dom-onboarding-complete", "true");
     localStorage.setItem("onboarding-complete", "true");
-    onComplete();
+    onComplete({ starterMode, enableDefaultRules });
   };
 
   return (
@@ -157,6 +163,75 @@ export function OnboardingWizard({
                     </div>
                   </button>
                 ))}
+              </div>
+            </>
+          )}
+
+          {step === "starter" && (
+            <>
+              <div className="empty-state-icon mb-2">
+                <Wallet className="w-8 h-8 text-emerald-400" />
+              </div>
+              <h2 className="text-xl font-semibold font-display text-foreground text-center mb-1">
+                {selectedLang === "es" ? "Estructura de Inicio" : "Initial Setup"}
+              </h2>
+              <p className="text-muted-foreground text-center text-sm mb-6">
+                {selectedLang === "es"
+                  ? "¿Cómo preferís comenzar a administrar tus cuentas?"
+                  : "How would you like to start managing your accounts?"}
+              </p>
+              <div className="w-full space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setStarterMode("defaults")}
+                  className={`w-full flex items-start gap-3 p-4 rounded-2xl transition-all border text-left ${
+                    starterMode === "defaults"
+                      ? "bg-primary/10 border-primary ring-1 ring-primary"
+                      : "bg-secondary/40 border-border/50 hover:bg-secondary/70"
+                  }`}
+                >
+                  <div className="pt-0.5">
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${starterMode === "defaults" ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground"}`}>
+                      {starterMode === "defaults" && <div className="w-1.5 h-1.5 rounded-full bg-background" />}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">
+                      {selectedLang === "es" ? "Cuentas recomendadas (Recomendado)" : "Recommended accounts (Recommended)"}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {selectedLang === "es"
+                        ? "Efectivo, Caja de Ahorro y Billetera Virtual con saldo $0 para empezar a registrar de inmediato."
+                        : "Cash, Savings, and Digital Wallet with $0 balance to start tracking immediately."}
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setStarterMode("blank")}
+                  className={`w-full flex items-start gap-3 p-4 rounded-2xl transition-all border text-left ${
+                    starterMode === "blank"
+                      ? "bg-primary/10 border-primary ring-1 ring-primary"
+                      : "bg-secondary/40 border-border/50 hover:bg-secondary/70"
+                  }`}
+                >
+                  <div className="pt-0.5">
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${starterMode === "blank" ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground"}`}>
+                      {starterMode === "blank" && <div className="w-1.5 h-1.5 rounded-full bg-background" />}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">
+                      {selectedLang === "es" ? "Empezar 100% en blanco" : "Start 100% blank"}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {selectedLang === "es"
+                        ? "Sin cuentas ni saldos predefinidos. Vos creás tus propias cuentas y métodos a medida."
+                        : "No predefined accounts or balances. You configure your accounts completely from scratch."}
+                    </div>
+                  </div>
+                </button>
               </div>
             </>
           )}

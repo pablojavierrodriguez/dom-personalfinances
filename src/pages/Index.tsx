@@ -360,7 +360,7 @@ const Index = ({ initialTab }: IndexProps = {}) => {
   }, [store.budgets, selMonth, selYear]);
 
   const avgBudgetUsage = useMemo(() => {
-    if (selectedBudgets.length === 0) return 50;
+    if (selectedBudgets.length === 0) return 0;
     return selectedBudgets.reduce((sum, b) => {
       const spent = store.getBudgetSpent(b.categoryId, b.month, b.year);
       return sum + (spent / b.amount) * 100;
@@ -535,6 +535,7 @@ const Index = ({ initialTab }: IndexProps = {}) => {
                       budgetsUsedPct={avgBudgetUsage}
                       goalsProgress={goalsProgress}
                       pendingBills={pendingBillsCount}
+                      hasBudgets={selectedBudgets.length > 0}
                     />
                   );
                 case "recent":
@@ -861,7 +862,16 @@ const Index = ({ initialTab }: IndexProps = {}) => {
 
       {showOnboarding && (
         <OnboardingWizard
-          onComplete={() => setShowOnboarding(false)}
+          onComplete={async (opts) => {
+            if (opts?.starterMode === "blank") {
+              try {
+                await store.purgeAllUserData({ reseed: false });
+              } catch (e) {
+                console.error("[Onboarding] Error al inicializar en blanco:", e);
+              }
+            }
+            setShowOnboarding(false);
+          }}
           onProvisionDefaultRules={store.provisionDefaultRules}
         />
       )}

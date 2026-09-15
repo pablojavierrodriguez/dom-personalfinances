@@ -169,6 +169,13 @@ export function QuickAddSheet({ open, onClose, onSubmit, accounts, categories, t
   };
 
   const handleSubmit = () => {
+    const parsedAmount = parseFloat(amount);
+    // Defensa en profundidad: nunca permitir monto <= 0 aunque se bypasee el botón disabled (UX-M3)
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      toast.error(t("quickadd.invalidAmountError") || "El monto debe ser mayor a cero");
+      setStep("amount");
+      return;
+    }
     if (!selectedCategory) {
       toast.error(t("quickadd.selectCategoryError") || "Selecciona una categoría para continuar");
       return;
@@ -190,7 +197,7 @@ export function QuickAddSheet({ open, onClose, onSubmit, accounts, categories, t
       extras.receiptUrl = receiptUrl;
     }
     triggerHaptic(25);
-    onSubmit(parseFloat(amount), description || selectedCategory.name, selectedCategory, type, effectiveAccountId, extras);
+    onSubmit(parsedAmount, description || selectedCategory.name, selectedCategory, type, effectiveAccountId, extras);
     resetAndClose();
   };
 

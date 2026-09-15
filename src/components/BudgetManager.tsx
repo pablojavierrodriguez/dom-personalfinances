@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { calculateBudgetMetrics, calculateSuggestedBudget, calculateEffectiveBudgetAmount } from "@/lib/budget-utils";
 import { usePrivacy } from "@/contexts/PrivacyContext";
 import { generateUUID } from "@/services/sync-queue.service";
+import { formatThousandsInput, parseThousandsInput } from "@/lib/utils";
 
 interface BudgetManagerProps {
   selectedDate?: Date;
@@ -52,6 +53,18 @@ export function BudgetManager({
   const handleAdd = () => {
     const parsedLimit = parseThousandsInput(limitAmount);
     if (!selectedCat || !parsedLimit) return;
+
+    // UX-M4: Control de duplicados. Si ya existe un presupuesto para este categoryId en el período, actualizarlo
+    const existing = currentBudgets.find(b => b.categoryId === selectedCat);
+    if (existing) {
+      onUpdate(existing.id, { amount: parsedLimit, enableRollover });
+      setSelectedCat("");
+      setLimitAmount("");
+      setEnableRollover(false);
+      setShowForm(false);
+      return;
+    }
+
     // Computar remanente del mes previo si tiene rollover habilitado
     const prevMonth = month === 0 ? 11 : month - 1;
     const prevYear = month === 0 ? year - 1 : year;

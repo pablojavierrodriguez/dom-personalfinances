@@ -114,6 +114,7 @@ const translations = {
     "quickadd.viewReceipt": "Ver comprobante adjunto",
     "quickadd.selectCategoryError": "Por favor seleccioná una categoría para registrar el movimiento",
     "quickadd.noAccountError": "Necesitás al menos una cuenta activa para guardar transacciones",
+    "quickadd.invalidAmountError": "El monto debe ser mayor a cero",
 
     // TransactionEdit
     "txedit.title": "Editar transacción",
@@ -312,6 +313,11 @@ const translations = {
     "settings.purgeCheckboxLabel": "Entiendo que esta acción no se puede deshacer y perderé todos mis datos financieros",
     "settings.purgeInputPrompt": "Escribí BORRAR para confirmar:",
     "settings.purgeConfirmBtn": "Eliminar definitivamente y reiniciar",
+    "settings.purgeModePrompt": "¿Cómo querés reiniciar tu cuenta?",
+    "settings.purgeModeBlank": "Borrado total (100% en blanco)",
+    "settings.purgeModeBlankDesc": "Elimina todo: transacciones, cuentas, categorías, reglas y presupuestos. Cero registros.",
+    "settings.purgeModeDefaults": "Reiniciar con cuentas base",
+    "settings.purgeModeDefaultsDesc": "Borra tus movimientos pero restablece 3 cuentas en $0 y categorías estándar.",
     "settings.purging": "Eliminando datos...",
     "settings.sectionVelocity": "Gasto diario",
     "settings.sectionBalance": "Balance general",
@@ -927,6 +933,12 @@ const translations = {
     "cat.backToAll": "Volver a todas las categorías",
     "health.spendingMore": "Gastando más de lo que ingresa",
     "health.savingsRate": "{rate}% tasa de ahorro",
+    "health.noActivity": "Sin movimientos este mes",
+    "health.balanced": "Ingresos y gastos equilibrados",
+    "health.neutral": "Neutro",
+    "health.excellent": "Excelente",
+    "health.good": "Bueno",
+    "health.attention": "Atención",
 
     // Obligations Manager
     "obligations.subtitle": "Cronograma unificado de pagos periódicos y vencimientos",
@@ -1399,6 +1411,7 @@ const translations = {
     "quickadd.viewReceipt": "View attached receipt",
     "quickadd.selectCategoryError": "Please select a category to record the transaction",
     "quickadd.noAccountError": "You need at least one active account to save transactions",
+    "quickadd.invalidAmountError": "Amount must be greater than zero",
 
     // TransactionEdit
     "txedit.title": "Edit Transaction",
@@ -1597,6 +1610,11 @@ const translations = {
     "settings.purgeCheckboxLabel": "I understand this action cannot be undone and I will lose all my financial data",
     "settings.purgeInputPrompt": "Type DELETE to confirm:",
     "settings.purgeConfirmBtn": "Permanently erase and restart",
+    "settings.purgeModePrompt": "How do you want to reset your account?",
+    "settings.purgeModeBlank": "Complete wipe (100% blank)",
+    "settings.purgeModeBlankDesc": "Deletes everything: transactions, accounts, categories, rules, and budgets. Zero records.",
+    "settings.purgeModeDefaults": "Restart with starter accounts",
+    "settings.purgeModeDefaultsDesc": "Deletes movements but restores 3 accounts with $0 balance and standard categories.",
     "settings.purging": "Erasing data...",
     "settings.sectionVelocity": "Daily spend",
     "settings.sectionBalance": "Overall balance",
@@ -2212,6 +2230,12 @@ const translations = {
     "cat.backToAll": "Back to all categories",
     "health.spendingMore": "Spending more than earning",
     "health.savingsRate": "{rate}% savings rate",
+    "health.noActivity": "No activity this month",
+    "health.balanced": "Income and expenses balanced",
+    "health.neutral": "Neutral",
+    "health.excellent": "Excellent",
+    "health.good": "Good",
+    "health.attention": "Attention",
 
     // Obligations Manager
     "obligations.subtitle": "Unified schedule of recurring payments and due dates",

@@ -14,11 +14,11 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], channel: "chrome" },
     },
     {
       name: "mobile-chrome",
-      use: { ...devices["Pixel 5"], viewport: { width: 375, height: 812 } },
+      use: { ...devices["Pixel 5"], channel: "chrome", viewport: { width: 375, height: 812 } },
     },
   ],
   webServer: {

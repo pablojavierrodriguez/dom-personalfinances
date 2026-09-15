@@ -18,7 +18,7 @@ interface CashFlowForecastProps {
 
 export function CashFlowForecast({ accounts, transactions, recurringTxs, bills }: CashFlowForecastProps) {
   const { maskAmount } = usePrivacy();
-  const { formatAmount: baseFormatAmount, t } = useSettings();
+  const { formatAmount: baseFormatAmount, t, settings, exchangeRates } = useSettings();
   const formatAmount = (n: number, opts?: any) => maskAmount(baseFormatAmount(n, opts));
   const [daysAhead, setDaysAhead] = useState<30 | 60 | 90>(30);
   const [simulatedAmount, setSimulatedAmount] = useState("");
@@ -29,11 +29,18 @@ export function CashFlowForecast({ accounts, transactions, recurringTxs, bills }
     const simDate = new Date();
     simDate.setDate(simDate.getDate() + 15);
 
+    const rates = {
+      ...exchangeRates,
+      ...(settings.customExchangeRates || {}),
+    };
+
     return calculateCashFlowForecast(accounts, transactions, recurringTxs, bills, {
       daysAhead,
+      targetCurrency: settings.currency,
+      exchangeRates: rates,
       simulatedExpense: simAmount > 0 ? { amount: simAmount, date: simDate, name: t("cashflow.simulatedExpense") } : undefined,
     });
-  }, [accounts, transactions, recurringTxs, bills, daysAhead, simulatedAmount]);
+  }, [accounts, transactions, recurringTxs, bills, daysAhead, simulatedAmount, settings.currency, settings.customExchangeRates, exchangeRates, t]);
 
   const minBalance = forecast.lowestBalance;
   const isCritical = forecast.hasDeficitRisk;

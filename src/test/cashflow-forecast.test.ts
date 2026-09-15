@@ -79,4 +79,29 @@ describe("Cash Flow Forecast Engine", () => {
     expect(summary.lowestBalance).toBeLessThan(0);
     expect(summary.lowestBalance).toBe(-70000); // 80000 - 150000
   });
+
+  it("handles multi-currency conversion accurately (BUG-A3)", () => {
+    // 1 ARS = 0.001 USD (tasa: 1000 ARS por USD)
+    const exchangeRates = { ARS: 1, USD: 0.001, EUR: 0.0009 };
+    const accounts: Account[] = [
+      { id: "acc-ars", name: "Banco ARS", balance: 100000, type: "checking", color: "bg-blue-500", currency: "ARS" },
+      { id: "acc-usd", name: "Caja USD", balance: 100, type: "savings", color: "bg-emerald-500", currency: "USD" },
+    ];
+
+    // En ARS: 100.000 ARS + (100 USD / 0.001) = 100.000 + 100.000 = 200.000 ARS
+    const summaryArs = calculateCashFlowForecast(accounts, [], [], [], {
+      daysAhead: 30,
+      targetCurrency: "ARS",
+      exchangeRates,
+    });
+    expect(summaryArs.startingBalance).toBe(200000);
+
+    // En USD: (100.000 ARS * 0.001) + 100 USD = 100 + 100 = 200 USD
+    const summaryUsd = calculateCashFlowForecast(accounts, [], [], [], {
+      daysAhead: 30,
+      targetCurrency: "USD",
+      exchangeRates,
+    });
+    expect(summaryUsd.startingBalance).toBe(200);
+  });
 });

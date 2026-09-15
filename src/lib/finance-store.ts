@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import {
   Transaction, Account, DEFAULT_ACCOUNTS,
@@ -60,8 +60,8 @@ function getNextDate(from: Date, freq: RecurrenceFrequency): Date {
 }
 
 export function useFinanceStore() {
-  const { user } = useAuth();
-  const { t } = useSettings();
+  const { user, loading: authLoading } = useAuth();
+  const { t, settings } = useSettings();
   const now = new Date();
 
   // Hidratación instantánea (0ms) desde caché local persistido
@@ -84,7 +84,18 @@ export function useFinanceStore() {
   const [goals, setGoals] = useState<Goal[]>(initialGoals);
   const [recurringTxs, setRecurringTxs] = useState<RecurringTransaction[]>(initialRecurring);
   const [bills, setBills] = useState<BillReminder[]>(initialBills);
-  const [tags, setTags] = useState<Tag[]>(() => loadJSON("tags", []));
+  // Tags: unificado en CACHE_KEYS.TAGS. Migración silenciosa desde clave legacy "tags" (BUG-A5 fix)
+  const [tags, setTags] = useState<Tag[]>(() => {
+    const fromCache = getCachedData<Tag[]>(CACHE_KEYS.TAGS, []);
+    if (fromCache.length > 0) return fromCache;
+    // Fallback: intentar migrar desde la clave legacy
+    const legacy = loadJSON<Tag[]>("tags", []);
+    if (legacy.length > 0) {
+      // Migración silenciosa: escribir en CACHE_KEYS.TAGS y continuar
+      try { setCachedData(CACHE_KEYS.TAGS, legacy); } catch { /* quota */ }
+    }
+    return legacy;
+  });
   const [pendingGlobalSyncCount, setPendingGlobalSyncCount] = useState<number>(() => getPendingGlobalSyncCount());
   const [isGlobalSyncing, setIsGlobalSyncing] = useState(false);
   const RULES_STORAGE_KEY = "dom-transaction-rules";
@@ -104,8 +115,21 @@ export function useFinanceStore() {
     saveJSON(RULES_STORAGE_KEY, newRules);
   }, []);
 
+  // Guardián de idempotencia para processRecurring (BUG-C7):
+  // Almacena la fecha de última ejecución en sessionStorage para sobrevivir hot-reloads
+  // pero resetearse entre sesiones de usuario distintas.
+  const processingRecurringRef = useRef(false);
+  const lastRecurringProcessDateRef = useRef<string | null>(
+    (() => {
+      try { return sessionStorage.getItem("dom-recurring-last-process"); } catch { return null; }
+    })()
+  );
+
   // Cargar datos desde Supabase al autenticarse (Stale-While-Revalidate en segundo plano)
   useEffect(() => {
+    // BUG-C1 fix: Si auth aún está resolviendo la sesión en cold start, NO vaciar el caché instantáneo
+    if (authLoading) return;
+
     if (!user) {
       setAccounts([]);
       setCategories([]);
@@ -155,17 +179,17 @@ export function useFinanceStore() {
                 id: p.id,
                 name: p.name,
                 balance: p.balance,
-                type: p.type,
+                type: p.type as Account["type"],
                 color: p.color,
                 icon: p.icon || undefined,
                 archived: p.archived || false,
                 creditLimit: p.creditLimit || undefined,
                 closingDay: p.closingDay || undefined,
                 paymentDay: p.paymentDay || undefined,
-                brand: p.brand || undefined,
+                brand: p.brand as Account["brand"] || undefined,
                 customBrandName: p.customBrandName || undefined,
-                currency: p.currency || "ARS",
-                creditCardViewMode: p.creditCardViewMode || "statement_cycles",
+                currency: (p.currency || "ARS") as Account["currency"],
+                creditCardViewMode: (p.creditCardViewMode || "statement_cycles") as Account["creditCardViewMode"],
               });
             }
           }
@@ -230,7 +254,7 @@ export function useFinanceStore() {
       isMounted = false;
       window.removeEventListener("online", handleOnline);
     };
-  }, [user]);
+  }, [user, authLoading]);
 
   // Persist helpers
   const saveBudgets = (b: Budget[]) => { setBudgets(b); saveJSON("budgets", b); };
@@ -543,9 +567,22 @@ export function useFinanceStore() {
           const nextAccs = accs.map(acc => {
             if (acc.id === tx.accountId) {
               const isCredit = acc.type === "credit";
-              const newBal = isCredit
-                ? (tx.type === "expense" ? acc.balance - tx.amount : acc.balance + tx.amount)
-                : (tx.type === "income" ? acc.balance - tx.amount : acc.balance + tx.amount);
+              // Al ELIMINAR una transacción se revierte su impacto original:
+              // - Para crédito (balance <= 0): un expense aumentó la deuda (restó al balance),
+              //   al eliminarlo la deuda DISMINUYE (sumamos al balance para acercarnos a 0).
+              //   Ejemplo: balance=-5000, se elimina gasto de 1000 → balance=-4000 ✅
+              //   INCORRECTO: balance - 1000 → -6000 (más deuda) ❌
+              // - Para no-crédito: un income sumó, al eliminarlo restamos. Un expense restó, al eliminarlo sumamos.
+              let newBal: number;
+              if (isCredit) {
+                newBal = tx.type === "expense"
+                  ? acc.balance + tx.amount  // revertir gasto: reduce deuda (sube hacia 0)
+                  : acc.balance - tx.amount; // revertir ingreso: aumenta deuda (baja desde 0)
+              } else {
+                newBal = tx.type === "income"
+                  ? acc.balance - tx.amount  // revertir ingreso: resta saldo
+                  : acc.balance + tx.amount; // revertir gasto: devuelve saldo
+              }
               updateAccountRemote(acc.id, { balance: newBal }).catch(err => {
                 enqueueGlobalSyncOp({ type: "update_account_balance", id: acc.id, balance: newBal });
                 setPendingGlobalSyncCount(getPendingGlobalSyncCount());
@@ -623,9 +660,46 @@ export function useFinanceStore() {
       receiptUrl: t.receiptUrl,
     }));
 
-    await insertTransactionsBatch(toInsert);
-    const updatedTransactions = await fetchTransactions(categories);
-    setTransactions(updatedTransactions);
+    // Inserción optimista en memoria ANTES de intentar el remote (garantía offline)
+    const txsWithIds: Transaction[] = newTxs.map(t => ({ ...t, id: t.id || generateUUID() }));
+    setTransactions(prev => {
+      const next = [...txsWithIds, ...prev];
+      setCachedData(CACHE_KEYS.TRANSACTIONS, next);
+      return next;
+    });
+
+    try {
+      await insertTransactionsBatch(toInsert);
+      // Refrescar desde Supabase para consistencia post-insert
+      const updatedTransactions = await fetchTransactions(categories);
+      setTransactions(updatedTransactions);
+      setCachedData(CACHE_KEYS.TRANSACTIONS, updatedTransactions);
+    } catch (err) {
+      // Sin conexión: encolar cada transacción para sync diferido (BUG-C6 fix)
+      console.warn("[importTransactions] Sin conexión, encolando", newTxs.length, "transacciones para sync:", err);
+      for (const tx of txsWithIds) {
+        enqueueGlobalSyncOp({
+          type: "insert_transaction",
+          payload: {
+            id: tx.id,
+            amount: tx.amount,
+            description: tx.description,
+            categoryId: tx.category?.id,
+            date: tx.date instanceof Date ? tx.date.toISOString() : tx.date,
+            type: tx.type,
+            accountId: tx.accountId,
+            currency: tx.currency || "ARS",
+            tags: tx.tags,
+            note: tx.note,
+            receiptUrl: tx.receiptUrl,
+            isTransfer: tx.isTransfer,
+            isCardPayment: tx.isCardPayment,
+            installmentInfo: tx.installmentInfo,
+          },
+        });
+      }
+      setPendingGlobalSyncCount(getPendingGlobalSyncCount());
+    }
 
     // Calcular impacto neto por cuenta
     const accountDeltas = new Map<string, number>();
@@ -640,8 +714,9 @@ export function useFinanceStore() {
       prev.map(acc => {
         const delta = accountDeltas.get(acc.id);
         if (delta !== undefined && delta !== 0) {
+          // Para tarjetas (balance <= 0): gastos aumentan la deuda (restan al balance negativo)
           const newBal = acc.type === "credit"
-            ? acc.balance - delta // para tarjetas, un gasto incrementa el balance adeudado
+            ? acc.balance - delta
             : acc.balance + delta;
           updateAccountRemote(acc.id, { balance: newBal }).catch(console.error);
           return { ...acc, balance: newBal };
@@ -876,52 +951,113 @@ export function useFinanceStore() {
 
       const paymentCategory = { id: "card-payment", name: "Card Payment", color: "bg-sky-500", type: "expense" as const, icon: "credit-card" };
       const now = new Date();
+      const tx1Id = generateUUID();
+      const tx2Id = generateUUID();
 
-      // Persistir ambas transacciones en Supabase
-      const txsToInsert: Omit<Transaction, "id">[] = [
-        {
-          amount,
-          description: `Pago tarjeta: ${card.name}`,
-          category: paymentCategory,
-          date: now,
-          type: "expense",
-          accountId: fromAccountId,
-          currency: sourceCurrency,
-          isCardPayment: true,
-        },
-        {
-          amount: amountInCardCurrency,
-          description: `Pago recibido desde ${source.name}`,
-          category: { ...paymentCategory, type: "income" as const },
-          date: now,
-          type: "income",
-          accountId: cardId,
-          currency: cardCurrency,
-          isCardPayment: true,
-        },
-      ];
+      const tx1: Transaction = {
+        id: tx1Id,
+        amount,
+        description: `Pago tarjeta: ${card.name}`,
+        category: paymentCategory,
+        date: now,
+        type: "expense",
+        accountId: fromAccountId,
+        currency: sourceCurrency,
+        isCardPayment: true,
+      };
 
-      insertTransactionsBatch(txsToInsert)
+      const tx2: Transaction = {
+        id: tx2Id,
+        amount: amountInCardCurrency,
+        description: `Pago recibido desde ${source.name}`,
+        category: { ...paymentCategory, type: "income" as const },
+        date: now,
+        type: "income",
+        accountId: cardId,
+        currency: cardCurrency,
+        isCardPayment: true,
+      };
+
+      // Optimistic update para transacciones
+      setTransactions(prevTxs => {
+        const next = [tx1, tx2, ...prevTxs];
+        setCachedData(CACHE_KEYS.TRANSACTIONS, next);
+        return next;
+      });
+
+      // Persistir ambas transacciones en Supabase o encolar offline
+      insertTransactionsBatch([tx1, tx2])
         .then(() => fetchTransactions(categories).then(setTransactions))
-        .catch(err => console.error("Error inserting card payment transactions:", err));
+        .catch(err => {
+          console.warn("[payCard] Error persistiendo transacciones, encolando en sync queue:", err);
+          enqueueGlobalSyncOp({
+            type: "insert_transaction",
+            payload: {
+              id: tx1Id,
+              amount: tx1.amount,
+              description: tx1.description,
+              categoryId: tx1.category?.id,
+              date: tx1.date.toISOString(),
+              type: tx1.type,
+              accountId: tx1.accountId,
+              currency: tx1.currency,
+              isCardPayment: true,
+            },
+          });
+          enqueueGlobalSyncOp({
+            type: "insert_transaction",
+            payload: {
+              id: tx2Id,
+              amount: tx2.amount,
+              description: tx2.description,
+              categoryId: tx2.category?.id,
+              date: tx2.date.toISOString(),
+              type: tx2.type,
+              accountId: tx2.accountId,
+              currency: tx2.currency,
+              isCardPayment: true,
+            },
+          });
+          setPendingGlobalSyncCount(getPendingGlobalSyncCount());
+        });
 
       // Actualizar balances:
       // - Cuenta fuente: pierde el monto pagado (en su moneda)
-      // - Tarjeta: la deuda se REDUCE (balance - amountInCardCurrency)
-      return prev.map(a => {
+      // - Tarjeta: la deuda se REDUCE sumando el monto (el balance de crédito es <= 0)
+      //   Ejemplo: balance = -5000 (deuda), pago = 2000 → nuevo balance = -3000 (menos deuda) ✅
+      //   INCORRECTO: balance - pago → -5000 - 2000 = -7000 (más deuda) ❌
+      const nextAccounts = prev.map(a => {
         if (a.id === fromAccountId) {
           const newBal = a.balance - amount;
-          updateAccountRemote(a.id, { balance: newBal }).catch(console.error);
+          updateAccountRemote(a.id, { balance: newBal }).catch(err => {
+            console.warn("[payCard] Error remoto en cuenta fuente, encolando balance:", err);
+            enqueueGlobalSyncOp({
+              type: "update_account_balance",
+              id: a.id,
+              balance: newBal,
+            });
+            setPendingGlobalSyncCount(getPendingGlobalSyncCount());
+          });
           return { ...a, balance: newBal };
         }
         if (a.id === cardId) {
-          // Para crédito: balance positivo = deuda adeudada. Pagar reduce la deuda.
-          const newBal = a.balance - amountInCardCurrency;
-          updateAccountRemote(a.id, { balance: newBal }).catch(console.error);
+          // Para crédito: el invariante es balance <= 0 (deuda). Pagar SUMA para acercarse a 0.
+          const newBal = Math.min(0, a.balance + amountInCardCurrency);
+          updateAccountRemote(a.id, { balance: newBal }).catch(err => {
+            console.warn("[payCard] Error remoto en balance de tarjeta, encolando:", err);
+            enqueueGlobalSyncOp({
+              type: "update_account_balance",
+              id: a.id,
+              balance: newBal,
+            });
+            setPendingGlobalSyncCount(getPendingGlobalSyncCount());
+          });
           return { ...a, balance: newBal };
         }
         return a;
       });
+      setCachedData(CACHE_KEYS.ACCOUNTS, nextAccounts);
+      return nextAccounts;
     });
   }, [categories]);
 
@@ -935,47 +1071,106 @@ export function useFinanceStore() {
       const fromCurrency = (from.currency as Currency) || "ARS";
       const toCurrency = (to.currency as Currency) || "ARS";
       const now = new Date();
+      const fromTxId = generateUUID();
+      const toTxId = generateUUID();
 
-      const txsToInsert: Omit<Transaction, "id">[] = [
-        {
-          amount,
-          description: `Transfer to ${to.name}`,
-          category: { ...transferCategory, type: "expense" },
-          date: now,
-          type: "expense",
-          accountId: fromAccountId,
-          currency: fromCurrency,
-          isTransfer: true,
-        },
-        {
-          amount: creditAmount,
-          description: `Transfer from ${from.name}`,
-          category: { ...transferCategory, type: "income" },
-          date: now,
-          type: "income",
-          accountId: toAccountId,
-          currency: toCurrency,
-          isTransfer: true,
-        },
-      ];
+      const tx1: Transaction = {
+        id: fromTxId,
+        amount,
+        description: `Transfer to ${to.name}`,
+        category: { ...transferCategory, type: "expense" },
+        date: now,
+        type: "expense",
+        accountId: fromAccountId,
+        currency: fromCurrency,
+        isTransfer: true,
+      };
 
-      insertTransactionsBatch(txsToInsert)
+      const tx2: Transaction = {
+        id: toTxId,
+        amount: creditAmount,
+        description: `Transfer from ${from.name}`,
+        category: { ...transferCategory, type: "income" },
+        date: now,
+        type: "income",
+        accountId: toAccountId,
+        currency: toCurrency,
+        isTransfer: true,
+      };
+
+      // Optimistic update para transacciones
+      setTransactions(prevTxs => {
+        const next = [tx1, tx2, ...prevTxs];
+        setCachedData(CACHE_KEYS.TRANSACTIONS, next);
+        return next;
+      });
+
+      insertTransactionsBatch([tx1, tx2])
         .then(() => fetchTransactions(categories).then(setTransactions))
-        .catch(err => console.error("Error inserting transfer transactions:", err));
+        .catch(err => {
+          console.warn("[transferBetweenAccounts] Error insertando transacciones, encolando:", err);
+          enqueueGlobalSyncOp({
+            type: "insert_transaction",
+            payload: {
+              id: fromTxId,
+              amount: tx1.amount,
+              description: tx1.description,
+              categoryId: tx1.category?.id,
+              date: tx1.date.toISOString(),
+              type: tx1.type,
+              accountId: tx1.accountId,
+              currency: tx1.currency,
+              isTransfer: true,
+            },
+          });
+          enqueueGlobalSyncOp({
+            type: "insert_transaction",
+            payload: {
+              id: toTxId,
+              amount: tx2.amount,
+              description: tx2.description,
+              categoryId: tx2.category?.id,
+              date: tx2.date.toISOString(),
+              type: tx2.type,
+              accountId: tx2.accountId,
+              currency: tx2.currency,
+              isTransfer: true,
+            },
+          });
+          setPendingGlobalSyncCount(getPendingGlobalSyncCount());
+        });
 
-      return prev.map(a => {
+      const nextAccounts = prev.map(a => {
         if (a.id === fromAccountId) {
           const newBal = a.balance - amount;
-          updateAccountRemote(a.id, { balance: newBal }).catch(console.error);
+          updateAccountRemote(a.id, { balance: newBal }).catch(err => {
+            console.warn("[transferBetweenAccounts] Error en updateAccountRemote from, encolando:", err);
+            enqueueGlobalSyncOp({
+              type: "update_account_balance",
+              id: a.id,
+              balance: newBal,
+            });
+            setPendingGlobalSyncCount(getPendingGlobalSyncCount());
+          });
           return { ...a, balance: newBal };
         }
         if (a.id === toAccountId) {
           const newBal = a.balance + creditAmount;
-          updateAccountRemote(a.id, { balance: newBal }).catch(console.error);
+          updateAccountRemote(a.id, { balance: newBal }).catch(err => {
+            console.warn("[transferBetweenAccounts] Error en updateAccountRemote to, encolando:", err);
+            enqueueGlobalSyncOp({
+              type: "update_account_balance",
+              id: a.id,
+              balance: newBal,
+            });
+            setPendingGlobalSyncCount(getPendingGlobalSyncCount());
+          });
           return { ...a, balance: newBal };
         }
         return a;
       });
+      setCachedData(CACHE_KEYS.ACCOUNTS, nextAccounts);
+      return nextAccounts;
     });
   }, [categories]);
 
@@ -1054,33 +1249,6 @@ export function useFinanceStore() {
   }, [recalculateAccountBalance]);
 
   // ===== BUDGETS =====
-  const addBudget = useCallback((budget: Budget) => {
-    const budgetId = (budget.id && isValidUuid(budget.id)) ? budget.id : generateUUID();
-    const newBudget = { ...budget, id: budgetId };
-    setBudgets(prev => {
-      const next = [...prev, newBudget];
-      setCachedData(CACHE_KEYS.BUDGETS, next);
-      return next;
-    });
-
-    insertBudget(newBudget).catch(err => {
-      console.warn("[addBudget] Offline/remote failure, enqueuing:", err);
-      enqueueGlobalSyncOp({
-        type: "insert_budget",
-        payload: {
-          id: budgetId,
-          categoryId: newBudget.categoryId,
-          amount: newBudget.amount,
-          month: newBudget.month,
-          year: newBudget.year,
-          enableRollover: newBudget.enableRollover,
-          accumulatedRollover: newBudget.accumulatedRollover,
-        },
-      });
-      setPendingGlobalSyncCount(getPendingGlobalSyncCount());
-    });
-  }, []);
-
   const updateBudget = useCallback((id: string, updates: Partial<Budget>) => {
     setBudgets(prev => {
       const next = prev.map(b => b.id === id ? { ...b, ...updates } : b);
@@ -1098,6 +1266,46 @@ export function useFinanceStore() {
       setPendingGlobalSyncCount(getPendingGlobalSyncCount());
     });
   }, []);
+
+  const addBudget = useCallback((budget: Budget) => {
+    let existingId: string | null = null;
+    setBudgets(prev => {
+      // UX-M4: Si ya existe un presupuesto para este categoryId, mes y año, actualizarlo
+      const existing = prev.find(b => b.categoryId === budget.categoryId && b.month === budget.month && b.year === budget.year);
+      if (existing) {
+        existingId = existing.id;
+        return prev;
+      }
+
+      const budgetId = (budget.id && isValidUuid(budget.id)) ? budget.id : generateUUID();
+      const newBudget = { ...budget, id: budgetId };
+      const next = [...prev, newBudget];
+      setCachedData(CACHE_KEYS.BUDGETS, next);
+
+      insertBudget(newBudget).catch(err => {
+        console.warn("[addBudget] Offline/remote failure, enqueuing:", err);
+        enqueueGlobalSyncOp({
+          type: "insert_budget",
+          payload: {
+            id: budgetId,
+            categoryId: newBudget.categoryId,
+            amount: newBudget.amount,
+            month: newBudget.month,
+            year: newBudget.year,
+            enableRollover: newBudget.enableRollover,
+            accumulatedRollover: newBudget.accumulatedRollover,
+          },
+        });
+        setPendingGlobalSyncCount(getPendingGlobalSyncCount());
+      });
+
+      return next;
+    });
+
+    if (existingId) {
+      updateBudget(existingId, budget);
+    }
+  }, [updateBudget]);
 
   const deleteBudget = useCallback((id: string) => {
     setBudgets(prev => {
@@ -1321,6 +1529,14 @@ export function useFinanceStore() {
     const bill = bills.find(b => b.id === id);
     if (!bill) return;
 
+    // BUG-A6 fix: Validar que la cuenta destino exista y no esté archivada
+    const targetAccount = accounts.find(a => a.id === accountId && !a.archived);
+    if (!targetAccount) {
+      console.warn(`[markBillPaid] Cuenta ${accountId} no encontrada o archivada.`);
+      toast.error(t("quickadd.noAccountError") || "Cuenta no válida para registrar el pago");
+      return;
+    }
+
     // Create expense transaction
     const cat = categories.find(c => c.id === bill.categoryId) ||
       { id: "bills", name: "Servicios/Facturas", color: "bg-red-400", type: "expense" as const, icon: "file-text" };
@@ -1339,7 +1555,7 @@ export function useFinanceStore() {
       setCachedData(CACHE_KEYS.BILLS, next);
       return next;
     });
-  }, [bills, categories, addTransaction]);
+  }, [bills, categories, accounts, addTransaction, t]);
 
   const getPendingBills = useCallback(() => {
     const now = new Date();
@@ -1434,7 +1650,22 @@ export function useFinanceStore() {
     });
   }, []);
 
+  // processRecurring con guardián de idempotencia doble (BUG-C7):
+  // 1. processingRecurringRef: mutex en memoria - evita ejecuciones simultáneas.
+  // 2. lastRecurringProcessDateRef: fecha de última ejecución en sessionStorage -
+  //    evita re-proceso si ya se ejecutó hoy en la misma sesión de navegador.
   const processRecurring = useCallback(() => {
+    const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+    // Guardián 1: si ya está procesando en este ciclo, salir
+    if (processingRecurringRef.current) return;
+    // Guardián 2: si ya se procesó hoy en esta sesión, salir
+    if (lastRecurringProcessDateRef.current === todayKey) return;
+
+    processingRecurringRef.current = true;
+    lastRecurringProcessDateRef.current = todayKey;
+    try { sessionStorage.setItem("dom-recurring-last-process", todayKey); } catch { /* quota */ }
+
     const now = new Date();
     setRecurringTxs(prev => {
       let anyUpdated = false;
@@ -1496,6 +1727,8 @@ export function useFinanceStore() {
 
       return anyBillUpdated ? nextBills : prevBills;
     });
+
+    processingRecurringRef.current = false;
   }, [addTransaction, categories, accounts]);
 
   // ===== TAGS =====
@@ -1504,8 +1737,8 @@ export function useFinanceStore() {
     const newTag = { ...tag, id: tagId };
     setTags(prev => {
       const updated = [...prev.filter(t => t.id !== tagId), newTag];
+      // Almacenamiento unificado en CACHE_KEYS.TAGS solamente (BUG-A5 fix: elimina doble escritura)
       setCachedData(CACHE_KEYS.TAGS, updated);
-      saveJSON("tags", updated);
       return updated;
     });
 
@@ -1527,8 +1760,8 @@ export function useFinanceStore() {
     updateTagRemote(id, updates).catch(err => console.error("Error updating remote tag:", err));
     setTags(prev => {
       const updated = prev.map(t => t.id === id ? { ...t, ...updates } : t);
+      // Almacenamiento unificado en CACHE_KEYS.TAGS solamente (BUG-A5 fix)
       setCachedData(CACHE_KEYS.TAGS, updated);
-      saveJSON("tags", updated);
       return updated;
     });
   }, []);
@@ -1536,8 +1769,8 @@ export function useFinanceStore() {
   const deleteTag = useCallback((id: string) => {
     setTags(prev => {
       const updated = prev.filter(t => t.id !== id);
+      // Almacenamiento unificado en CACHE_KEYS.TAGS solamente (BUG-A5 fix)
       setCachedData(CACHE_KEYS.TAGS, updated);
-      saveJSON("tags", updated);
       return updated;
     });
 
@@ -1556,50 +1789,67 @@ export function useFinanceStore() {
   }, [transactions]);
 
   // ===== COMPUTED =====
-  const totalBalance = accounts.filter(a => !a.archived).reduce((sum, acc) => sum + acc.balance, 0);
+  // BUG-A1 fix: Memorizar cálculos financieros para evitar O(n) Array.filter/reduce innecesarios en cada render
+  const totalBalance = useMemo(
+    () => accounts.filter(a => !a.archived).reduce((sum, acc) => sum + acc.balance, 0),
+    [accounts]
+  );
 
-  // Usar new Date() en cada evaluación para que los valores reflejen el día real
-  // aunque la app quede abierta sobre la medianoche o cambio de mes
-  const _now = new Date();
+  const monthlyExpenses = useMemo(() => {
+    const now = new Date();
+    const curMonth = now.getMonth();
+    const curYear = now.getFullYear();
+    return transactions
+      .filter(t => t.type === "expense" && !t.isCardPayment && !t.isTransfer && t.date.getMonth() === curMonth && t.date.getFullYear() === curYear)
+      .reduce((sum, t) => sum + t.amount, 0);
+  }, [transactions]);
 
-  const monthlyExpenses = transactions
-    .filter(t => t.type === "expense" && !t.isCardPayment && !t.isTransfer && t.date.getMonth() === _now.getMonth() && t.date.getFullYear() === _now.getFullYear())
-    .reduce((sum, t) => sum + t.amount, 0);
+  const monthlyIncome = useMemo(() => {
+    const now = new Date();
+    const curMonth = now.getMonth();
+    const curYear = now.getFullYear();
+    return transactions
+      .filter(t => t.type === "income" && !t.isCardPayment && !t.isTransfer && t.date.getMonth() === curMonth && t.date.getFullYear() === curYear)
+      .reduce((sum, t) => sum + t.amount, 0);
+  }, [transactions]);
 
-  const monthlyIncome = transactions
-    .filter(t => t.type === "income" && !t.isCardPayment && !t.isTransfer && t.date.getMonth() === _now.getMonth() && t.date.getFullYear() === _now.getFullYear())
-    .reduce((sum, t) => sum + t.amount, 0);
+  const todaySpent = useMemo(() => {
+    const todayStr = new Date().toDateString();
+    return transactions
+      .filter(t => t.type === "expense" && !t.isCardPayment && t.date.toDateString() === todayStr)
+      .reduce((sum, t) => sum + t.amount, 0);
+  }, [transactions]);
 
-  const todaySpent = transactions
-    .filter(t => t.type === "expense" && !t.isCardPayment && t.date.toDateString() === _now.toDateString())
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const weekSpent = (() => {
-    const weekStart = new Date(_now);
-    weekStart.setDate(_now.getDate() - _now.getDay());
+  const weekSpent = useMemo(() => {
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
     weekStart.setHours(0, 0, 0, 0);
     return transactions
       .filter(t => t.type === "expense" && !t.isCardPayment && !t.isTransfer && t.date >= weekStart)
       .reduce((sum, t) => sum + t.amount, 0);
-  })();
+  }, [transactions]);
 
   // Monthly data for last 6 months
   const getMonthlyTrend = useCallback(() => {
     const today = new Date();
     const months: { month: string; income: number; expenses: number }[] = [];
+    // Usar locale explícito del usuario — "default" depende del SO y puede mostrar meses en inglés
+    // aunque la app esté en español (BUG-A2 fix). settings viene del scope del hook.
+    const locale = settings.language === "en" ? "en-US" : "es-AR";
     for (let i = 5; i >= 0; i--) {
       const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const m = d.getMonth();
       const y = d.getFullYear();
       const monthTxs = transactions.filter(t => t.date.getMonth() === m && t.date.getFullYear() === y && !t.isCardPayment && !t.isTransfer);
       months.push({
-        month: d.toLocaleString("default", { month: "short" }),
+        month: d.toLocaleString(locale, { month: "short" }),
         income: monthTxs.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0),
         expenses: monthTxs.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0),
       });
     }
     return months;
-  }, [transactions]);
+  }, [transactions, settings.language]);
 
   const getLastMonthExpenses = useCallback(() => {
     const today = new Date();
@@ -1786,9 +2036,10 @@ export function useFinanceStore() {
     }
   }, [t]);
 
-  const purgeAllUserData = useCallback(async () => {
+  const purgeAllUserData = useCallback(async (options?: { reseed?: boolean }) => {
+    const shouldReseed = options?.reseed ?? false;
     try {
-      await purgeUserDataService(user?.id);
+      await purgeUserDataService(user?.id, { reseed: shouldReseed });
 
       // Limpiar estados locales en React a cero absoluto
       setTransactions([]);
@@ -1806,6 +2057,7 @@ export function useFinanceStore() {
       // Limpiar caché local y colas offline
       Object.values(CACHE_KEYS).forEach((k) => localStorage.removeItem(k));
       localStorage.removeItem(GLOBAL_QUEUE_KEY);
+      localStorage.removeItem("dom-onboarding-complete");
       localStorage.removeItem("onboarding-complete");
 
       toast.success(t("toast.purgeSuccess"));

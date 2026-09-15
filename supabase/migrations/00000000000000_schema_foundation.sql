@@ -1,6 +1,6 @@
 -- =============================================================================
--- m3 Money Master - Schema Foundation
--- Version: current (consolidates all migrations up to 2026-09-08)
+-- DOM - Finanzas Personales Soberanas — Schema Foundation
+-- Version: current (consolidates all migrations up to 2026-09-15)
 -- =============================================================================
 -- Este archivo es la ÚNICA fuente de verdad del esquema para inicialización local.
 -- Para producción/cloud, aplicar el delta correspondiente en migrations/delta/.
@@ -224,6 +224,7 @@ CREATE INDEX IF NOT EXISTS idx_transactions_user_date ON public.transactions(use
 CREATE INDEX IF NOT EXISTS idx_transactions_account   ON public.transactions(account_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_category  ON public.transactions(category_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_origin    ON public.transactions(user_id, origin);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_account_date ON public.transactions(user_id, account_id, date DESC);
 
 -- ---------------------------------------------------------------------------
 -- TABLE: budgets
@@ -252,6 +253,9 @@ CREATE TRIGGER update_budgets_updated_at
   BEFORE UPDATE ON public.budgets
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+CREATE INDEX IF NOT EXISTS idx_budgets_category_month_year
+  ON public.budgets(user_id, category_id, month, year);
+
 -- ---------------------------------------------------------------------------
 -- TABLE: goals
 -- ---------------------------------------------------------------------------
@@ -279,6 +283,9 @@ DROP TRIGGER IF EXISTS update_goals_updated_at ON public.goals;
 CREATE TRIGGER update_goals_updated_at
   BEFORE UPDATE ON public.goals
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE INDEX IF NOT EXISTS idx_goals_user_completed
+  ON public.goals(user_id, completed);
 
 -- ---------------------------------------------------------------------------
 -- TABLE: recurring_transactions
@@ -315,6 +322,9 @@ CREATE TRIGGER update_recurring_updated_at
   BEFORE UPDATE ON public.recurring_transactions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+CREATE INDEX IF NOT EXISTS idx_recurring_user_active_next
+  ON public.recurring_transactions(user_id, paused, next_date);
+
 -- ---------------------------------------------------------------------------
 -- TABLE: bill_reminders
 -- ---------------------------------------------------------------------------
@@ -343,6 +353,9 @@ DROP TRIGGER IF EXISTS update_bills_updated_at ON public.bill_reminders;
 CREATE TRIGGER update_bills_updated_at
   BEFORE UPDATE ON public.bill_reminders
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE INDEX IF NOT EXISTS idx_bills_user_status_due
+  ON public.bill_reminders(user_id, status, due_date);
 
 -- ---------------------------------------------------------------------------
 -- TABLE: user_settings

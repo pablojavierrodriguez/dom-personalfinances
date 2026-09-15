@@ -44,7 +44,7 @@ export default function AuthPage() {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ 
           email: cleanEmail, 
-          password 
+          password: password.trim(),
         });
         if (error) throw error;
         toast.success(t("auth.welcomeBack"));
@@ -54,7 +54,7 @@ export default function AuthPage() {
         }
         const { error } = await supabase.auth.signUp({
           email: cleanEmail,
-          password,
+          password: password.trim(),
           options: {
             data: { full_name: fullName.trim() },
             emailRedirectTo: window.location.origin,

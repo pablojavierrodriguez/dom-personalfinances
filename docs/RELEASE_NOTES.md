@@ -2,7 +2,10 @@
 
 ---
 
-## [Unreleased] — En Desarrollo (Próxima Versión)
+## [0.5.0] — 2026-09-15 🚀 Integridad Financiera, Auditor de Fugas e Ingesta Soberana
+
+### 🎯 Resumen
+*Hito mayor enfocado en la solidez contable y la consciencia financiera del usuario: incorporación del Auditor de Suscripciones y Detector de Fugas con proyección de costo de oportunidad con interés compuesto; motor de ingesta masiva de extractos con inversión de signos en 1-tap y homologación inteligente de categorías; blindaje matemático de invariantes de deuda y pasivos en tarjetas de crédito (`balance <= 0`); cola de sincronización offline resiliente con actualización optimista inmediata en transferencias y cancelaciones; motor de proyección de liquidez multi-divisa (`CashFlowForecast`); optimización de rendimiento en base de datos mediante índices compuestos; y blindaje en tiempo de ejecución con `ErrorBoundary` global y cabeceras de seguridad web.*
 
 ### 🔍 Auditor de Suscripciones & Detector de Fugas
 - **Detección Heurística Autónoma:**
@@ -18,23 +21,53 @@
 
 ### 📥 Ingesta Masiva de Extractos Bancarios & Tarjetas
 - **Inversión Masiva de Signos en 1-Tap:**
-  - Selector ágil para invertir el sentido de débitos y créditos en extractos con signos opuestos habituales en exportaciones de tarjetas de crédito o plataformas como Mobills.
+  - Selector ágil para invertir el sentido de débitos y créditos en extractos con signos opuestos habituales en exportaciones de tarjetas de crédito o plataformas externas.
   - Botón de alternancia global en la previsualización interactiva antes de confirmar la carga masiva.
 - **Mapeo Predictivo de Categorías:**
   - Detección y homologación automática de categorías provenientes de archivos externos hacia el árbol de categorías de DOM, eliminando la edición manual fila por fila.
+
+### 🛡️ Integridad Financiera & Resiliencia de Sincronización
+- **Invariantes en Tarjetas de Crédito y Deuda:**
+  - Corrección matemática en el registro de pagos y cancelaciones de resúmenes de tarjetas de crédito (`balance <= 0`), garantizando que cada pago disminuya la deuda con exactitud sin distorsión contable.
+  - Reversión determinista del saldo ante la eliminación de consumos en tarjetas.
+  - Mutex de ejecución en el procesamiento de transacciones recurrentes para evitar duplicaciones en caso de montajes simultáneos.
+- **Calibración de Salud Financiera & Cero Registros:**
+  - Estado neutral ponderado (`50 - Neutro`) cuando no existen ingresos ni gastos en el mes (`0/0`), eliminando alertas rojas de falso déficit.
+  - Supresión de bonus presupuestario artificial cuando no hay presupuestos configurados por el usuario.
+- **Hard Reset Soberano & Control de Inicio Limpio:**
+  - Selector de modalidad de reseteo en Configuración: permite elegir entre *Borrado total (100% en blanco)* sin auto-siembra forzada (`reseed: false`) o *Reinicio con cuentas base* (`reseed: true`).
+  - Asistente de inicio (`OnboardingWizard`) con bifurcación de configuración inicial: opción de arrancar con cuentas recomendadas o lienzo 100% en blanco.
+- **Sincronización Offline en Transferencias, Pagos e Importaciones:**
+  - Actualización optimista inmediata en interfaz y encolado automático bidireccional en cola de sincronización ante fallas de conectividad en transferencias entre cuentas, pagos de tarjetas e importación masiva de movimientos.
+  - Validación de cuenta activa antes de liquidar compromisos o vencimientos de servicios.
+- **Protección de Caché en Cold Starts:**
+  - Blindaje del estado local ante renderizados intermedios de autenticación, asegurando que la carga inicial de sesión nunca vacíe el almacenamiento local instantáneo.
+- **Control de Duplicados en Presupuestos:**
+  - Fusión automática de presupuestos para la misma categoría y período tanto a nivel de interfaz (`BudgetManager`) como de Store de dominio, impidiendo duplicaciones en la interfaz o en base de datos.
+- **Garantía Estricta de Identificadores UUID:**
+  - Unificación exhaustiva de la generación de identificadores bajo el estándar UUID v4 en cuentas, tarjetas de crédito, categorías, presupuestos y transacciones, garantizando compatibilidad nativa con las restricciones de tipo en PostgreSQL.
+- **Motor Autónomo de Auto-Rescate de Datos:**
+  - Rutina automática de saneamiento que detecta entidades locales previas con identificadores legados o temporales (`card-*`, `acc-*`), transformándolas deterministamente a UUIDs válidos y actualizando en cadena las referencias foráneas y la cola de sincronización sin pérdida de movimientos para el usuario.
+
+### ⚡ Rendimiento, Multi-Divisa y Arquitectura
+- **Proyección de Flujo de Caja Multi-Divisa:**
+  - Motor de proyección de liquidez (`CashFlowForecast`) con conversión de saldos líquidos, gastos recurrentes, facturas y resúmenes de tarjetas a la divisa objetivo (`targetCurrency`), evitando distorsiones por mezcla de monedas heterogéneas.
+- **Memoización de Cálculos Financieros:**
+  - Optimización con `useMemo` de balances acumulados, gastos mensuales, ingresos y proyecciones de gasto en el Store central, reduciendo los re-renders innecesarios en componentes consumidores.
+- **Índices Compuestos de Base de Datos:**
+  - Nuevos índices en PostgreSQL para acelerar consultas críticas: presupuestos por categoría/período, transacciones por cuenta y fecha descendente, facturas pendientes y transacciones recurrentes activas.
+- **Seguridad y Resiliencia en Runtime:**
+  - Incorporación de `ErrorBoundary` global con pantalla de recuperación elegante sin pérdida de contexto ni pantallas en blanco ante excepciones no capturadas.
+  - Políticas de seguridad HTTP (`CSP`, anti-clickjacking y MIME sniffing) en configuración de despliegue.
+  - Sanitización estricta (`trim`) de credenciales en el flujo de autenticación para evitar fallos accidentales por espacios generados por teclados móviles.
 
 ### 💎 Consolidación de UX Móvil, Ergonomía y Paridad de Idiomas
 - **Fluidez y Lectura Tabular en Transacciones:**
   - Tipografía tabular monoespaciada en todos los montos para evitar saltos horizontales o parpadeos durante el desplazamiento.
   - Saneamiento del área inferior de desplazamiento respetando las barras de navegación móviles y áreas seguras sin espacios vacíos redundantes.
   - Homogeneización de la escala tipográfica según los estándares del sistema de diseño.
-### 🛡️ Resiliencia y Auto-Reparación de Sincronización Local / Nube
-- **Garantía Estricta de Identificadores UUID:**
-  - Unificación exhaustiva de la generación de identificadores bajo el estándar UUID v4 en cuentas, tarjetas de crédito, categorías, presupuestos y transacciones, garantizando compatibilidad nativa con las restricciones de tipo en PostgreSQL.
-- **Motor Autónomo de Auto-Rescate de Datos:**
-  - Rutina automática de saneamiento que detecta entidades locales previas con identificadores legados o temporales (`card-*`, `acc-*`), transformándolas deterministamente a UUIDs válidos y actualizando en cadena las referencias foráneas y la cola de sincronización sin pérdida de movimientos para el usuario.
-- **Persistencia Visual en Creación de Cuentas:**
-  - Fusión inmediata de cuentas pendientes de sincronización en el estado de la aplicación, evitando que nuevas cuentas y tarjetas desaparezcan de pantalla mientras se procesan hacia el servidor.
+  - Validación con feedback inmediato de importes mayores a cero en el alta rápida de transacciones.
+  - Formato regional de fechas y meses explícito en español (`es-AR`) para todas las métricas y tendencias.
 
 ---
 

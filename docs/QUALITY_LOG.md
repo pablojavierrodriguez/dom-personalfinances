@@ -43,6 +43,20 @@ Registro formal, estructurado y vivo de defectos, fricciones de UX/UI, problemas
 | **BUG-022** | Sincronización | Presupuestos desconectados del mes de la cabecera (hardcodeado a `new Date().getMonth()`). | `src/components/BudgetManager.tsx` | Media | `[x] Resuelto` |
 | **BUG-023** | Empty States | `AccountCards` dibuja un espacio vacío debajo de `(0)` sin invitar a crear la primera cuenta. | `src/components/AccountCards.tsx` | Media | `[x] Resuelto` |
 | **BUG-024** | Auth / Mobile | Error de credenciales incorrectas al ingresar email y password válidos debido a espacios/mayúsculas del teclado móvil sin sanitizar. | `src/pages/Auth.tsx` | **Crítica** | `[x] Resuelto` |
+| **BUG-C1** | Auth / Cache | Race condition al montar la app: vaciado prematuro del caché local antes de resolver la sesión de Supabase. | `src/lib/finance-store.ts` | **Crítica** | `[x] Resuelto` |
+| **BUG-C2** | Dominio / Crédito | Signo invertido al pagar resúmenes de tarjetas de crédito (`a.balance - amount` en lugar de sumar a balance negativo). | `src/lib/finance-store.ts` | **Crítica** | `[x] Resuelto` |
+| **BUG-C3** | Dominio / Crédito | Reversión errónea de saldo al eliminar gastos con tarjeta de crédito en `deleteTransaction`. | `src/lib/finance-store.ts` | **Crítica** | `[x] Resuelto` |
+| **BUG-C7** | Dominio / Sync | Doble procesamiento y transacciones duplicadas en `processRecurring` por StrictMode o renders simultáneos. | `src/lib/finance-store.ts` | **Crítica** | `[x] Resuelto` |
+| **BUG-A1** | Performance | Falta de memoización (`useMemo`) en computados globales (`totalBalance`, `monthlyExpenses`, `todaySpent`). | `src/lib/finance-store.ts` | Alta | `[x] Resuelto` |
+| **BUG-A2** | i18n / Fechas | Meses en inglés en gráfico de tendencia mensual por uso de `locale: "default"`. | `src/lib/finance-store.ts` | Media | `[x] Resuelto` |
+| **BUG-A3** | Multi-Divisa | Proyección de flujo de caja sumaba balances de distintas monedas (ARS, USD, EUR) sin convertir. | `src/lib/cashflow-forecast.ts` | Alta | `[x] Resuelto` |
+| **BUG-A4** | Sync / Offline | Transferencias y pagos de tarjeta sin inserción optimista ni fallback encolado a cola de sync ante fallas de red. | `src/lib/finance-store.ts` | Alta | `[x] Resuelto` |
+| **BUG-A5** | Storage | Doble almacenamiento divergente en `tags` vs `CACHE_KEYS.TAGS` con riesgo de desincronización offline. | `src/lib/finance-store.ts` | Media | `[x] Resuelto` |
+| **BUG-A6** | Dominio / Bills | `markBillPaid` permitía imputar pagos a cuentas eliminadas o archivadas sin validación previa. | `src/lib/finance-store.ts` | Media | `[x] Resuelto` |
+| **BUG-A10** | UX / Gestos | `SwipeableTransaction` disparaba `onDelete` silenciosamente al desmontar el componente si el usuario cambiaba de tab. | `src/components/TransactionList.tsx` | Alta | `[x] Resuelto` |
+| **UX-M3** | UX / Forms | `QuickAddSheet` permitía registrar gastos con monto $0 distorsionando métricas. | `src/components/QuickAddSheet.tsx` | Media | `[x] Resuelto` |
+| **UX-M4** | Dominio / Presupuestos | Ausencia de deduplicación: permitía crear presupuestos duplicados para la misma categoría en un mismo mes. | `src/components/BudgetManager.tsx` / `finance-store.ts` | Media | `[x] Resuelto` |
+| **TEC-M7** | Performance | `storage-migration.ts` iteraba el almacenamiento en cada cold start en lugar de verificar flag $O(1)$. | `src/lib/storage-migration.ts` | Media | `[x] Resuelto` |
 
 ---
 

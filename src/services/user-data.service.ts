@@ -8,10 +8,12 @@ import { SHOPPING_CACHE_KEY, SHOPPING_QUEUE_KEY } from "@/services/shopping.serv
  * Si la función RPC no está disponible en la base de datos, ejecuta un fallback
  * REST estructurado con validación estricta de errores y orden de dependencias seguro.
  */
-export async function purgeRemoteUserData(userId?: string): Promise<void> {
+export async function purgeRemoteUserData(userId?: string, options?: { reseed?: boolean }): Promise<void> {
+  const shouldReseed = options?.reseed ?? true;
+
   // 1. Intento primario: RPC atómico
   try {
-    const { error } = await (supabase as any).rpc("purge_user_data", { p_reseed: true });
+    const { error } = await (supabase as any).rpc("purge_user_data", { p_reseed: shouldReseed });
     if (!error) {
       return;
     }
@@ -116,36 +118,38 @@ export async function purgeRemoteUserData(userId?: string): Promise<void> {
     console.warn("[UserDataService] Error al purgar categories:", catErr);
   }
 
-  // 2.10. Re-seed de contingencia en cliente si las cuentas fueron borradas
-  try {
-    const { data: remainingAccounts } = await supabase.from("accounts").select("id").eq("user_id", effectiveUserId);
-    if (!remainingAccounts || remainingAccounts.length === 0) {
-      await supabase.from("accounts").insert([
-        { user_id: effectiveUserId, name: "Efectivo", balance: 0, type: "cash", color: "bg-emerald-500", icon: "banknote" },
-        { user_id: effectiveUserId, name: "Caja de Ahorro", balance: 0, type: "savings", color: "bg-sky-500", icon: "landmark" },
-        { user_id: effectiveUserId, name: "Billetera Virtual", balance: 0, type: "checking", color: "bg-violet-500", icon: "wallet" },
-      ]);
+  // 2.10. Re-seed de contingencia en cliente sólo si shouldReseed es true
+  if (shouldReseed) {
+    try {
+      const { data: remainingAccounts } = await supabase.from("accounts").select("id").eq("user_id", effectiveUserId);
+      if (!remainingAccounts || remainingAccounts.length === 0) {
+        await supabase.from("accounts").insert([
+          { user_id: effectiveUserId, name: "Efectivo", balance: 0, type: "cash", color: "bg-emerald-500", icon: "banknote" },
+          { user_id: effectiveUserId, name: "Caja de Ahorro", balance: 0, type: "savings", color: "bg-sky-500", icon: "landmark" },
+          { user_id: effectiveUserId, name: "Billetera Virtual", balance: 0, type: "checking", color: "bg-violet-500", icon: "wallet" },
+        ]);
+      }
+    } catch (seedAccErr) {
+      console.warn("[UserDataService] Error en re-seed de cuentas:", seedAccErr);
     }
-  } catch (seedAccErr) {
-    console.warn("[UserDataService] Error en re-seed de cuentas:", seedAccErr);
-  }
 
-  try {
-    const { data: remainingCategories } = await supabase.from("categories").select("id").eq("user_id", effectiveUserId);
-    if (!remainingCategories || remainingCategories.length === 0) {
-      await supabase.from("categories").insert([
-        { user_id: effectiveUserId, name: "Salario", color: "bg-emerald-500", type: "income", icon: "briefcase", sort_order: 1 },
-        { user_id: effectiveUserId, name: "Otros Ingresos", color: "bg-teal-500", type: "income", icon: "wallet", sort_order: 2 },
-        { user_id: effectiveUserId, name: "Alimentación", color: "bg-orange-500", type: "expense", icon: "utensils", sort_order: 10 },
-        { user_id: effectiveUserId, name: "Transporte", color: "bg-sky-500", type: "expense", icon: "car", sort_order: 20 },
-        { user_id: effectiveUserId, name: "Vivienda", color: "bg-violet-500", type: "expense", icon: "home", sort_order: 30 },
-        { user_id: effectiveUserId, name: "Servicios", color: "bg-yellow-500", type: "expense", icon: "zap", sort_order: 40 },
-        { user_id: effectiveUserId, name: "Ocio y Salidas", color: "bg-pink-500", type: "expense", icon: "film", sort_order: 50 },
-        { user_id: effectiveUserId, name: "Salud", color: "bg-red-400", type: "expense", icon: "heart-pulse", sort_order: 60 },
-      ]);
+    try {
+      const { data: remainingCategories } = await supabase.from("categories").select("id").eq("user_id", effectiveUserId);
+      if (!remainingCategories || remainingCategories.length === 0) {
+        await supabase.from("categories").insert([
+          { user_id: effectiveUserId, name: "Salario", color: "bg-emerald-500", type: "income", icon: "briefcase", sort_order: 1 },
+          { user_id: effectiveUserId, name: "Otros Ingresos", color: "bg-teal-500", type: "income", icon: "wallet", sort_order: 2 },
+          { user_id: effectiveUserId, name: "Alimentación", color: "bg-orange-500", type: "expense", icon: "utensils", sort_order: 10 },
+          { user_id: effectiveUserId, name: "Transporte", color: "bg-sky-500", type: "expense", icon: "car", sort_order: 20 },
+          { user_id: effectiveUserId, name: "Vivienda", color: "bg-violet-500", type: "expense", icon: "home", sort_order: 30 },
+          { user_id: effectiveUserId, name: "Servicios", color: "bg-yellow-500", type: "expense", icon: "zap", sort_order: 40 },
+          { user_id: effectiveUserId, name: "Ocio y Salidas", color: "bg-pink-500", type: "expense", icon: "film", sort_order: 50 },
+          { user_id: effectiveUserId, name: "Salud", color: "bg-red-400", type: "expense", icon: "heart-pulse", sort_order: 60 },
+        ]);
+      }
+    } catch (seedCatErr) {
+      console.warn("[UserDataService] Error en re-seed de categorías:", seedCatErr);
     }
-  } catch (seedCatErr) {
-    console.warn("[UserDataService] Error en re-seed de categorías:", seedCatErr);
   }
 
   // Si fallaron simultáneamente las tablas críticas, propagar error
@@ -228,14 +232,15 @@ export function purgeLocalUserData(): void {
 /**
  * Orquesta la purga integral de datos del usuario (remota si aplica y local siempre).
  */
-export async function purgeAllUserData(userId?: string): Promise<void> {
+export async function purgeAllUserData(userId?: string, options?: { reseed?: boolean }): Promise<void> {
+  const shouldReseed = options?.reseed ?? false;
   if (userId) {
-    await purgeRemoteUserData(userId);
+    await purgeRemoteUserData(userId, { reseed: shouldReseed });
   } else {
     try {
       const { data } = await supabase.auth.getUser();
       if (data?.user?.id) {
-        await purgeRemoteUserData(data.user.id);
+        await purgeRemoteUserData(data.user.id, { reseed: shouldReseed });
       }
     } catch {
       // Silencioso en entornos offline o tests sin sesión

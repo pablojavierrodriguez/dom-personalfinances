@@ -109,9 +109,18 @@ export function getMigratedStorageItem(primaryKey: string, legacyKeys: string[] 
 /**
  * Ejecuta la migración silenciosa e idempotente de todas las claves legadas a DOM.
  * No sobrescribe valores ya existentes en las claves nuevas.
+ *
+ * TEC-M7: Verifica un flag one-time en localStorage para saltear el loop O(n)
+ * en cold starts subsiguientes (99.9% de los arranques).
  */
 export function runStorageMigration(): { migratedCount: number; errorCount: number } {
   if (typeof window === "undefined" || !window.localStorage) {
+    return { migratedCount: 0, errorCount: 0 };
+  }
+
+  // Guardián one-time: si ya migramos en una sesión anterior, salir en O(1)
+  const MIGRATION_FLAG = "dom-migration-v3-done";
+  if (localStorage.getItem(MIGRATION_FLAG) === "1") {
     return { migratedCount: 0, errorCount: 0 };
   }
 
@@ -140,8 +149,12 @@ export function runStorageMigration(): { migratedCount: number; errorCount: numb
     console.info("[DOM Storage] Auto-reparación de entidades no-UUID completada:", repairResult);
   }
 
+  // Marcar como completado para futuros cold starts
+  try { localStorage.setItem(MIGRATION_FLAG, "1"); } catch { /* quota */ }
+
   return { migratedCount, errorCount };
 }
+
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

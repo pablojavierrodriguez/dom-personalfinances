@@ -51,13 +51,18 @@ const SwipeableTransaction = memo(function SwipeableTransaction({
 
   useEffect(() => {
     return () => {
-      if (deleteTimerRef.current && !executedRef.current) {
+      // Cleanup: SOLO cancelar el timer pendiente.
+      // NUNCA llamar onDelete aquí: si el componente se desmonta por navegación
+      // (cambio de tab, apertura de modal), el timer se cancela de forma segura.
+      // El delete real ocurre únicamente desde el timer expirado o el onDismiss del toast.
+      // (BUG-A10 fix: el comportamiento anterior borraba transacciones al navegar)
+      if (deleteTimerRef.current) {
         clearTimeout(deleteTimerRef.current);
-        executedRef.current = true;
-        onDelete?.(tx.id);
+        deleteTimerRef.current = null;
       }
     };
-  }, [tx.id, onDelete]);
+  }, []);
+
 
   const x = useMotionValue(0);
   const deleteOpacity = useTransform(x, [-120, -60], [1, 0]);
