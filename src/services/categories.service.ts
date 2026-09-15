@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Category, TransactionType } from "@/lib/types";
 import { Database } from "@/integrations/supabase/types";
+import { isValidUuid } from "@/services/transactions.service";
 
 type CategoryUpdate = Database["public"]["Tables"]["categories"]["Update"];
 
@@ -39,7 +40,7 @@ export async function insertCategory(cat: Omit<Category, "id"> & { id?: string }
     archived: cat.archived || false,
     sort_order: cat.order || 0,
   };
-  if (cat.id) insertPayload.id = cat.id;
+  if (cat.id && isValidUuid(cat.id)) insertPayload.id = cat.id;
 
   const { data, error } = await supabase
     .from("categories")

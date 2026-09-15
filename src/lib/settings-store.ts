@@ -42,21 +42,31 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem("app-settings");
       if (saved) {
         const parsed = JSON.parse(saved);
-    // Merge with new default sections and preserve custom order & fields
-    const savedSections = (parsed.homeSections || []) as HomeSection[];
-    const mergedSections: HomeSection[] = DEFAULT_HOME_SECTIONS.map((def, defaultIdx) => {
-      const existing = savedSections.find(s => s.id === def.id);
-      if (!existing) return { ...def, order: def.order ?? defaultIdx };
-      return {
-        ...def,
-        ...existing,
-        enabled: typeof existing.enabled === "boolean" ? existing.enabled : def.enabled,
-        order: typeof existing.order === "number" ? existing.order : (def.order ?? defaultIdx),
-        category: def.category,
-        column: def.column,
-      };
-    }).sort((a, b) => a.order - b.order);
-    return { ...DEFAULT_SETTINGS, ...parsed, homeSections: mergedSections };
+        const hasStreamlined = localStorage.getItem("dom-dashboard-streamlined-v2");
+        if (!hasStreamlined) {
+          localStorage.setItem("dom-dashboard-streamlined-v2", "true");
+          const next = { ...DEFAULT_SETTINGS, ...parsed, homeSections: DEFAULT_HOME_SECTIONS };
+          try {
+            localStorage.setItem("app-settings", JSON.stringify(next));
+          } catch {}
+          return next;
+        }
+
+        // Merge with new default sections and preserve custom order & fields
+        const savedSections = (parsed.homeSections || []) as HomeSection[];
+        const mergedSections: HomeSection[] = DEFAULT_HOME_SECTIONS.map((def, defaultIdx) => {
+          const existing = savedSections.find(s => s.id === def.id);
+          if (!existing) return { ...def, order: def.order ?? defaultIdx };
+          return {
+            ...def,
+            ...existing,
+            enabled: typeof existing.enabled === "boolean" ? existing.enabled : def.enabled,
+            order: typeof existing.order === "number" ? existing.order : (def.order ?? defaultIdx),
+            category: def.category,
+            column: def.column,
+          };
+        }).sort((a, b) => a.order - b.order);
+        return { ...DEFAULT_SETTINGS, ...parsed, homeSections: mergedSections };
       }
     } catch {}
     return DEFAULT_SETTINGS;

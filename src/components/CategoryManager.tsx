@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { generateUUID } from "@/services/sync-queue.service";
 
 interface CategoryManagerProps {
   categories: Category[];
@@ -112,7 +113,7 @@ export function CategoryManager({
       });
     } else {
       onAdd({
-        id: `cat-${Date.now()}`,
+        id: generateUUID(),
         name: formName.trim(),
         color: formColor,
         type: formType,

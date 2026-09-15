@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { parseLocalDate, parseThousandsInput } from "@/lib/utils";
 import { MoneyInput } from "@/components/ui/MoneyInput";
 import { usePrivacy } from "@/contexts/PrivacyContext";
+import { generateUUID } from "@/services/sync-queue.service";
 import { CategoryIcon } from "./CategoryIcon";
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import {
@@ -253,7 +254,7 @@ export function ObligationsManager({
       // se registra como recurring_transaction. De lo contrario, como bill_reminder.
       if (formAutoPay && formFreq !== "once") {
         onAddRecurring({
-          id: Date.now().toString(),
+          id: generateUUID(),
           amount: parsed,
           description: formName.trim(),
           category: cat || {
@@ -273,7 +274,7 @@ export function ObligationsManager({
         });
       } else {
         onAddBill({
-          id: Date.now().toString(),
+          id: generateUUID(),
           name: formName.trim(),
           amount: parsed,
           dueDate: targetDate,

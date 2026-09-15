@@ -20,17 +20,17 @@ export type HomeSection = {
 };
 
 export const DEFAULT_HOME_SECTIONS: HomeSection[] = [
-  { id: "velocity", labelKey: "settings.sectionVelocity", category: "finances", column: "left", enabled: true, order: 0 },
-  { id: "balance", labelKey: "settings.sectionBalance", category: "finances", column: "left", enabled: true, order: 1 },
-  { id: "accounts", labelKey: "settings.sectionAccounts", category: "finances", column: "left", enabled: true, order: 2 },
-  { id: "net_worth", labelKey: "settings.sectionNetWorth", category: "analytics", column: "left", enabled: true, order: 3 },
-  { id: "breakdown", labelKey: "settings.sectionBreakdown", category: "analytics", column: "left", enabled: true, order: 4 },
-  { id: "monthly_comparison", labelKey: "settings.sectionMonthlyComparison", category: "analytics", column: "right", enabled: true, order: 5 },
-  { id: "budgets", labelKey: "settings.sectionBudgets", category: "planning", column: "right", enabled: true, order: 6 },
-  { id: "goals", labelKey: "settings.sectionGoals", category: "planning", column: "right", enabled: true, order: 7 },
-  { id: "bills", labelKey: "settings.sectionBills", category: "operations", column: "right", enabled: true, order: 8 },
-  { id: "health_score", labelKey: "settings.sectionHealthScore", category: "analytics", column: "right", enabled: true, order: 9 },
-  { id: "recent", labelKey: "settings.sectionRecent", category: "operations", column: "right", enabled: true, order: 10 },
+  { id: "balance", labelKey: "settings.sectionBalance", category: "finances", column: "left", enabled: true, order: 0 },
+  { id: "accounts", labelKey: "settings.sectionAccounts", category: "finances", column: "left", enabled: true, order: 1 },
+  { id: "recent", labelKey: "settings.sectionRecent", category: "operations", column: "right", enabled: true, order: 2 },
+  { id: "velocity", labelKey: "settings.sectionVelocity", category: "finances", column: "left", enabled: false, order: 3 },
+  { id: "net_worth", labelKey: "settings.sectionNetWorth", category: "analytics", column: "right", enabled: false, order: 4 },
+  { id: "breakdown", labelKey: "settings.sectionBreakdown", category: "analytics", column: "right", enabled: false, order: 5 },
+  { id: "monthly_comparison", labelKey: "settings.sectionMonthlyComparison", category: "analytics", column: "right", enabled: false, order: 6 },
+  { id: "budgets", labelKey: "settings.sectionBudgets", category: "planning", column: "right", enabled: false, order: 7 },
+  { id: "goals", labelKey: "settings.sectionGoals", category: "planning", column: "right", enabled: false, order: 8 },
+  { id: "bills", labelKey: "settings.sectionBills", category: "operations", column: "right", enabled: false, order: 9 },
+  { id: "health_score", labelKey: "settings.sectionHealthScore", category: "analytics", column: "right", enabled: false, order: 10 },
 ];
 
 export const CURRENCIES: { value: Currency; symbol: string }[] = [
@@ -45,6 +45,8 @@ export const DEFAULT_EXCHANGE_RATES: Record<Currency, number> = {
   EUR: 1 / 1300,
 };
 
+export type NavPlusPosition = "auto" | "center" | "right";
+
 export type AppSettings = {
   currency: Currency;
   language: Language;
@@ -57,6 +59,7 @@ export type AppSettings = {
   appTheme?: AppTheme;
   accountViewMode?: "list" | "carousel";
   showDailySubtotals?: boolean;
+  navPlusPosition?: NavPlusPosition;
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -70,5 +73,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   appTheme: "m3",
   accountViewMode: "list",
   showDailySubtotals: false,
+  navPlusPosition: "auto",
 };
 

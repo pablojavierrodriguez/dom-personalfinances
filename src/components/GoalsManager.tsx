@@ -9,6 +9,7 @@ import { calculateGoalPace } from "@/lib/goal-utils";
 import { parseLocalDate, parseThousandsInput } from "@/lib/utils";
 import { MoneyInput } from "@/components/ui/MoneyInput";
 import { usePrivacy } from "@/contexts/PrivacyContext";
+import { generateUUID } from "@/services/sync-queue.service";
 
 interface GoalsManagerProps {
   goals: Goal[];
@@ -44,7 +45,7 @@ export function GoalsManager({ goals, accounts = [], onAdd, onUpdate, onDelete, 
     const parsedTarget = parseThousandsInput(target);
     if (!name || !parsedTarget) return;
     onAdd({
-      id: Date.now().toString(), name, targetAmount: parsedTarget,
+      id: generateUUID(), name, targetAmount: parsedTarget,
       currentAmount: 0, deadline: deadline ? parseLocalDate(deadline) : undefined,
       color, icon, completed: false, createdAt: new Date(),
     });

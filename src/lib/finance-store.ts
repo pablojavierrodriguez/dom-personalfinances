@@ -12,7 +12,7 @@ import { useAuth } from "./auth-context";
 import { useSettings } from "./settings-store";
 import { fetchAccounts, insertAccount, updateAccountRemote, deleteAccountRemote } from "@/services/accounts.service";
 import { fetchCategories, insertCategory, updateCategoryRemote, deleteCategoryRemote, seedDefaultCategoriesRemote } from "@/services/categories.service";
-import { fetchTransactions, insertTransaction, insertTransactionsBatch, updateTransactionRemote, deleteTransactionRemote, deleteTransactionsByGroupIdRemote } from "@/services/transactions.service";
+import { fetchTransactions, insertTransaction, insertTransactionsBatch, updateTransactionRemote, deleteTransactionRemote, deleteTransactionsByGroupIdRemote, isValidUuid } from "@/services/transactions.service";
 import {
   fetchBudgets, insertBudget, updateBudgetRemote, deleteBudgetRemote,
   fetchGoals, insertGoal, updateGoalRemote, deleteGoalRemote,
@@ -32,6 +32,7 @@ import {
   syncPendingGlobalQueue,
   getPendingGlobalSyncCount,
   generateUUID,
+  getGlobalSyncQueue,
 } from "@/services/sync-queue.service";
 
 function loadJSON<T>(key: string, fallback: T): T {
@@ -143,7 +144,34 @@ export function useFinanceStore() {
 
         if (!isMounted) return;
 
-        setAccounts(accs);
+        // Preservar cuentas encoladas pendientes de sincronización para que nunca desaparezcan
+        const pendingAccountOps = getGlobalSyncQueue().filter(op => op.type === "insert_account");
+        const mergedAccs = [...accs];
+        for (const op of pendingAccountOps) {
+          if (op.type === "insert_account" && op.payload) {
+            const p = op.payload;
+            if (!mergedAccs.some(a => a.id === p.id)) {
+              mergedAccs.push({
+                id: p.id,
+                name: p.name,
+                balance: p.balance,
+                type: p.type,
+                color: p.color,
+                icon: p.icon || undefined,
+                archived: p.archived || false,
+                creditLimit: p.creditLimit || undefined,
+                closingDay: p.closingDay || undefined,
+                paymentDay: p.paymentDay || undefined,
+                brand: p.brand || undefined,
+                customBrandName: p.customBrandName || undefined,
+                currency: p.currency || "ARS",
+                creditCardViewMode: p.creditCardViewMode || "statement_cycles",
+              });
+            }
+          }
+        }
+
+        setAccounts(mergedAccs);
         setCategories(cats);
         setBudgets(bds);
         setGoals(gls);
@@ -152,7 +180,7 @@ export function useFinanceStore() {
         setRules(remoteRules);
 
         // Guardar snapshot actualizado en caché local
-        setCachedData(CACHE_KEYS.ACCOUNTS, accs);
+        setCachedData(CACHE_KEYS.ACCOUNTS, mergedAccs);
         setCachedData(CACHE_KEYS.CATEGORIES, cats);
         setCachedData(CACHE_KEYS.BUDGETS, bds);
         setCachedData(CACHE_KEYS.GOALS, gls);
@@ -625,7 +653,7 @@ export function useFinanceStore() {
 
   // ===== CATEGORIES =====
   const addCategory = useCallback((cat: Category) => {
-    const categoryId = cat.id || generateUUID();
+    const categoryId = (cat.id && isValidUuid(cat.id)) ? cat.id : generateUUID();
     const newCat = { ...cat, id: categoryId };
     setCategories(prev => {
       const next = [...prev, newCat];
@@ -734,7 +762,7 @@ export function useFinanceStore() {
 
   // ===== ACCOUNTS =====
   const addAccount = useCallback((account: Account) => {
-    const accountId = account.id || generateUUID();
+    const accountId = (account.id && isValidUuid(account.id)) ? account.id : generateUUID();
     const newAcc = { ...account, id: accountId };
     setAccounts(prev => {
       const next = [...prev, newAcc];
@@ -1027,7 +1055,7 @@ export function useFinanceStore() {
 
   // ===== BUDGETS =====
   const addBudget = useCallback((budget: Budget) => {
-    const budgetId = budget.id || generateUUID();
+    const budgetId = (budget.id && isValidUuid(budget.id)) ? budget.id : generateUUID();
     const newBudget = { ...budget, id: budgetId };
     setBudgets(prev => {
       const next = [...prev, newBudget];
@@ -1102,7 +1130,7 @@ export function useFinanceStore() {
 
   // ===== GOALS =====
   const addGoal = useCallback((goal: Goal) => {
-    const goalId = goal.id || generateUUID();
+    const goalId = (goal.id && isValidUuid(goal.id)) ? goal.id : generateUUID();
     const newGoal = { ...goal, id: goalId };
     setGoals(prev => {
       const next = [newGoal, ...prev];
@@ -1225,7 +1253,7 @@ export function useFinanceStore() {
 
   // ===== BILLS =====
   const addBill = useCallback((bill: BillReminder) => {
-    const billId = bill.id || generateUUID();
+    const billId = (bill.id && isValidUuid(bill.id)) ? bill.id : generateUUID();
     const newBill = { ...bill, id: billId };
     setBills(prev => {
       const next = [...prev, newBill];
@@ -1327,7 +1355,7 @@ export function useFinanceStore() {
 
   // ===== RECURRING TRANSACTIONS =====
   const addRecurringTx = useCallback((rtx: RecurringTransaction) => {
-    const rtxId = rtx.id || generateUUID();
+    const rtxId = (rtx.id && isValidUuid(rtx.id)) ? rtx.id : generateUUID();
     const newRtx = { ...rtx, id: rtxId };
     setRecurringTxs(prev => {
       const next = [...prev, newRtx];
@@ -1472,7 +1500,7 @@ export function useFinanceStore() {
 
   // ===== TAGS =====
   const addTag = useCallback((tag: Tag) => {
-    const tagId = tag.id || generateUUID();
+    const tagId = (tag.id && isValidUuid(tag.id)) ? tag.id : generateUUID();
     const newTag = { ...tag, id: tagId };
     setTags(prev => {
       const updated = [...prev.filter(t => t.id !== tagId), newTag];
@@ -1585,7 +1613,7 @@ export function useFinanceStore() {
 
   // ===== RULES ENGINE (P10) =====
   const addRule = useCallback((rule: TransactionRule) => {
-    const ruleId = rule.id || generateUUID();
+    const ruleId = (rule.id && isValidUuid(rule.id)) ? rule.id : generateUUID();
     const newRule = { ...rule, id: ruleId };
     setRules(prev => {
       const updated = [...prev.filter(r => r.id !== ruleId), newRule];

@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { isValidUuid } from "@/services/transactions.service";
+import { repairNonUuidEntities } from "@/lib/storage-migration";
 
 export const GLOBAL_QUEUE_KEY = "dom-global-sync-queue";
 export const LEGACY_GLOBAL_QUEUE_KEY = "dominus-global-sync-queue";
@@ -341,6 +342,7 @@ export function enqueueGlobalSyncOp(op: GlobalSyncOperation): void {
 }
 
 export async function syncPendingGlobalQueue(): Promise<{ processed: number; remaining: number }> {
+  repairNonUuidEntities();
   const queue = getGlobalSyncQueue();
   if (queue.length === 0) return { processed: 0, remaining: 0 };
 

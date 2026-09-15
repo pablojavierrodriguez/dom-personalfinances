@@ -4,7 +4,7 @@
 
 ## [Unreleased] — En Desarrollo (Próxima Versión)
 
-### 🔍 Auditor de Suscripciones & Detector de Fugas (Épica C3)
+### 🔍 Auditor de Suscripciones & Detector de Fugas
 - **Detección Heurística Autónoma:**
   - Motor de identificación en el historial de transacciones de patrones periódicos y suscripciones mensuales, semanales o anuales con normalización inteligente de nombres bancarios (Netflix, Spotify, ChatGPT, YouTube Premium, abonos y servicios).
 - **Shock Visual y Consciencia Patrimonial:**
@@ -16,7 +16,7 @@
 - **Acceso Omnicanal:**
   - Botón de acceso directo en el encabezado de *Compromisos* (`ObligationsManager`) e integración en la paleta de comandos `Cmd+K`.
 
-### 📥 Ingesta Masiva de Extractos Bancarios & Tarjetas (CSV / Mobills)
+### 📥 Ingesta Masiva de Extractos Bancarios & Tarjetas
 - **Inversión Masiva de Signos en 1-Tap:**
   - Selector ágil para invertir el sentido de débitos y créditos en extractos con signos opuestos habituales en exportaciones de tarjetas de crédito o plataformas como Mobills.
   - Botón de alternancia global en la previsualización interactiva antes de confirmar la carga masiva.
@@ -28,8 +28,13 @@
   - Tipografía tabular monoespaciada en todos los montos para evitar saltos horizontales o parpadeos durante el desplazamiento.
   - Saneamiento del área inferior de desplazamiento respetando las barras de navegación móviles y áreas seguras sin espacios vacíos redundantes.
   - Homogeneización de la escala tipográfica según los estándares del sistema de diseño.
-- **Paridad Bilingüe Total (100% i18n):**
-  - Erradicación completa de textos huérfanos o etiquetas no localizadas en tarjetas de cuentas, selectores de reglas, importador de extractos y auditor de suscripciones, con soporte íntegro en español e inglés.
+### 🛡️ Resiliencia y Auto-Reparación de Sincronización Local / Nube
+- **Garantía Estricta de Identificadores UUID:**
+  - Unificación exhaustiva de la generación de identificadores bajo el estándar UUID v4 en cuentas, tarjetas de crédito, categorías, presupuestos y transacciones, garantizando compatibilidad nativa con las restricciones de tipo en PostgreSQL.
+- **Motor Autónomo de Auto-Rescate de Datos:**
+  - Rutina automática de saneamiento que detecta entidades locales previas con identificadores legados o temporales (`card-*`, `acc-*`), transformándolas deterministamente a UUIDs válidos y actualizando en cadena las referencias foráneas y la cola de sincronización sin pérdida de movimientos para el usuario.
+- **Persistencia Visual en Creación de Cuentas:**
+  - Fusión inmediata de cuentas pendientes de sincronización en el estado de la aplicación, evitando que nuevas cuentas y tarjetas desaparezcan de pantalla mientras se procesan hacia el servidor.
 
 ---
 

@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { generateUUID } from "@/services/sync-queue.service";
 
 interface AccountManagerProps {
   accounts: Account[];
@@ -107,7 +108,7 @@ export function AccountManager({
       });
     } else {
       onAdd({
-        id: `acc-${Date.now()}`,
+        id: generateUUID(),
         name: formName.trim(),
         balance,
         type: formType,

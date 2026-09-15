@@ -7,8 +7,8 @@ import { useSettings } from "@/lib/settings-store";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { calculateBudgetMetrics, calculateSuggestedBudget, calculateEffectiveBudgetAmount } from "@/lib/budget-utils";
-import { formatThousandsInput, parseThousandsInput } from "@/lib/utils";
 import { usePrivacy } from "@/contexts/PrivacyContext";
+import { generateUUID } from "@/services/sync-queue.service";
 
 interface BudgetManagerProps {
   selectedDate?: Date;
@@ -63,7 +63,7 @@ export function BudgetManager({
     }
 
     onAdd({
-      id: Date.now().toString(),
+      id: generateUUID(),
       categoryId: selectedCat,
       amount: parsedLimit,
       month, year,

@@ -27,9 +27,11 @@ export function DOMSymbol({
   className = "",
   idSuffix = "",
 }: DOMSymbolProps) {
+  const reactId = React.useId().replace(/[:]/g, "");
+  const uid = idSuffix || reactId;
   const pixelSize = typeof size === "number" ? size : SIZE_MAP[size] || 32;
-  const gradId   = `dg${idSuffix ? `-${idSuffix}` : ""}`;
-  const bgId     = `db${idSuffix ? `-${idSuffix}` : ""}`;
+  const gradId   = `dg-${uid}`;
+  const bgId     = `db-${uid}`;
 
   const isGold  = variant === "gold";
   const isMono  = variant === "monochrome";

@@ -32,17 +32,17 @@ export function PwaInstallPrompt() {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-gradient-to-r from-card to-secondary/30 border border-border/80 rounded-2xl shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-            <Smartphone className="w-5 h-5 text-primary" />
+      <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-card/75 backdrop-blur-sm border border-border/50 rounded-2xl shadow-xs transition-all">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+          <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 shadow-xs">
+            <Smartphone className="w-4 h-4 text-primary" />
           </div>
-          <div>
-            <h4 className="text-sm font-semibold text-foreground">
+          <div className="min-w-0 flex-1">
+            <h4 className="text-xs sm:text-sm font-semibold text-foreground truncate">
               {t("pwa.installTitle") || "Instalar DOM en tu teléfono"}
             </h4>
-            <p className="text-xs text-muted-foreground">
-              {t("pwa.installSubtitle") || "Tu dinero. Tu mente. Tu control. Acceso en 1 toque, pantalla completa y offline."}
+            <p className="text-[11px] text-muted-foreground truncate sm:line-clamp-1">
+              {t("pwa.installSubtitle") || "Acceso instantáneo, pantalla completa y modo offline."}
             </p>
           </div>
         </div>
@@ -50,10 +50,10 @@ export function PwaInstallPrompt() {
         <Button
           size="sm"
           onClick={handleInstallClick}
-          className="w-full sm:w-auto h-10 px-4 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium theme-pill-btn shadow transition-all active:scale-[0.98]"
+          className="h-8 px-3 text-xs gap-1.5 shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg shadow-xs transition-all active:scale-[0.98]"
         >
-          <Download className="w-4 h-4" />
-          <span>{t("pwa.installButton") || "Instalar App"}</span>
+          <Download className="w-3.5 h-3.5" />
+          <span>{t("pwa.installButton") || "Instalar"}</span>
         </Button>
       </div>
 

@@ -45,6 +45,10 @@ const translations = {
     "nav.today": "Hoy",
     "nav.customizeDashboard": "Personalizar Dashboard",
     "nav.logout": "Cerrar sesión",
+    "nav.sectionPlanning": "Finanzas & Planificación",
+    "nav.sectionTools": "Herramientas & Automatización",
+    "nav.sectionSystem": "Cuenta & Ajustes",
+    "nav.mobileAriaLabel": "Navegación principal móvil",
 
     // Command Palette (⌘K)
     "command.placeholder": "Buscar vistas, transacciones, cuentas o acciones...",
@@ -337,11 +341,17 @@ const translations = {
     "theme.cobaltFlow.subtitle": "Azul marino suizo & Precisión arquitectónica",
     "theme.cobaltFlow.trait": "Estructurado",
     "theme.styleLabel": "Estilo",
+    "theme.navCenter": "Navbar: (+) al centro",
+    "theme.navRight": "Navbar: (+) a la derecha",
 
     // Layout & Display
     "settings.accountLayout": "Disposición de Cuentas",
     "settings.accountLayoutList": "Lista ordenada",
     "settings.accountLayoutCarousel": "Carrusel compacto",
+    "settings.navPlusPosition": "Posición del botón (+)",
+    "settings.navPlusAuto": "Según el tema",
+    "settings.navPlusCenter": "Centro (Simétrico)",
+    "settings.navPlusRight": "Derecha (Flotante)",
     "settings.dailySubtotals": "Subtotales diarios en historial",
     "settings.widgetsActive": "widgets activos",
     "settings.moreWidgets": "más",
@@ -1320,6 +1330,10 @@ const translations = {
     "nav.today": "Today",
     "nav.customizeDashboard": "Customize Dashboard",
     "nav.logout": "Log out",
+    "nav.sectionPlanning": "Finances & Planning",
+    "nav.sectionTools": "Tools & Automation",
+    "nav.sectionSystem": "Account & Settings",
+    "nav.mobileAriaLabel": "Mobile main navigation",
 
     // Command Palette (⌘K)
     "command.placeholder": "Search views, transactions, accounts or actions...",
@@ -1612,11 +1626,17 @@ const translations = {
     "theme.cobaltFlow.subtitle": "Swiss navy blue & architectural precision",
     "theme.cobaltFlow.trait": "Structured",
     "theme.styleLabel": "Style",
+    "theme.navCenter": "Navbar: (+) centered",
+    "theme.navRight": "Navbar: (+) on the right",
 
     // Layout & Display
     "settings.accountLayout": "Account Layout",
     "settings.accountLayoutList": "Ordered list",
     "settings.accountLayoutCarousel": "Compact carousel",
+    "settings.navPlusPosition": "(+) Button Position",
+    "settings.navPlusAuto": "Follow theme",
+    "settings.navPlusCenter": "Center (Symmetric)",
+    "settings.navPlusRight": "Right (Floating)",
     "settings.dailySubtotals": "Daily subtotals in history",
     "settings.widgetsActive": "active widgets",
     "settings.moreWidgets": "more",

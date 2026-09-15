@@ -135,5 +135,205 @@ export function runStorageMigration(): { migratedCount: number; errorCount: numb
     }
   }
 
+  const repairResult = repairNonUuidEntities();
+  if (repairResult.repairedAccounts > 0 || repairResult.repairedTxs > 0 || repairResult.repairedOps > 0) {
+    console.info("[DOM Storage] Auto-reparación de entidades no-UUID completada:", repairResult);
+  }
+
   return { migratedCount, errorCount };
+}
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function isValidUuid(id?: string | null): boolean {
+  return typeof id === "string" && UUID_REGEX.test(id);
+}
+
+export function generateUUID(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+/**
+ * Escanea y auto-repara cuentas, transacciones y colas de sincronización
+ * que contengan IDs no-UUID (como card-*, acc-*, o timestamps numéricos).
+ * Mapea deterministamente cada ID obsoleto a un UUID v4 legítimo para
+ * evitar rechazos de sintaxis de tipo UUID ('22P02') en Supabase/PostgreSQL.
+ */
+export function repairNonUuidEntities(): { repairedAccounts: number; repairedTxs: number; repairedOps: number } {
+  if (typeof window === "undefined" || !window.localStorage) {
+    return { repairedAccounts: 0, repairedTxs: 0, repairedOps: 0 };
+  }
+
+  let repairedAccounts = 0;
+  let repairedTxs = 0;
+  let repairedOps = 0;
+
+  const idMap = new Map<string, string>();
+
+  // 1. Escanear cachés de cuentas
+  const accountKeys = ["dom-cache-accounts", "dom-accounts", "dominus-cache-accounts", "impero-cache-accounts"];
+  for (const accKey of accountKeys) {
+    try {
+      const raw = localStorage.getItem(accKey);
+      if (!raw) continue;
+      const accounts = JSON.parse(raw);
+      if (!Array.isArray(accounts)) continue;
+
+      let changed = false;
+      const updatedAccounts = accounts.map((acc: any) => {
+        if (acc && acc.id && !isValidUuid(acc.id)) {
+          if (!idMap.has(acc.id)) {
+            idMap.set(acc.id, generateUUID());
+          }
+          const newId = idMap.get(acc.id)!;
+          changed = true;
+          repairedAccounts++;
+          return { ...acc, id: newId };
+        }
+        return acc;
+      });
+
+      if (changed) {
+        localStorage.setItem(accKey, JSON.stringify(updatedAccounts));
+      }
+    } catch (e) {
+      console.warn(`[repairNonUuidEntities] Error reparando cuentas en ${accKey}:`, e);
+    }
+  }
+
+  // 2. Escanear la cola de sincronización global
+  const queueKeys = ["dom-global-sync-queue", "dominus-global-sync-queue", "impero-global-sync-queue"];
+  for (const qKey of queueKeys) {
+    try {
+      const raw = localStorage.getItem(qKey);
+      if (!raw) continue;
+      const queue = JSON.parse(raw);
+      if (!Array.isArray(queue)) continue;
+
+      let changed = false;
+      const updatedQueue = queue.map((op: any) => {
+        if (!op) return op;
+
+        // Inserción de cuenta con id corrupto
+        if (op.type === "insert_account" && op.payload) {
+          const oldId = op.payload.id;
+          if (oldId && !isValidUuid(oldId)) {
+            if (!idMap.has(oldId)) {
+              idMap.set(oldId, generateUUID());
+            }
+            const newId = idMap.get(oldId)!;
+            changed = true;
+            repairedOps++;
+            return {
+              ...op,
+              payload: { ...op.payload, id: newId },
+            };
+          }
+        }
+
+        // Actualización de cuenta o balance con id corrupto
+        if ((op.type === "update_account_balance" || op.type === "update_account" || op.type === "delete_account") && op.id) {
+          if (idMap.has(op.id) || !isValidUuid(op.id)) {
+            if (!idMap.has(op.id)) {
+              idMap.set(op.id, generateUUID());
+            }
+            const newId = idMap.get(op.id)!;
+            changed = true;
+            repairedOps++;
+            return { ...op, id: newId };
+          }
+        }
+
+        // Transacciones asociadas a cuenta corrupta
+        if ((op.type === "insert_transaction" || op.type === "update_transaction") && op.payload) {
+          let txModified = false;
+          let newPayload = { ...op.payload };
+
+          const oldAccId = op.payload.accountId;
+          if (oldAccId && (idMap.has(oldAccId) || !isValidUuid(oldAccId))) {
+            if (!idMap.has(oldAccId)) {
+              idMap.set(oldAccId, generateUUID());
+            }
+            newPayload.accountId = idMap.get(oldAccId)!;
+            txModified = true;
+          }
+
+          if (op.type === "insert_transaction" && op.payload.id && !isValidUuid(op.payload.id)) {
+            newPayload.id = generateUUID();
+            txModified = true;
+          }
+
+          if (txModified) {
+            changed = true;
+            repairedOps++;
+            return {
+              ...op,
+              payload: newPayload,
+            };
+          }
+        }
+
+        return op;
+      });
+
+      if (changed) {
+        localStorage.setItem(qKey, JSON.stringify(updatedQueue));
+      }
+    } catch (e) {
+      console.warn(`[repairNonUuidEntities] Error reparando cola de sync en ${qKey}:`, e);
+    }
+  }
+
+  // 3. Escanear cachés de transacciones
+  const txKeys = ["dom-cache-transactions", "dom-transactions", "dominus-cache-transactions", "impero-cache-transactions"];
+  for (const txKey of txKeys) {
+    try {
+      const raw = localStorage.getItem(txKey);
+      if (!raw) continue;
+      const txs = JSON.parse(raw);
+      if (!Array.isArray(txs)) continue;
+
+      let changed = false;
+      const updatedTxs = txs.map((tx: any) => {
+        if (!tx) return tx;
+        let modified = false;
+        let newTx = { ...tx };
+
+        if (tx.accountId && (idMap.has(tx.accountId) || !isValidUuid(tx.accountId))) {
+          if (!idMap.has(tx.accountId)) {
+            idMap.set(tx.accountId, generateUUID());
+          }
+          newTx.accountId = idMap.get(tx.accountId)!;
+          modified = true;
+        }
+
+        if (tx.id && !isValidUuid(tx.id)) {
+          newTx.id = generateUUID();
+          modified = true;
+        }
+
+        if (modified) {
+          changed = true;
+          repairedTxs++;
+          return newTx;
+        }
+        return tx;
+      });
+
+      if (changed) {
+        localStorage.setItem(txKey, JSON.stringify(updatedTxs));
+      }
+    } catch (e) {
+      console.warn(`[repairNonUuidEntities] Error reparando transacciones en ${txKey}:`, e);
+    }
+  }
+
+  return { repairedAccounts, repairedTxs, repairedOps };
 }

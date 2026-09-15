@@ -64,15 +64,12 @@ export function BalanceHeader({
     return convert(monthlyExpenses, "ARS", currentCurrency);
   }, [transactions, calculateConsolidatedTransactions, currentCurrency, accountsMap, monthlyExpenses, convert]);
 
-  const delta = effectiveIncome - effectiveExpenses;
-
   // Curvas de tendencia acumulada para los sparklines de fondo
-  const { incomePoints, expensePoints, deltaPoints } = useMemo(() => {
+  const { incomePoints, expensePoints } = useMemo(() => {
     if (transactions.length === 0) {
       return {
         incomePoints: [0, 0, 0, 0, 0],
         expensePoints: [0, 0, 0, 0, 0],
-        deltaPoints: [0, 0, 0, 0, 0],
       };
     }
 
@@ -100,7 +97,6 @@ export function BalanceHeader({
       return {
         incomePoints: [0, 0, 0],
         expensePoints: [0, 0, 0],
-        deltaPoints: [0, 0, 0],
       };
     }
 
@@ -108,7 +104,6 @@ export function BalanceHeader({
     let runningExp = 0;
     const incSeries: number[] = [0];
     const expSeries: number[] = [0];
-    const deltaSeries: number[] = [0];
 
     for (const day of sortedDays) {
       const val = daysMap.get(day)!;
@@ -116,13 +111,11 @@ export function BalanceHeader({
       runningExp += val.exp;
       incSeries.push(runningInc);
       expSeries.push(runningExp);
-      deltaSeries.push(runningInc - runningExp);
     }
 
     return {
       incomePoints: incSeries,
       expensePoints: expSeries,
-      deltaPoints: deltaSeries,
     };
   }, [transactions, accountsMap, convert, currentCurrency]);
 
@@ -136,7 +129,7 @@ export function BalanceHeader({
   };
 
   return (
-    <div className="px-4 pt-3 pb-2">
+    <div className="px-4 pt-0 pb-1">
       <div className="hero-balance-surface p-4 sm:p-5 relative overflow-hidden">
         {/* Glow de fondo temático en esquina superior derecha */}
         <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
@@ -214,64 +207,40 @@ export function BalanceHeader({
           )}
         </div>
 
-        {/* Cápsulas Sensoriales de Métricas (Ingresos / Gastos / Resultado) */}
-        <div className="grid grid-cols-3 gap-2 relative z-10 pt-2 border-t border-border/40">
+        {/* Cápsulas de Métricas (Ingresos y Gastos) */}
+        <div className="grid grid-cols-2 gap-2.5 relative z-10 pt-2 border-t border-border/40">
           {/* Ingresos */}
-          <div className="relative overflow-hidden flex flex-col justify-between p-2 theme-pill-btn bg-secondary/40 border border-border/30">
-            <div className="absolute inset-x-0 bottom-0 h-6.5 opacity-40 pointer-events-none">
+          <div className="relative overflow-hidden flex flex-col justify-between p-3 rounded-xl bg-secondary/40 border border-border/30">
+            <div className="absolute inset-x-0 bottom-0 h-7 opacity-40 pointer-events-none">
               <DashboardSparkline data={incomePoints} color="hsl(var(--primary))" gradientId="spark-income" />
             </div>
             <div className="relative z-10">
-              <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium mb-0.5">
+              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium mb-1">
                 <div className="w-3.5 h-3.5 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                   <TrendingUp className="w-2.5 h-2.5 text-primary" />
                 </div>
                 <span className="truncate">{t("balance.income")}</span>
               </div>
-              <span className="font-mono-data text-[12px] sm:text-[13px] font-semibold text-primary truncate block">
+              <span className="font-mono-data text-sm sm:text-base font-semibold text-primary truncate block tabular-nums">
                 {!isPrivacyMode ? `+${formatInCurrency(effectiveIncome, currentCurrency)}` : HIDDEN}
               </span>
             </div>
           </div>
 
           {/* Gastos */}
-          <div className="relative overflow-hidden flex flex-col justify-between p-2 theme-pill-btn bg-secondary/40 border border-border/30">
-            <div className="absolute inset-x-0 bottom-0 h-6.5 opacity-40 pointer-events-none">
+          <div className="relative overflow-hidden flex flex-col justify-between p-3 rounded-xl bg-secondary/40 border border-border/30">
+            <div className="absolute inset-x-0 bottom-0 h-7 opacity-40 pointer-events-none">
               <DashboardSparkline data={expensePoints} color="hsl(var(--destructive))" gradientId="spark-expenses" />
             </div>
             <div className="relative z-10">
-              <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium mb-0.5">
+              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium mb-1">
                 <div className="w-3.5 h-3.5 rounded-full bg-destructive/20 flex items-center justify-center shrink-0">
                   <TrendingDown className="w-2.5 h-2.5 text-destructive" />
                 </div>
                 <span className="truncate">{t("balance.expenses")}</span>
               </div>
-              <span className="font-mono-data text-[12px] sm:text-[13px] font-semibold text-foreground truncate block">
+              <span className="font-mono-data text-sm sm:text-base font-semibold text-foreground truncate block tabular-nums">
                 {!isPrivacyMode ? `-${formatInCurrency(effectiveExpenses, currentCurrency)}` : HIDDEN}
-              </span>
-            </div>
-          </div>
-
-          {/* Delta / Saldo del Mes */}
-          <div className="relative overflow-hidden flex flex-col justify-between p-2 theme-pill-btn bg-secondary/40 border border-border/30">
-            <div className="absolute inset-x-0 bottom-0 h-6.5 opacity-40 pointer-events-none">
-              <DashboardSparkline
-                data={deltaPoints}
-                color={delta >= 0 ? "hsl(var(--primary))" : "hsl(var(--destructive))"}
-                gradientId="spark-delta"
-              />
-            </div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium mb-0.5">
-                <div className={`w-3.5 h-3.5 rounded-full ${delta >= 0 ? "bg-primary/20" : "bg-destructive/20"} flex items-center justify-center shrink-0`}>
-                  <span className={`text-[9px] font-bold ${delta >= 0 ? "text-primary" : "text-destructive"}`}>Δ</span>
-                </div>
-                <span className="truncate">{t("balance.delta")}</span>
-              </div>
-              <span className={`font-mono-data text-[12px] sm:text-[13px] font-semibold truncate block ${delta >= 0 ? "text-primary" : "text-destructive"}`}>
-                {!isPrivacyMode
-                  ? `${delta >= 0 ? "+" : "-"}${formatInCurrency(Math.abs(delta), currentCurrency)}`
-                  : HIDDEN}
               </span>
             </div>
           </div>

@@ -10,6 +10,7 @@ import { useCurrencyConversion } from "@/hooks/useCurrencyConversion";
 import { formatThousandsInput, parseThousandsInput } from "@/lib/utils";
 import { MoneyInput } from "@/components/ui/MoneyInput";
 import { usePrivacy } from "@/contexts/PrivacyContext";
+import { generateUUID } from "@/services/sync-queue.service";
 
 interface CreditCardManagerProps {
   accounts: Account[];
@@ -142,7 +143,7 @@ export function CreditCardManager({
     } else {
       const balance = -Math.abs(parseThousandsInput(formBalance) || 0);
       onAdd({
-        id: `card-${Date.now()}`,
+        id: generateUUID(),
         name: formName.trim(),
         balance,
         type: "credit",

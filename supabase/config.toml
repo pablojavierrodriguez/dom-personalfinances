@@ -268,12 +268,12 @@ content_path = "./supabase/templates/change_email.html"
 [auth.email.notification.email_changed]
 enabled = true
 subject = "📫 Tu correo en DOM ha sido actualizado"
-content_path = "./supabase/templates/email_changed_notification.html"
+content_path = "./templates/email_changed_notification.html"
 
 [auth.email.notification.password_changed]
 enabled = true
 subject = "🔐 Tu contraseña de DOM ha sido cambiada"
-content_path = "./supabase/templates/password_changed_notification.html"
+content_path = "./templates/password_changed_notification.html"
 
 
 [auth.sms]

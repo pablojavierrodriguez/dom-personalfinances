@@ -1,5 +1,6 @@
 import { Transaction, Category, CATEGORIES, Currency } from "./types";
 import { applyRulesToTransaction, TransactionRule, DraftTransactionInput } from "./rules-engine";
+import { generateUUID } from "@/services/sync-queue.service";
 
 export interface CsvRow {
   [key: string]: string;
@@ -746,7 +747,7 @@ export function rowsToTransactions(
     }
 
     return {
-      id: `import-${Date.now()}-${i}`,
+      id: generateUUID(),
       amount: evaluated.amount,
       description: evaluated.description,
       category: finalCategory,

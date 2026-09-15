@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Account, AccountType, CreditCardBrand } from "@/lib/types";
 import { Database } from "@/integrations/supabase/types";
+import { isValidUuid } from "@/services/transactions.service";
 
 type AccountUpdate = Database["public"]["Tables"]["accounts"]["Update"];
 
@@ -54,7 +55,7 @@ export async function insertAccount(acc: Omit<Account, "id"> & { id?: string }):
     currency: acc.currency || "ARS",
     credit_card_view_mode: acc.creditCardViewMode || "statement_cycles",
   };
-  if (acc.id) insertPayload.id = acc.id;
+  if (acc.id && isValidUuid(acc.id)) insertPayload.id = acc.id;
 
   const { data, error } = await supabase
     .from("accounts")

@@ -117,12 +117,12 @@ export function AccountCards({ accounts, onSelectAccount, onAddAccount }: Accoun
                 className="card-surface cursor-pointer active:scale-[0.99] transition-transform w-full"
               >
                 <div className="card-inner p-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className={`w-9 h-9 theme-pill-btn ${account.color} flex items-center justify-center shrink-0 shadow-xs text-white`}>
                       <CategoryIcon name={account.icon || (isCredit ? "credit-card" : "wallet")} className="w-4 h-4 text-white" />
                     </div>
-                    <div className="min-w-0">
-                      <span className="text-[14px] text-foreground font-semibold truncate block leading-snug">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-sm text-foreground font-semibold truncate block leading-snug">
                         {account.name}
                       </span>
                       <span className="text-xs text-muted-foreground capitalize block leading-tight">
@@ -142,7 +142,7 @@ export function AccountCards({ accounts, onSelectAccount, onAddAccount }: Accoun
                       <span className="text-[10px] font-mono-data font-semibold px-1.5 py-0.5 theme-pill-btn bg-secondary text-muted-foreground">
                         {accCurrency}
                       </span>
-                      <span className={`font-mono-data text-[16px] font-semibold tracking-tight ${account.balance < 0 ? "text-destructive" : "text-foreground"}`}>
+                      <span className={`font-mono-data text-sm font-semibold tracking-tight ${account.balance < 0 ? "text-destructive" : "text-foreground"}`}>
                         {maskAmount(formatInCurrency(account.balance, accCurrency))}
                       </span>
                     </div>
@@ -202,7 +202,7 @@ export function AccountCards({ accounts, onSelectAccount, onAddAccount }: Accoun
                       <span className="text-xs text-muted-foreground block leading-tight">
                         {isCredit ? t("acct.balanceOwed") : (t("balance.title") || "Balance")}
                       </span>
-                      <span className={`font-mono-data text-[16px] font-semibold tracking-tight ${account.balance < 0 ? "text-destructive" : "text-foreground"}`}>
+                      <span className={`font-mono-data text-sm font-semibold tracking-tight ${account.balance < 0 ? "text-destructive" : "text-foreground"}`}>
                         {maskAmount(formatInCurrency(account.balance, accCurrency))}
                       </span>
                     </div>

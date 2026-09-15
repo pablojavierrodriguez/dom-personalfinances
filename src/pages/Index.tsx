@@ -386,18 +386,20 @@ const Index = ({ initialTab }: IndexProps = {}) => {
         pendingBillsCount={pendingBillsCount}
       />
       <div className="flex-1 w-full min-w-0 max-w-2xl mx-auto relative pb-32 md:pb-6 md:px-6 md:max-w-5xl lg:max-w-6xl md:h-screen md:overflow-y-auto overflow-x-hidden">
-        {/* Mobile Search Bar Trigger Header */}
-        <div className="md:hidden px-4 pt-3 pb-1">
-          <button
-            type="button"
-            onClick={() => setCommandMenuOpen(true)}
-            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-secondary/50 border border-border/40 text-xs text-muted-foreground active:scale-[0.99] transition-all shadow-xs"
-            aria-label={t("nav.searchOrCommand") || "Buscar o ejecutar comando"}
-          >
-            <Search className="w-3.5 h-3.5 text-primary shrink-0" />
-            <span className="truncate">{t("nav.searchOrCommand") || "Buscar transacciones, cuentas o acciones..."}</span>
-          </button>
-        </div>
+        {/* Mobile Search Bar Trigger Header - Solo en Dashboard */}
+        {activeTab === "dashboard" && (
+          <div className="md:hidden px-4 pt-3 pb-1">
+            <button
+              type="button"
+              onClick={() => setCommandMenuOpen(true)}
+              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-secondary/50 border border-border/40 text-xs text-muted-foreground active:scale-[0.99] transition-all shadow-xs"
+              aria-label={t("nav.searchOrCommand") || "Buscar o ejecutar comando"}
+            >
+              <Search className="w-3.5 h-3.5 text-primary shrink-0" />
+              <span className="truncate">{t("nav.searchOrCommand") || "Buscar transacciones, cuentas o acciones..."}</span>
+            </button>
+          </div>
+        )}
 
       <PullToRefresh onRefresh={store.refetchData}>
         <AnimatePresence mode="wait">
@@ -561,9 +563,9 @@ const Index = ({ initialTab }: IndexProps = {}) => {
               <div className="space-y-4">
                 <div className="md:grid md:grid-cols-2 md:gap-6 md:pt-4">
                   {/* Columna Izquierda / Principal */}
-                  <div className="space-y-4">
+                  <div className="space-y-2.5">
                     {/* Selector de Mes Global (< Mes Año >) */}
-                    <div className="px-4 pt-2 pb-2">
+                    <div className="px-4 pt-1 pb-0">
                       <MonthSelector
                         currentDate={selectedDate}
                         onChangeDate={setSelectedDate}
