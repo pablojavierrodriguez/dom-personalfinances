@@ -30,12 +30,10 @@ A diferencia de aplicaciones comerciales cerradas (**Mobills**, **Wallet by Budg
 
 1. **Crear base de datos en Supabase (Gratis):**
    - Creá una cuenta en [supabase.com](https://supabase.com) y un nuevo proyecto.
-   - En el **SQL Editor** de tu proyecto Supabase, ejecutá el script consolidado:
+   - En el **SQL Editor** de tu proyecto Supabase, ejecutá el esquema consolidado:
      ```sql
-     -- Copiar y pegar el contenido de:
-     supabase/releases/release_v1.0.0_core_foundation.sql
-     -- Luego ejecutar el delta de features:
-     supabase/releases/release_v1.1.0_ai_whatsapp_and_multicurrency.sql
+     -- Copiar y pegar el contenido completo de:
+     supabase/migrations/00000000000000_schema_foundation.sql
      ```
    - Obtené tu **Project URL** y **anon/public API key** desde *Project Settings -> API*.
 

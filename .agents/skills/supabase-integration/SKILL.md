@@ -99,8 +99,7 @@ supabase/
 │   ├── 00000000000000_schema_foundation.sql   ← FUENTE DE VERDAD: esquema completo consolidado
 │   ├── delta/                                  ← Deltas para aplicar en Supabase Cloud (sin borrar datos)
 │   │   └── YYYYMMDD_<nombre>.sql
-│   └── archive/                                ← Histórico de migraciones anteriores (solo referencia)
-├── releases/                                   ← Resúmenes por versión de producto
+│   └── archive/                                ← Histórico de migraciones y snapshots legados
 └── snippets/                                   ← Scripts utilitarios puntuales (no son migraciones)
 ```
 

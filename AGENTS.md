@@ -133,9 +133,8 @@
 - **Taxonomía y Organización de `supabase/`:**
   - `migrations/00000000000000_schema_foundation.sql`: **Única fuente de verdad** del esquema completo para desarrollo local e inicialización determinista (`supabase db reset`). Prohibido crear migraciones parche para el entorno local.
   - `migrations/delta/YYYYMMDD_<nombre>.sql`: Deltas SQL idempotentes exclusivos para aplicar en Supabase Cloud / Producción.
-  - `migrations/archive/`: Migraciones históricas previas a la consolidación (solo referencia histórica, no se ejecutan).
+  - `migrations/archive/`: Migraciones históricas previas a la consolidación y snapshots legados (`archive/releases/`) (solo referencia histórica, no se ejecutan).
   - `seed.sql`: Datos semilla oficiales para desarrollo local.
-  - `releases/`: Snapshots y documentación de esquemas consolidados por versión de producto.
   - `functions/`: Edge Functions en Deno (`Deno.serve`).
   - `templates/`: Plantillas HTML oficiales de correos transaccionales y Auth.
   - `snippets/`: Scripts utilitarios puntuales, nombrados y documentados (ej: `clear_seed_data.sql`).
